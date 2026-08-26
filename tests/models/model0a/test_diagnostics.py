@@ -11,7 +11,8 @@ examples. They are not `STATE_PARAMETER_VALUES` nor a
 import numpy as np
 import pytest
 
-from cosmotgg.core.modular import hermitian_log
+from cosmotgg.core.information import log_density_difference, mutual_information
+from cosmotgg.core.modular import finite_connes_cocycle, hermitian_log
 from cosmotgg.core.states import partial_trace
 from cosmotgg.models.model0a.diagnostics import (
     log_commutator_obstruction,
@@ -227,3 +228,141 @@ def test_ordinary_group_defect_rejects_bad_s1(bad_s):
 def test_ordinary_group_defect_rejects_bad_s2(bad_s):
     with pytest.raises(ValueError):
         ordinary_group_defect(_n2_state(), S1, bad_s, **_diagnostics_kwargs())
+
+
+# ---------------------------------------------------------------------------
+# Local product-unitary covariance: U = U_A (x) U_B, rho' = U rho U^dagger.
+#
+# Scope note (do not generalize): this covers ONLY local product
+# unitaries U_A (x) U_B, i.e. a change of basis within each of H_A, H_B
+# separately, preserving the A|B tensor-factorization itself. It says
+# nothing about an arbitrary global/entangling unitary, which can change
+# the very notion of the A/B subsystems relative to which rho_A, rho_B,
+# sigma_AB are defined; that broader claim is explicitly NOT tested here.
+# ---------------------------------------------------------------------------
+
+# NON_NORMATIVE_TEST_FIXTURE: deterministic, explicitly unitary 2x2
+# matrices with no privileged physical status, used only to leave the
+# canonical |00>,|01>,|10>,|11> basis for this covariance check.
+_SQRT2 = np.sqrt(2.0)
+U_A = (1.0 / _SQRT2) * np.array([[1.0, 1.0], [1.0, -1.0]], dtype=complex)
+U_B = (1.0 / _SQRT2) * np.array([[1.0, 1.0j], [1.0j, 1.0]], dtype=complex)
+U = np.kron(U_A, U_B)
+
+# NON_NORMATIVE_TEST_FIXTURE: modular-parameter values used only for this
+# covariance check (not a MODULAR_PARAMETER_DOMAIN).
+S_COCYCLE = 0.4
+
+
+def test_local_unitary_fixtures_are_actually_unitary():
+    assert np.allclose(U_A.conj().T @ U_A, np.eye(2), atol=1e-10)
+    assert np.allclose(U_B.conj().T @ U_B, np.eye(2), atol=1e-10)
+    assert np.allclose(U.conj().T @ U, np.eye(4), atol=1e-10)
+
+
+def _apply_local_unitary(matrix):
+    """Test-only helper: `U @ matrix @ U.conj().T` for the fixture `U` above."""
+    return U @ matrix @ U.conj().T
+
+
+STATE_FACTORIES = [_n0_state, _n1_state, _n2_state]
+STATE_FACTORY_IDS = ["N0", "N1", "N2"]
+
+
+@pytest.mark.parametrize("state_factory", STATE_FACTORIES, ids=STATE_FACTORY_IDS)
+def test_cov1_reference_state_transforms_covariantly(state_factory):
+    rho = state_factory()
+    sigma = model0a_reference_state(rho)
+
+    rho_transformed = _apply_local_unitary(rho)
+    sigma_transformed = model0a_reference_state(rho_transformed)
+
+    assert np.allclose(sigma_transformed, _apply_local_unitary(sigma), atol=1e-8)
+
+
+@pytest.mark.parametrize("state_factory", STATE_FACTORIES, ids=STATE_FACTORY_IDS)
+def test_cov2_mutual_information_is_locally_invariant(state_factory):
+    rho = state_factory()
+    rho_transformed = _apply_local_unitary(rho)
+
+    mutual_info = mutual_information(rho, dimensions=DIMENSIONS, **_diagnostics_kwargs())
+    mutual_info_transformed = mutual_information(
+        rho_transformed, dimensions=DIMENSIONS, **_diagnostics_kwargs()
+    )
+
+    assert np.isclose(mutual_info_transformed, mutual_info, atol=1e-8)
+
+
+@pytest.mark.parametrize("state_factory", STATE_FACTORIES, ids=STATE_FACTORY_IDS)
+def test_cov3_log_density_difference_transforms_covariantly(state_factory):
+    rho = state_factory()
+    sigma = model0a_reference_state(rho)
+    r_ab = log_density_difference(rho, sigma, **_diagnostics_kwargs())
+
+    rho_transformed = _apply_local_unitary(rho)
+    sigma_transformed = model0a_reference_state(rho_transformed)
+    r_ab_transformed = log_density_difference(
+        rho_transformed, sigma_transformed, **_diagnostics_kwargs()
+    )
+
+    assert np.allclose(r_ab_transformed, _apply_local_unitary(r_ab), atol=1e-8)
+
+
+@pytest.mark.parametrize("state_factory", STATE_FACTORIES, ids=STATE_FACTORY_IDS)
+def test_cov4_finite_connes_cocycle_transforms_covariantly(state_factory):
+    rho = state_factory()
+    sigma = model0a_reference_state(rho)
+    v_s = finite_connes_cocycle(rho, sigma, S_COCYCLE, **_diagnostics_kwargs())
+
+    rho_transformed = _apply_local_unitary(rho)
+    sigma_transformed = model0a_reference_state(rho_transformed)
+    v_s_transformed = finite_connes_cocycle(
+        rho_transformed, sigma_transformed, S_COCYCLE, **_diagnostics_kwargs()
+    )
+
+    assert np.allclose(v_s_transformed, _apply_local_unitary(v_s), atol=1e-8)
+
+
+@pytest.mark.parametrize("state_factory", STATE_FACTORIES, ids=STATE_FACTORY_IDS)
+def test_cov5_log_commutator_obstruction_transforms_covariantly(state_factory):
+    rho = state_factory()
+    c_ab = log_commutator_obstruction(rho, **_diagnostics_kwargs())
+
+    rho_transformed = _apply_local_unitary(rho)
+    c_ab_transformed = log_commutator_obstruction(rho_transformed, **_diagnostics_kwargs())
+
+    assert np.allclose(c_ab_transformed, _apply_local_unitary(c_ab), atol=1e-8)
+
+
+@pytest.mark.parametrize("state_factory", STATE_FACTORIES, ids=STATE_FACTORY_IDS)
+def test_cov6_ordinary_group_defect_transforms_covariantly(state_factory):
+    rho = state_factory()
+    g = ordinary_group_defect(rho, S1, S2, **_diagnostics_kwargs())
+
+    rho_transformed = _apply_local_unitary(rho)
+    g_transformed = ordinary_group_defect(rho_transformed, S1, S2, **_diagnostics_kwargs())
+
+    assert np.allclose(g_transformed, _apply_local_unitary(g), atol=1e-8)
+
+
+def test_cov7_n0_classification_preserved_under_local_unitary():
+    rho_transformed = _apply_local_unitary(_n0_state())
+    sigma_transformed = model0a_reference_state(rho_transformed)
+    assert np.allclose(rho_transformed, sigma_transformed, atol=1e-8)
+
+
+def test_cov7_n1_classification_preserved_under_local_unitary():
+    rho_transformed = _apply_local_unitary(_n1_state())
+    sigma_transformed = model0a_reference_state(rho_transformed)
+
+    assert not np.allclose(rho_transformed, sigma_transformed, atol=1e-8)
+    commutator = rho_transformed @ sigma_transformed - sigma_transformed @ rho_transformed
+    assert np.allclose(commutator, ZERO_4X4, atol=1e-8)
+
+
+def test_cov7_n2_classification_preserved_under_local_unitary():
+    rho_transformed = _apply_local_unitary(_n2_state())
+    sigma_transformed = model0a_reference_state(rho_transformed)
+
+    commutator = rho_transformed @ sigma_transformed - sigma_transformed @ rho_transformed
+    assert not np.allclose(commutator, ZERO_4X4, atol=1e-8)
