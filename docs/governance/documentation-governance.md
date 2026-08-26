@@ -1,0 +1,181 @@
+# Gouvernance normative de la documentation
+
+Statut : **gelé**
+
+Ce document définit l'architecture documentaire normative du dépôt `cosmotgg`.
+
+## 1. Principe
+
+Une information normative possède une seule source de vérité principale. Les index, README, décisions et fichiers de compatibilité peuvent la résumer ou y renvoyer, mais ne doivent pas maintenir une définition divergente.
+
+Le code implémente les documents normatifs. Il ne redéfinit jamais silencieusement une convention scientifique.
+
+Les documents de gouvernance s'appliquent transversalement aux documents et au code relevant de leur domaine. Lorsqu'une règle de gouvernance transverse précise ou restreint un choix d'implémentation plus ancien sans modifier son contenu scientifique, cette gouvernance s'applique jusqu'à remise en cohérence du document concerné.
+
+## 2. Arborescence cible
+
+```text
+docs/
+├── governance/
+│   ├── collaboration-governance.md
+│   ├── documentation-governance.md
+│   ├── software-architecture-governance.md
+│   ├── current-task.md
+│   └── agents/
+│       ├── code-governance.md
+│       ├── docs-governance.md
+│       └── physic-governance.md
+├── model/
+│   └── c-hypothesis.md
+├── decisions/
+│   ├── decisions.md
+│   └── Dxxx-*.md
+└── toy-models/
+    └── toyN/
+        ├── specification.md
+        ├── implementation-design.md
+        ├── validation-plan.md      # lorsqu'il existe
+        └── closure-report.md       # lorsqu'il existe
+
+experiments/
+└── toyN/
+
+schemas/
+└── toyN/
+```
+
+Les dossiers vides ne sont pas créés à l'avance. Cette arborescence est la cible normative ; l'écart entre elle et l'état réel du dépôt à un instant donné est décrit en §10.
+
+## 3. Rôle des fonctions documentaires
+
+### `docs/governance/`
+
+Règles transverses du dépôt : architecture documentaire, collaboration, architecture logicielle, publication, statuts, contrôles, et état courant du contrat de continuité.
+
+### `docs/governance/agents/`
+
+Contrats normatifs des rôles spécialisés utilisés par les agents ou outils de collaboration. Ces documents définissent le comportement d'un rôle sans remplacer les gouvernances transverses.
+
+Les configurations locales d'agents ne sont pas des sources normatives et ne sont pas tenues d'être versionnées. Elles doivent référencer le contrat versionné correspondant au lieu d'en maintenir une copie divergente.
+
+### `docs/model/`
+
+Hypothèse C générale et conventions communes à plusieurs modèles jouets.
+
+### `docs/decisions/`
+
+Le fichier `decisions.md` conserve le journal historique. Une décision structurante volumineuse peut être portée par un fichier `Dxxx-*.md`, référencé par l'index et par le journal lors de sa prochaine consolidation.
+
+Une ancienne décision gelée n'est jamais réécrite pour masquer l'historique.
+
+### `docs/toy-models/toyN/`
+
+Documentation propre à un modèle jouet : spécification, conception d'implémentation, plan de validation et clôture.
+
+### `experiments/toyN/`
+
+Manifestes et protocoles d'exécution pré-enregistrés.
+
+### `schemas/toyN/`
+
+Contrats de sérialisation versionnés.
+
+### `features/`
+
+Propositions temporaires non gelées. Après validation, leur contenu est migré vers les emplacements fonctionnels puis le brouillon est supprimé.
+
+## 4. Hiérarchie des sources
+
+Les documents de gouvernance ont autorité sur les règles transverses relevant explicitement de leur domaine, notamment collaboration, architecture documentaire et architecture logicielle.
+
+Une gouvernance de rôle spécialisée sous `docs/governance/agents/` est subordonnée aux gouvernances transverses et fait autorité pour le comportement du rôle qu'elle définit. Une configuration locale ou un mandat courant peut restreindre davantage ce rôle mais ne peut pas affaiblir sa gouvernance ni une gouvernance transverse.
+
+À l'intérieur du contenu scientifique ou expérimental, en cas de divergence :
+
+1. décision gelée la plus récente ;
+2. manifeste pré-enregistré pour les valeurs propres à une campagne ou une expérience ;
+3. spécification du modèle jouet concerné ;
+4. hypothèse C générale (`docs/model/`) ;
+5. plan de validation ;
+6. schéma de données ;
+7. index et README ;
+8. document exploratoire.
+
+Une conception d'implémentation applique à la fois la spécification scientifique et les gouvernances transverses. Elle ne peut déroger implicitement à une gouvernance gelée plus récente.
+
+Cette hiérarchie sert à résoudre temporairement la divergence ; la contradiction doit ensuite être corrigée.
+
+## 5. Statuts
+
+```text
+brouillon
+revue en cours
+validé pour gel
+gelé
+clos
+supersédé
+archivé
+```
+
+Un document ne peut être gelé si une contradiction de statut ou de valeur subsiste.
+
+## 6. Non-duplication
+
+Les documents secondaires utilisent un renvoi vers la source principale. Les résumés sont autorisés s'ils sont clairement identifiés comme tels et mis à jour dans le même paquet lorsqu'ils changent de sens.
+
+Une configuration locale d'agent contient uniquement les éléments techniques nécessaires à son chargement et les références vers sa gouvernance versionnée ; elle ne maintient pas une seconde définition normative du rôle.
+
+## 7. Modification d'une norme gelée
+
+Toute modification de sens exige :
+
+1. une nouvelle décision ;
+2. la mise à jour de la spécification concernée ;
+3. la mise à jour du manifeste et du plan de validation si nécessaire ;
+4. une nouvelle version de schéma en cas d'incompatibilité ;
+5. la mise à jour des index et renvois.
+
+Une correction éditoriale sans changement de sens ne nécessite pas de décision.
+
+Une gouvernance transverse nouvellement gelée peut rendre nécessaire la remise en cohérence d'un document d'implémentation antérieur. Cette remise en cohérence est traitée dans le lot suivant applicable et ne modifie pas implicitement la physique gelée.
+
+## 8. Compatibilité des anciens chemins
+
+Lors d'une migration, un ancien chemin peut être conservé temporairement comme fichier de redirection marqué `supersédé`.
+
+Ce fichier :
+
+- ne contient aucune définition normative ;
+- indique uniquement le nouveau chemin canonique ;
+- n'est jamais utilisé dans un nouveau document ;
+- est supprimé après vérification que plus aucun outil ou document actif ne le référence.
+
+## 9. Contrôle avant publication documentaire
+
+Avant de déclarer une migration terminée :
+
+- vérifier la présence réelle des nouveaux fichiers ;
+- vérifier que les anciens chemins ne contiennent plus de source normative dupliquée ;
+- vérifier les statuts et valeurs gelées ;
+- vérifier les liens des README et index ;
+- vérifier le diff global fichier par fichier ;
+- identifier explicitement les fichiers de compatibilité restants ;
+- fournir le SHA final.
+
+Un succès d'API Git ou une mise à jour de référence ne prouve pas à lui seul que le contenu annoncé est présent.
+
+## 10. État actuel des sources canoniques
+
+Les sources canoniques sont :
+
+```text
+docs/governance/collaboration-governance.md                    — gelé
+docs/governance/documentation-governance.md                    — gelé
+docs/governance/software-architecture-governance.md            — gelé
+docs/governance/current-task.md                                — état courant
+docs/governance/agents/code-governance.md                      — validé pour gel
+docs/governance/agents/docs-governance.md                      — validé pour gel
+docs/governance/agents/physic-governance.md                    — validé pour gel
+```
+
+Aucun document sous `docs/model/`, `docs/decisions/`, `docs/toy-models/`, `experiments/` ou `schemas/` n'existe encore : le projet CosmoTGG démarre uniquement avec sa gouvernance transverse et ses contrats de rôles spécialisés. Ces dossiers ne sont créés que lorsqu'un besoin réel apparaît, conformément au §2.
