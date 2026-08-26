@@ -20,9 +20,9 @@ Ce document sera mis à jour à chaque jalon.
 ## État global
 
 ```text
-PROJECT_STATUS = INITIALIZED
-CURRENT_LOT    = FOUNDING-HYPOTHESIS-CORR-1
-PHASE          = FOUNDING_HYPOTHESIS_V02_PENDING_SECOND_REVIEW
+PROJECT_STATUS = FOUNDING_HYPOTHESIS_FROZEN
+CURRENT_LOT    = NONE
+PHASE          = FOUNDING_HYPOTHESIS_FROZEN
 ```
 
 La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Aucun modèle jouet, plan de validation ou lot scientifique n'est encore engagé.
@@ -33,23 +33,31 @@ La gouvernance transverse (`collaboration-governance.md`, `documentation-governa
 
 ```text
 HYPOTHESIS_SOURCE       = docs/model/hypothesis.md
-HYPOTHESIS_STATUS       = brouillon (v0.2 corrigée, non gelée, en attente de seconde revue physic)
+HYPOTHESIS_STATUS       = FROZEN (v0.2)
 HYPOTHESIS_TITLE        = Temps, Géométrie et Gravitation depuis une structure quantique relationnelle
 HYPOTHESIS_ANNEX_SOURCE = docs/model/hypothesis-annex-a.md
-HYPOTHESIS_ANNEX_STATUS = brouillon synchronisé v0.2 (mémoire de recherche, non gelée)
+HYPOTHESIS_ANNEX_STATUS = FROZEN (synchronisée avec hypothesis.md v0.2)
 ```
 
-Première source scientifique du projet. Elle pose la question de recherche et l'hypothèse centrale de CosmoTGG (temps et géométrie comme deux manifestations d'une même structure quantique relationnelle, gravitation recherchée ensuite comme propriété collective), distingue explicitement `[KNOWN]`, `[DERIVED]`, `[HYPOTHESIS]` et `[OPEN]`, et définit sept tests de réfutabilité (T1–T7, §15 du document). Statut `brouillon` (v0.2) : aucune validation pour gel n'a encore eu lieu.
+Première source scientifique du projet. Elle pose la question de recherche et l'hypothèse centrale de CosmoTGG (temps et géométrie comme deux manifestations d'une même structure quantique relationnelle, gravitation recherchée ensuite comme propriété collective), distingue explicitement `[KNOWN]`, `[DERIVED]`, `[HYPOTHESIS]` et `[OPEN]`, et définit sept tests de réfutabilité (T1–T7, §15 du document). Statut `FROZEN` (v0.2) : gel documentaire du document scientifique comme point de départ du programme, après seconde contre-expertise physic PASS et arbitrage ChatGPT. Ce gel ne signifie pas `COSMOTGG_HYPOTHESIS = TRUE` : les GAP-1 à GAP-6 restent explicitement `OPEN`.
 
 `docs/model/hypothesis-annex-a.md` (Annexe A) est la mémoire de traçabilité conceptuelle associée : elle cartographie les idées et résultats de la littérature rencontrés pendant la construction de l'hypothèse (échelles de Planck, tenseur énergie-impulsion, Tolman–Ehrenfest, gravité stochastique, TGFT, gravité induite de Sakharov, équilibre d'intrication de Jacobson, courbure de Berry modulaire, etc.), y compris les pistes explicitement `[ARCHIVED]` ou `[REJECTED]` (ex. facteur temporel unique expliquant toute la gravitation, \(\alpha_G\) comme quantum minimal de géométrie), et liste des questions encore `[OPEN]` (§A.24). Elle ne redéfinit aucun objet normatif de `hypothesis.md`.
 
 ```text
-FIRST_PHYSIC_REVIEW  = REVISION_REQUIRED
-CHATGPT_ARBITRATION  = INTEGRATED
-SECOND_PHYSIC_REVIEW = PENDING
+FIRST_PHYSIC_REVIEW        = REVISION_REQUIRED
+CHATGPT_ARBITRATION        = INTEGRATED
+SECOND_PHYSIC_REVIEW       = PASS
+FREEZE_DECISION            = AUTHORIZED
+FOUNDING_HYPOTHESIS_FREEZE = FROZEN
 ```
 
-La première contre-expertise scientifique (`physic`) a retourné `SCIENTIFIC_REVIEW = BLOCKED` / `RECOMMENDATION = REVISION_REQUIRED`. ChatGPT a ensuite arbitré scientifiquement les points bloquants (décisions D1 à D11 du lot `FOUNDING-HYPOTHESIS-CORR-1`), intégrées documentairement dans `hypothesis.md` (passage v0.1 → v0.2) et son Annexe A. Une seconde revue `physic`, bornée au diff corrigé, reste `PENDING`.
+La première contre-expertise scientifique (`physic`) a retourné `SCIENTIFIC_REVIEW = BLOCKED` / `RECOMMENDATION = REVISION_REQUIRED`. ChatGPT a ensuite arbitré scientifiquement les points bloquants (décisions D1 à D11 du lot `FOUNDING-HYPOTHESIS-CORR-1`), intégrées documentairement dans `hypothesis.md` (passage v0.1 → v0.2) et son Annexe A. Une seconde contre-expertise `physic`, bornée à la v0.2, a retourné `SECOND_SCIENTIFIC_REVIEW = PASS` / `BLOCKING = NONE` / `RECOMMENDATION = VALIDATED_FOR_FREEZE`. ChatGPT a arbitré `CHATGPT_SCIENTIFIC_ARBITRATION = PASS` / `FOUNDING_HYPOTHESIS_V02 = VALIDATED_FOR_FREEZE`. Lionel ORCIL a autorisé le gel documentaire de l'hypothèse fondatrice v0.2.
+
+```text
+SCIENTIFIC_CONTENT_HEAD = 589b0727ad880670435bfbb50a268d7472e5410f
+```
+
+Le contenu scientifique de référence gelé est celui validé au commit ci-dessus ; le présent lot ne modifie que les métadonnées de statut documentaire.
 
 ---
 
@@ -120,11 +128,11 @@ Aucun lot n'a encore été confié à un rôle spécialisé.
 ## Lot courant
 
 ```text
-CURRENT_LOT = FOUNDING-HYPOTHESIS-CORR-1
-PHASE       = FOUNDING_HYPOTHESIS_V02_PENDING_SECOND_REVIEW
+CURRENT_LOT = NONE
+PHASE       = FOUNDING_HYPOTHESIS_FROZEN
 ```
 
-Lot d'intégration documentaire (rôle `docs`) corrigeant `docs/model/hypothesis.md` et `docs/model/hypothesis-annex-a.md` (v0.1 → v0.2) suite à l'arbitrage scientifique de ChatGPT sur la première contre-expertise `physic`. Base du lot : `BASE_COMMIT = dd3b89f7a5f056089a266beca0dd57f08c70ece3`.
+Aucun lot n'est actuellement engagé. Le dernier lot exécuté (rôle `docs`) a effectué le gel documentaire (`VALIDATED_FOR_FREEZE` → `FROZEN`) de `docs/model/hypothesis.md` et `docs/model/hypothesis-annex-a.md` (v0.2), suite à la seconde contre-expertise `physic` PASS et à l'arbitrage scientifique de ChatGPT. Base du lot : `EXPECTED_HEAD = 589b0727ad880670435bfbb50a268d7472e5410f`.
 
 ---
 
@@ -132,12 +140,12 @@ Lot d'intégration documentaire (rôle `docs`) corrigeant `docs/model/hypothesis
 
 ```text
 BRANCHE                     = master
-COMMIT_DE_TETE              = dd3b89f7a5f056089a266beca0dd57f08c70ece3
-LOT_COURANT                 = FOUNDING-HYPOTHESIS-CORR-1
-DERNIER_JALON_VALIDE        = intégration documentaire des corrections v0.2 de l'hypothèse fondatrice
+LOT_COURANT                 = NONE
+DERNIER_JALON_VALIDE        = hypothèse fondatrice CosmoTGG v0.2 gelée
 DOCUMENTS_APPLICABLES       = docs/governance/*, docs/model/hypothesis.md, docs/model/hypothesis-annex-a.md
-TRAVAIL_REALISE             = première contre-expertise scientifique ; arbitrage scientifique ChatGPT ; intégration documentaire des corrections v0.2
-TRAVAIL_NON_REALISE         = seconde revue physic ; gel de l'hypothèse ; définition opératoire de T4 ; tout modèle numérique ; tout test T1-T7 effectif
-PROCHAINE_ACTION_AUTORISEE  = revue du commit distant par ChatGPT, puis seconde contre-expertise physic bornée au diff corrigé après autorisation explicite de Lionel ORCIL
+TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2
+TRAVAIL_NON_REALISE         = définition opératoire de T1 ; définition opératoire de T4 ; tout modèle numérique ; tout test T1-T7 effectif
+PROCHAINE_ACTION_AUTORISEE  = cadrage scientifique par ChatGPT du premier lot post-gel, après décision explicite de Lionel ORCIL
 QUESTIONS_OUVERTES          = T4_OPERATIONAL_CRITERION, DIMENSIONAL_CALIBRATION, TYPE_I_TO_ALGEBRAIC_MODULAR_BRIDGE
+BACKLOG_NON_BLOQUANT        = K_ADDITIVE_CONSTANT_CONVENTION_FOR_R_AB, T1_NONTRIVIALITY_CRITERION, RELATIONAL_CLOCK_BOUNDARY_WORDING
 ```

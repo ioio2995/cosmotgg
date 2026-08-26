@@ -1,6 +1,6 @@
 # Annexe A — Cartographie des idées et structures mathématiques explorées
 
-**Statut : synchronisée avec `hypothesis.md` v0.2 — mémoire de recherche, brouillon, non gelée.**
+**Statut : synchronisée avec `hypothesis.md` v0.2 — FROZEN comme mémoire de recherche associée. Le gel conserve l'état historique des pistes au jalon fondateur ; aucune entrée scientifique n'est ajoutée, corrigée ou supprimée par ce gel.**
 
 ## A.1 Objet de l’annexe
 

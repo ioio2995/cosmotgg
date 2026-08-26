@@ -2,7 +2,7 @@
 
 ## Temps, Géométrie et Gravitation depuis une structure quantique relationnelle
 
-**Statut : note conceptuelle de travail — v0.2, corrigée après première contre-expertise scientifique, en attente de seconde revue**
+**Statut : hypothèse fondatrice — v0.2, FROZEN (gel documentaire après seconde contre-expertise scientifique et arbitrage ChatGPT). Ce gel valide le document comme point de départ documentaire gelé du programme CosmoTGG ; il ne valide pas les hypothèses physiques comme vraies et ne ferme aucun des GAP-1 à GAP-6 ni des paramètres OPEN identifiés dans ce document.**
 
 ### 1. Question de recherche
 
