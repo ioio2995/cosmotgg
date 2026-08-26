@@ -4,9 +4,9 @@
 
 Ce document définit `model0a`, première construction candidate du toy `toy0a`.
 
-Il intègre des décisions scientifiques déjà arbitrées par ChatGPT (revue physique bornée `MODEL0A_T1_BOUNDARY_REVIEW = PASS_WITH_CHATGPT_CORRECTIONS`). Il n'ouvre, ne clôt et n'arbitre aucune décision scientifique par lui-même.
+Il intègre des décisions scientifiques déjà arbitrées par ChatGPT (revue physique bornée `MODEL0A_T1_BOUNDARY_REVIEW = PASS_WITH_CHATGPT_CORRECTIONS` ; fermeture de `LOCAL_DIMENSION` et de `STATE_FAMILY` au lot `MODEL0A-DESIGN-1`). Il n'ouvre, ne clôt et n'arbitre aucune décision scientifique par lui-même.
 
-Ce document n'est pas un plan de validation, n'inclut aucun code, aucun notebook, aucune dimension choisie, aucune valeur numérique d'état et aucun seuil.
+Ce document n'est pas un plan de validation, n'inclut aucun code, aucun notebook, aucune valeur numérique de paramètre d'état, aucun domaine de paramètre modulaire et aucun seuil numérique.
 
 ---
 
@@ -52,17 +52,139 @@ $$
 \mathcal H = \mathcal H_A \otimes \mathcal H_B .
 $$
 
-La dimension locale exacte reste :
+La dimension locale est fixée :
 
 ```text
-LOCAL_DIMENSION = OPEN
+LOCAL_DIMENSION = (2, 2)
 ```
+
+Sens :
+
+$$
+\mathcal H_A = \mathbb C^2,
+\qquad
+\mathcal H_B = \mathbb C^2,
+\qquad
+\mathcal H_{AB} = \mathbb C^4.
+$$
+
+Justification : une dimension locale 1 implique un état nécessairement produit relativement à ce facteur et ne permet donc pas les régimes N1/N2 (§8) ; \(2\times2\) est le cadre minimal suffisant pour réaliser les trois régimes. Cette dimension n'est pas présentée comme fondamentale ; elle est un choix de banc d'essai minimal pour `toy0a`.
 
 Les états utilisés pour la construction modulaire doivent être **fidèles** lorsqu'un logarithme matriciel ordinaire est requis, conformément au domaine de travail fixé par `docs/model/hypothesis.md` §4–5 (\(\rho_X>0\)).
 
 ---
 
-## 3. Paire relationnelle canonique
+## 3. Famille d'états candidate
+
+```text
+STATE_FAMILY = TWO_QUBIT_FIXED_MARGINAL_CORRELATION_FAMILY
+```
+
+Dans la base \(|00\rangle,|01\rangle,|10\rangle,|11\rangle\), on définit :
+
+$$
+\rho_{AB}(a,b,c,\eta)
+=
+\begin{pmatrix}
+ab+c & 0 & 0 & \eta \\
+0 & a(1-b)-c & 0 & 0 \\
+0 & 0 & (1-a)b-c & 0 \\
+\eta & 0 & 0 & (1-a)(1-b)+c
+\end{pmatrix}
+$$
+
+avec paramètres réels \(a,b,c,\eta\).
+
+### 3.1 Marginales exactes
+
+Les identités analytiques suivantes sont enregistrées :
+
+$$
+\rho_A = \operatorname{diag}(a,\,1-a),
+\qquad
+\rho_B = \operatorname{diag}(b,\,1-b),
+$$
+
+indépendamment de \(c\) et de \(\eta\). Donc :
+
+$$
+\sigma_{AB} = \rho_A \otimes \rho_B
+=
+\operatorname{diag}\!\big(ab,\ a(1-b),\ (1-a)b,\ (1-a)(1-b)\big).
+$$
+
+À \(a,b\) fixés, \(\sigma_{AB}\) est fixe lorsque \(c\) et \(\eta\) sont modifiés.
+
+```text
+DESIGN_RATIONALE = isoler les modifications de la structure de corrélation
+                    sans faire varier simultanément les marginales
+```
+
+### 3.2 Domaine fidèle
+
+Le domaine analytique suivant est normatif :
+
+$$
+0 < a < 1,
+\qquad
+0 < b < 1,
+$$
+
+$$
+-\min\big(ab,\ (1-a)(1-b)\big)
+<
+c
+<
+\min\big(a(1-b),\ (1-a)b\big),
+$$
+
+$$
+\eta^2
+<
+\big(ab+c\big)\big((1-a)(1-b)+c\big).
+$$
+
+Ces inégalités sont strictes ; elles définissent un \(\rho_{AB}\) strictement positif. Aucune tolérance numérique n'intervient dans cette définition et aucune correction d'entrée n'est autorisée : la définition analytique du domaine est la source normative du domaine scientifique. Des tolérances numériques pourront être introduites par un futur protocole d'implémentation ou de validation, mais elles ne redéfinissent pas ce domaine analytique.
+
+### 3.3 Régimes canoniques
+
+Les tranches suivantes sont les constructions canoniques retenues pour produire les trois régimes (§8) dans `toy0a`.
+
+**N0 :** \(c=0\), \(\eta=0\) donne exactement :
+
+$$
+\rho_{AB} = \rho_A \otimes \rho_B.
+$$
+
+**N1 — tranche canonique :** \(c\neq0\), \(\eta=0\) donne :
+
+$$
+\rho_{AB} \neq \rho_A \otimes \rho_B,
+\qquad
+[\rho_{AB},\sigma_{AB}] = 0.
+$$
+
+Ce régime reste `COMMUTING_CORRELATED_REGIME` (N1, §8) et n'est pas un `FAIL` de T1.
+
+**N2 — tranche canonique :** \(\eta\neq0\) et \(a+b\neq1\), car exactement :
+
+$$
+[\rho_{AB},\sigma_{AB}]_{(00,11)} = \eta\,(1-a-b),
+$$
+
+l'élément conjugué portant le signe opposé. Donc :
+
+$$
+[\rho_{AB},\sigma_{AB}] \neq 0.
+$$
+
+Ce régime reste `NONCOMMUTING_CORRELATED_REGIME` (N2, §8) et n'est pas un `PASS` de T1.
+
+**Important :** la classification conceptuelle N0/N1/N2 de §8 reste définie par les propriétés des états. Les tranches ci-dessus sont les constructions canoniques retenues pour produire les trois régimes dans `toy0a`, et non une redéfinition de cette classification.
+
+---
+
+## 4. Paire relationnelle canonique
 
 À partir d'un état fidèle \(\rho_{AB}\) sur \(\mathcal H_A\otimes\mathcal H_B\), on construit :
 
@@ -94,7 +216,7 @@ Aucun cocycle direct entre \(K_A\) et \(K_B\) n'est défini.
 
 ---
 
-## 4. Objet mathématique candidat
+## 5. Objet mathématique candidat
 
 Convention CosmoTGG (cf. `docs/model/hypothesis.md` §4) :
 
@@ -121,7 +243,7 @@ $$
 
 ---
 
-## 5. Raccord à \(\mathcal R_{AB}\)
+## 6. Raccord à \(\mathcal R_{AB}\)
 
 La science gelée (`docs/model/hypothesis.md` §5) définit :
 
@@ -145,7 +267,7 @@ Cette identité n'établit pas que \(\mathcal R_{AB}\) est l'opérateur modulair
 
 ---
 
-## 6. Identités structurelles
+## 7. Identités structurelles
 
 Les propriétés analytiques suivantes sont documentées pour un usage ultérieur comme oracles :
 
@@ -163,7 +285,7 @@ v_s^{(\rho,\sigma)\dagger}
 \sigma_s^{\rho}(O),
 $$
 
-avec la convention CosmoTGG correspondante (§4, flot \(O(s)=e^{+iKs}Oe^{-iKs}\)).
+avec la convention CosmoTGG correspondante (§5, flot \(O(s)=e^{+iKs}Oe^{-iKs}\)).
 
 Relation de cocycle :
 
@@ -185,7 +307,7 @@ $$
 
 ---
 
-## 7. Régimes algébriques
+## 8. Régimes algébriques
 
 Sont définies uniquement les classifications neutres suivantes.
 
@@ -244,7 +366,7 @@ alors le cocycle n'est pas identiquement réductible à \(\exp(-is\,\mathcal R_{
 
 ---
 
-## 8. Faux positif central
+## 9. Faux positif central
 
 ```text
 PARAMETER_ELIMINATION_ALONE = INSUFFICIENT
@@ -266,7 +388,7 @@ physical_time.
 
 ---
 
-## 9. Frontière HSMI
+## 10. Frontière HSMI
 
 Borne interprétative :
 
@@ -290,7 +412,7 @@ Cette borne ne constitue pas un échec de `model0a`.
 
 ---
 
-## 10. Référence relationnelle
+## 11. Référence relationnelle
 
 ```text
 FUNDAMENTAL_PRIVILEGED_CLOCK = FORBIDDEN
@@ -300,7 +422,7 @@ RELATIONAL_REFERENCE_CHOICE = CONCEPTUALLY_COMPATIBLE_WITH_KNOWN_RELATIONAL_FRAM
 
 Page–Wootters / Höhn–Smith–Lock / QRF ne sont pas importés comme théorèmes techniques de `model0a`.
 
-La chain rule du cocycle (§6) montre une propriété algébrique de composition entre références. Elle ne démontre pas à elle seule :
+La chain rule du cocycle (§7) montre une propriété algébrique de composition entre références. Elle ne démontre pas à elle seule :
 
 ```text
 physical clock covariance
@@ -310,7 +432,7 @@ emergent time
 
 ---
 
-## 11. Voies exclues de toy0a
+## 12. Voies exclues de toy0a
 
 Sont exclues de `toy0a` :
 
@@ -325,7 +447,7 @@ Sont exclues de `toy0a` :
 
 ---
 
-## 12. Ce que toy0a pourra tester
+## 13. Ce que toy0a pourra tester
 
 `toy0a` pourra ultérieurement qualifier/falsifier :
 
@@ -338,7 +460,7 @@ Sont exclues de `toy0a` :
 
 ---
 
-## 13. Ce que toy0a ne pourra pas établir
+## 14. Ce que toy0a ne pourra pas établir
 
 `toy0a` ne peut pas établir :
 
@@ -359,11 +481,11 @@ Il ne peut pas falsifier l'existence de toute construction possible de temps rel
 
 ---
 
-## 14. Paramètres qui restent `OPEN`
+## 15. Paramètres qui restent `OPEN`
 
 ```text
-LOCAL_DIMENSION               = OPEN
-STATE_FAMILY                  = OPEN
+LOCAL_DIMENSION               = CLOSED — cf. §2, (2, 2)
+STATE_FAMILY                  = CLOSED — cf. §3, TWO_QUBIT_FIXED_MARGINAL_CORRELATION_FAMILY
 STATE_PARAMETER_VALUES        = OPEN
 MODULAR_PARAMETER_DOMAIN      = OPEN
 NUMERICAL_TOLERANCES          = OPEN
@@ -372,24 +494,24 @@ MODEL0A_ACCEPTANCE_CRITERION  = OPEN
 CONFIRMATORY_PROTOCOL         = NOT_DEFINED
 ```
 
-Aucune valeur n'est fixée dans ce document.
+`LOCAL_DIMENSION` et `STATE_FAMILY` ont été fermés au lot `MODEL0A-DESIGN-1` par décision scientifique ChatGPT (§2, §3). Aucune autre valeur n'est fixée dans ce document.
 
 ---
 
-## 15. Sources
+## 16. Sources
 
 Alain Connes, *Une classification des facteurs de type III*, Ann. Sci. ENS 6 (1973) 133–252, DOI [10.24033/asens.1247](https://doi.org/10.24033/asens.1247).
 
 H.-W. Wiesbrock, *Half-Sided Modular Inclusions of von-Neumann-Algebras*, Commun. Math. Phys. 157 (1993) 83–92, DOI [10.1007/BF02098019](https://doi.org/10.1007/BF02098019).
 
-Parrikar, Rajgadia, Singh, Sorce, *Relational bulk reconstruction from modular flow*, JHEP 07 (2024) 138, [arXiv:2403.02377](https://arxiv.org/abs/2403.02377) — utilisée uniquement pour la présentation explicite moderne des identités modulaires générales citées aux §5–6, pas pour son interprétation holographique.
+Parrikar, Rajgadia, Singh, Sorce, *Relational bulk reconstruction from modular flow*, JHEP 07 (2024) 138, [arXiv:2403.02377](https://arxiv.org/abs/2403.02377) — utilisée uniquement pour la présentation explicite moderne des identités modulaires générales citées aux §6–7, pas pour son interprétation holographique.
 
 ---
 
-## 16. Statut et prochaine étape
+## 17. Statut et prochaine étape
 
 ```text
-MODEL0A_SPECIFICATION_STATUS = PROPOSED
+MODEL0A_SPECIFICATION_STATUS = ACCEPTED_AS_DESIGN_BASIS
 ```
 
-La prochaine étape autorisée est une revue physique bornée de ce document, après revue du commit distant par ChatGPT.
+La prochaine étape autorisée est l'implémentation bornée de la famille d'états de `model0a` par le rôle `code` (Claude Sonnet 5), sur la base du présent document et de `docs/toy-models/toy0a/implementation-design.md`.
