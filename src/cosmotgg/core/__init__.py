@@ -13,7 +13,8 @@ Submodules:
   entropy, Umegaki relative entropy, mutual information, generic
   log-density difference).
 - `cosmotgg.core.modular` — modular theory primitives (hermitian matrix
-  logarithm, modular Hamiltonian `K = -log(rho)`, modular flow).
+  logarithm, modular Hamiltonian `K = -log(rho)`, modular flow, finite
+  Connes cocycle).
 """
 
 SCIENTIFIC_METADATA = {
