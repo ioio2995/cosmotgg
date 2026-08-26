@@ -21,11 +21,11 @@ Ce document sera mis à jour à chaque jalon.
 
 ```text
 PROJECT_STATUS = ACTIVE_RESEARCH
-CURRENT_LOT    = MODEL0A-SPEC-1
-PHASE          = MODEL0A_SPECIFICATION_PROPOSED_PENDING_REVIEW
+CURRENT_LOT    = NONE
+PHASE          = MODEL0A_IMPLEMENTATION_DESIGN_PENDING
 ```
 
-La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Le lot `T1-CORE-FOUNDATION-0A` (fondation `core` préalable au test de réfutabilité T1) a été implémenté et la gouvernance des notebooks Jupyter d'exécution des toy models a été intégrée (§ci-dessous). Une première spécification scientifique `PROPOSED` de `model0a` (`docs/toy-models/toy0a/specification.md`) a été créée par le lot `MODEL0A-SPEC-1` ; aucune implémentation, aucun plan de validation et aucun notebook ne sont encore engagés.
+La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Le lot `T1-CORE-FOUNDATION-0A` (fondation `core` préalable au test de réfutabilité T1) a été implémenté et la gouvernance des notebooks Jupyter d'exécution des toy models a été intégrée (§ci-dessous). Une première spécification scientifique `PROPOSED` de `model0a` (`docs/toy-models/toy0a/specification.md`) a été créée par le lot `MODEL0A-SPEC-1` puis revue par ChatGPT (`MODEL0A_CHATGPT_SPEC_REVIEW = PASS`) et acceptée par Lionel ORCIL comme base de conception (`MODEL0A_SPECIFICATION_STATUS = ACCEPTED_AS_DESIGN_BASIS`) ; aucune implémentation, aucun plan de validation et aucun notebook ne sont encore engagés.
 
 ---
 
@@ -128,8 +128,8 @@ Aucun lot n'a encore été confié à un rôle spécialisé.
 ## Lot courant
 
 ```text
-CURRENT_LOT = MODEL0A-SPEC-1
-PHASE       = MODEL0A_SPECIFICATION_PROPOSED_PENDING_REVIEW
+CURRENT_LOT = NONE
+PHASE       = MODEL0A_IMPLEMENTATION_DESIGN_PENDING
 ```
 
 Le rôle `docs` a créé la première spécification scientifique `PROPOSED` de `model0a` (`docs/toy-models/toy0a/specification.md`), sur décisions déjà arbitrées par ChatGPT (revue physique bornée). Les deux lots précédents ont été menés à terme : l'implémentation bornée du socle `core` (`T1-CORE-FOUNDATION-0A`) et l'intégration de la gouvernance des notebooks Jupyter d'exécution des toy models (`NOTEBOOK-GOVERNANCE-1`). Le lot antérieur à ces deux-là (rôle `docs`) avait effectué le gel documentaire (`VALIDATED_FOR_FREEZE` → `FROZEN`) de `docs/model/hypothesis.md` et `docs/model/hypothesis-annex-a.md` (v0.2), suite à la seconde contre-expertise `physic` PASS et à l'arbitrage scientifique de ChatGPT.
@@ -138,7 +138,16 @@ Le rôle `docs` a créé la première spécification scientifique `PROPOSED` de 
 MODEL0A_T1_BOUNDARY_REVIEW   = PASS_WITH_CHATGPT_CORRECTIONS
 MODEL0A_CARRIER_CANDIDATE    = FINITE_CONNES_COCYCLE
 MODEL0A_T1_STATUS            = OPEN_NOT_EXECUTED
-MODEL0A_SPECIFICATION_STATUS = PROPOSED
+MODEL0A_CHATGPT_SPEC_REVIEW  = PASS
+MODEL0A_SPECIFICATION_STATUS = ACCEPTED_AS_DESIGN_BASIS
+MODEL0A_SPECIFICATION_FREEZE = NOT_YET_REQUIRED
+```
+
+Décision de Lionel ORCIL et arbitrage ChatGPT sur le workflow de conception : les revues `physic` / Opus ne sont pas requises à chaque étape de conception d'un toy. Opus reste réservé aux décisions ou blocages scientifiques structurels nécessitant une escalade explicite (cf. `docs/governance/collaboration-governance.md` §12.3–§12.4). Pour `model0a`, la revue ChatGPT du commit `6673a5fa80e21689a0e50a91fed8290abe0473d3` est suffisante pour poursuivre la conception avec Sonnet/`code`.
+
+```text
+PHYSIC_ESCALATION  = NOT_REQUIRED_FOR_CURRENT_MODEL0A_DESIGN
+OPUS_USAGE_POLICY  = STRUCTURAL_SCIENTIFIC_ESCALATION_ONLY
 ```
 
 ```text
@@ -190,12 +199,12 @@ La gouvernance normative applicable aux notebooks Jupyter d'exécution des toy m
 
 ```text
 BRANCHE                     = master
-LOT_COURANT                 = MODEL0A-SPEC-1
-DERNIER_JALON_VALIDE        = spécification scientifique PROPOSED de model0a créée (docs/toy-models/toy0a/specification.md)
+LOT_COURANT                 = NONE
+DERNIER_JALON_VALIDE        = spécification scientifique de model0a acceptée comme base de conception (ACCEPTED_AS_DESIGN_BASIS) après revue ChatGPT PASS
 DOCUMENTS_APPLICABLES       = docs/governance/*, docs/model/hypothesis.md, docs/model/hypothesis-annex-a.md, docs/toy-models/toy0a/specification.md
-TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter ; spécification scientifique PROPOSED de model0a (toy0a)
-TRAVAIL_NON_REALISE         = revue physic bornée de specification.md ; implémentation model0a ; plan de validation toy0a ; notebook toy0a ; ajout dépendance Jupyter ; définition opérationnelle de T1 ; exécution T1
-PROCHAINE_ACTION_AUTORISEE  = revue physic bornée de specification.md après revue du commit distant par ChatGPT
+TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter ; spécification scientifique PROPOSED de model0a (toy0a) ; revue ChatGPT PASS de specification.md ; synchronisation du workflow de conception model0a (physic/Opus réservés à l'escalade scientifique structurelle)
+TRAVAIL_NON_REALISE         = implementation design de model0a ; state family ; local dimension ; modular parameter domain ; numerical tolerances ; plan de validation toy0a ; implémentation model0a ; notebook toy0a ; ajout dépendance Jupyter ; définition opérationnelle de T1 ; exécution T1
+PROCHAINE_ACTION_AUTORISEE  = bounded architecture/implementation audit of model0a by code / Claude Sonnet 5, using specification.md as the scientific design basis
 QUESTIONS_OUVERTES          = T4_OPERATIONAL_CRITERION, DIMENSIONAL_CALIBRATION, TYPE_I_TO_ALGEBRAIC_MODULAR_BRIDGE
 BACKLOG_NON_BLOQUANT        = K_ADDITIVE_CONSTANT_CONVENTION_FOR_R_AB, T1_NONTRIVIALITY_CRITERION, RELATIONAL_CLOCK_BOUNDARY_WORDING, JUPYTER_RUNTIME_DEPENDENCY (état technique non ajouté, cf. §23.14 software-architecture-governance.md)
 ```
