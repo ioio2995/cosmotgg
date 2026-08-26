@@ -21,11 +21,11 @@ Ce document sera mis à jour à chaque jalon.
 
 ```text
 PROJECT_STATUS = ACTIVE_RESEARCH
-CURRENT_LOT    = NONE
-PHASE          = MODEL0A_SCIENTIFIC_DESIGN_PENDING
+CURRENT_LOT    = MODEL0A-SPEC-1
+PHASE          = MODEL0A_SPECIFICATION_PROPOSED_PENDING_REVIEW
 ```
 
-La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Le lot `T1-CORE-FOUNDATION-0A` (fondation `core` préalable au test de réfutabilité T1) a été implémenté et la gouvernance des notebooks Jupyter d'exécution des toy models a été intégrée (§ci-dessous) ; aucun modèle jouet, plan de validation ou notebook n'est encore engagé.
+La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Le lot `T1-CORE-FOUNDATION-0A` (fondation `core` préalable au test de réfutabilité T1) a été implémenté et la gouvernance des notebooks Jupyter d'exécution des toy models a été intégrée (§ci-dessous). Une première spécification scientifique `PROPOSED` de `model0a` (`docs/toy-models/toy0a/specification.md`) a été créée par le lot `MODEL0A-SPEC-1` ; aucune implémentation, aucun plan de validation et aucun notebook ne sont encore engagés.
 
 ---
 
@@ -128,11 +128,18 @@ Aucun lot n'a encore été confié à un rôle spécialisé.
 ## Lot courant
 
 ```text
-CURRENT_LOT = NONE
-PHASE       = MODEL0A_SCIENTIFIC_DESIGN_PENDING
+CURRENT_LOT = MODEL0A-SPEC-1
+PHASE       = MODEL0A_SPECIFICATION_PROPOSED_PENDING_REVIEW
 ```
 
-Aucun lot n'est ouvert à l'issue du présent commit. Les deux lots précédents ont été menés à terme : l'implémentation bornée du socle `core` (`T1-CORE-FOUNDATION-0A`) et l'intégration de la gouvernance des notebooks Jupyter d'exécution des toy models (`NOTEBOOK-GOVERNANCE-1`). Le lot antérieur à ces deux-là (rôle `docs`) avait effectué le gel documentaire (`VALIDATED_FOR_FREEZE` → `FROZEN`) de `docs/model/hypothesis.md` et `docs/model/hypothesis-annex-a.md` (v0.2), suite à la seconde contre-expertise `physic` PASS et à l'arbitrage scientifique de ChatGPT.
+Le rôle `docs` a créé la première spécification scientifique `PROPOSED` de `model0a` (`docs/toy-models/toy0a/specification.md`), sur décisions déjà arbitrées par ChatGPT (revue physique bornée). Les deux lots précédents ont été menés à terme : l'implémentation bornée du socle `core` (`T1-CORE-FOUNDATION-0A`) et l'intégration de la gouvernance des notebooks Jupyter d'exécution des toy models (`NOTEBOOK-GOVERNANCE-1`). Le lot antérieur à ces deux-là (rôle `docs`) avait effectué le gel documentaire (`VALIDATED_FOR_FREEZE` → `FROZEN`) de `docs/model/hypothesis.md` et `docs/model/hypothesis-annex-a.md` (v0.2), suite à la seconde contre-expertise `physic` PASS et à l'arbitrage scientifique de ChatGPT.
+
+```text
+MODEL0A_T1_BOUNDARY_REVIEW   = PASS_WITH_CHATGPT_CORRECTIONS
+MODEL0A_CARRIER_CANDIDATE    = FINITE_CONNES_COCYCLE
+MODEL0A_T1_STATUS            = OPEN_NOT_EXECUTED
+MODEL0A_SPECIFICATION_STATUS = PROPOSED
+```
 
 ```text
 T1_CORE_FOUNDATION_AUDIT = PASS
@@ -183,12 +190,12 @@ La gouvernance normative applicable aux notebooks Jupyter d'exécution des toy m
 
 ```text
 BRANCHE                     = master
-LOT_COURANT                 = NONE
-DERNIER_JALON_VALIDE        = socle core générique implémenté et gouvernance notebook intégrée
-DOCUMENTS_APPLICABLES       = docs/governance/*, docs/model/hypothesis.md, docs/model/hypothesis-annex-a.md
-TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter
-TRAVAIL_NON_REALISE         = définition scientifique de model0a ; implémentation model0a ; notebook toy0a ; ajout dépendance Jupyter ; définition opérationnelle de T1 ; exécution T1
-PROCHAINE_ACTION_AUTORISEE  = revue du commit de gouvernance par ChatGPT, puis cadrage scientifique de model0a après décision explicite de Lionel ORCIL
+LOT_COURANT                 = MODEL0A-SPEC-1
+DERNIER_JALON_VALIDE        = spécification scientifique PROPOSED de model0a créée (docs/toy-models/toy0a/specification.md)
+DOCUMENTS_APPLICABLES       = docs/governance/*, docs/model/hypothesis.md, docs/model/hypothesis-annex-a.md, docs/toy-models/toy0a/specification.md
+TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter ; spécification scientifique PROPOSED de model0a (toy0a)
+TRAVAIL_NON_REALISE         = revue physic bornée de specification.md ; implémentation model0a ; plan de validation toy0a ; notebook toy0a ; ajout dépendance Jupyter ; définition opérationnelle de T1 ; exécution T1
+PROCHAINE_ACTION_AUTORISEE  = revue physic bornée de specification.md après revue du commit distant par ChatGPT
 QUESTIONS_OUVERTES          = T4_OPERATIONAL_CRITERION, DIMENSIONAL_CALIBRATION, TYPE_I_TO_ALGEBRAIC_MODULAR_BRIDGE
 BACKLOG_NON_BLOQUANT        = K_ADDITIVE_CONSTANT_CONVENTION_FOR_R_AB, T1_NONTRIVIALITY_CRITERION, RELATIONAL_CLOCK_BOUNDARY_WORDING, JUPYTER_RUNTIME_DEPENDENCY (état technique non ajouté, cf. §23.14 software-architecture-governance.md)
 ```
