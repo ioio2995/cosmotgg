@@ -10,10 +10,10 @@ Ce document suit `docs/governance/collaboration-governance.md` §11 et porte le 
 REPOSITORY    = ioio2995/cosmotgg
 REMOTE        = https://github.com/ioio2995/cosmotgg.git
 ACTIVE_BRANCH = master
-BASE_COMMIT   = NONE
+BASE_COMMIT   = da64051
 ```
 
-Aucun commit n'a encore été effectué sur ce dépôt. Ce document sera mis à jour à chaque jalon.
+Ce document sera mis à jour à chaque jalon.
 
 ---
 
@@ -22,10 +22,26 @@ Aucun commit n'a encore été effectué sur ce dépôt. Ce document sera mis à 
 ```text
 PROJECT_STATUS = INITIALIZED
 CURRENT_LOT    = NONE
-PHASE          = GOVERNANCE_SETUP
+PHASE          = FOUNDING_HYPOTHESIS_DRAFTED
 ```
 
-Aucun modèle, spécification ou lot scientifique n'est encore engagé. La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place et prêts à s'appliquer dès l'ouverture du premier lot.
+La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Aucun modèle jouet, plan de validation ou lot scientifique n'est encore engagé.
+
+---
+
+## Hypothèse fondatrice
+
+```text
+HYPOTHESIS_SOURCE       = docs/model/hypothesis.md
+HYPOTHESIS_STATUS       = brouillon (v0.1)
+HYPOTHESIS_TITLE        = Temps, Géométrie et Gravitation depuis une structure quantique relationnelle
+HYPOTHESIS_ANNEX_SOURCE = docs/model/hypothesis-annex-a.md
+HYPOTHESIS_ANNEX_STATUS = brouillon (mémoire de recherche)
+```
+
+Première source scientifique du projet. Elle pose la question de recherche et l'hypothèse centrale de CosmoTGG (temps et géométrie comme deux manifestations d'une même structure quantique relationnelle, gravitation recherchée ensuite comme propriété collective), distingue explicitement `[KNOWN]`, `[DERIVED]`, `[HYPOTHESIS]` et `[OPEN]`, et définit sept tests de réfutabilité (T1–T7, §15 du document). Statut `brouillon` : aucune revue scientifique (`physic`) ni validation pour gel n'a encore eu lieu.
+
+`docs/model/hypothesis-annex-a.md` (Annexe A) est la mémoire de traçabilité conceptuelle associée : elle cartographie les idées et résultats de la littérature rencontrés pendant la construction de l'hypothèse (échelles de Planck, tenseur énergie-impulsion, Tolman–Ehrenfest, gravité stochastique, TGFT, gravité induite de Sakharov, équilibre d'intrication de Jacobson, courbure de Berry modulaire, etc.), y compris les pistes explicitement `[ARCHIVED]` ou `[REJECTED]` (ex. facteur temporel unique expliquant toute la gravitation, \(\alpha_G\) comme quantum minimal de géométrie), et liste six questions encore `[OPEN]` (§A.24). Elle ne redéfinit aucun objet normatif de `hypothesis.md`.
 
 ---
 
@@ -108,12 +124,12 @@ Aucun lot n'est ouvert. Ce bloc sera mis à jour au lancement du premier lot con
 
 ```text
 BRANCHE                     = master
-COMMIT_DE_TETE              = NONE
+COMMIT_DE_TETE              = da64051
 LOT_COURANT                 = NONE
-DERNIER_JALON_VALIDE        = NONE (initialisation de la gouvernance)
-DOCUMENTS_APPLICABLES       = docs/governance/*
-TRAVAIL_REALISE             = mise en place de la gouvernance transverse et des rôles spécialisés (docs, code, physic) pour CosmoTGG
-TRAVAIL_NON_REALISE         = tout lot scientifique ou d'implémentation
-PROCHAINE_ACTION_AUTORISEE  = commit initial, puis cadrage du premier lot par Lionel ORCIL / ChatGPT
+DERNIER_JALON_VALIDE        = commit initial (gouvernance + rôles spécialisés)
+DOCUMENTS_APPLICABLES       = docs/governance/*, docs/model/hypothesis.md, docs/model/hypothesis-annex-a.md
+TRAVAIL_REALISE             = mise en place de la gouvernance transverse et des rôles spécialisés (docs, code, physic) ; ajout de la note fondatrice docs/model/hypothesis.md (brouillon v0.1) et de son annexe de traçabilité conceptuelle docs/model/hypothesis-annex-a.md
+TRAVAIL_NON_REALISE         = revue scientifique de l'hypothèse fondatrice ; tout lot d'implémentation
+PROCHAINE_ACTION_AUTORISEE  = revue/critique de docs/model/hypothesis.md et docs/model/hypothesis-annex-a.md (rôle physic), ou cadrage du premier lot par Lionel ORCIL / ChatGPT
 QUESTIONS_OUVERTES          = aucune
 ```

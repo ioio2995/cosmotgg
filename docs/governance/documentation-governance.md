@@ -26,7 +26,8 @@ docs/
 │       ├── docs-governance.md
 │       └── physic-governance.md
 ├── model/
-│   └── c-hypothesis.md
+│   ├── hypothesis.md
+│   └── hypothesis-annex-a.md
 ├── decisions/
 │   ├── decisions.md
 │   └── Dxxx-*.md
@@ -60,7 +61,7 @@ Les configurations locales d'agents ne sont pas des sources normatives et ne son
 
 ### `docs/model/`
 
-Hypothèse C générale et conventions communes à plusieurs modèles jouets.
+Hypothèse fondatrice générale du projet et conventions communes à plusieurs modèles jouets.
 
 ### `docs/decisions/`
 
@@ -176,6 +177,8 @@ docs/governance/current-task.md                                — état courant
 docs/governance/agents/code-governance.md                      — validé pour gel
 docs/governance/agents/docs-governance.md                      — validé pour gel
 docs/governance/agents/physic-governance.md                    — validé pour gel
+docs/model/hypothesis.md                                       — brouillon (v0.1)
+docs/model/hypothesis-annex-a.md                                — brouillon (mémoire de recherche)
 ```
 
-Aucun document sous `docs/model/`, `docs/decisions/`, `docs/toy-models/`, `experiments/` ou `schemas/` n'existe encore : le projet CosmoTGG démarre uniquement avec sa gouvernance transverse et ses contrats de rôles spécialisés. Ces dossiers ne sont créés que lorsqu'un besoin réel apparaît, conformément au §2.
+Aucun document sous `docs/decisions/`, `docs/toy-models/`, `experiments/` ou `schemas/` n'existe encore. `docs/model/hypothesis.md` est la première source scientifique du projet : elle pose la question de recherche et l'hypothèse centrale de CosmoTGG, distingue explicitement `[KNOWN]`, `[DERIVED]`, `[HYPOTHESIS]` et `[OPEN]`, et reste au statut `brouillon` tant qu'elle n'a pas été revue et validée pour gel conformément au §5 et au §7. `docs/model/hypothesis-annex-a.md` complète cette source comme mémoire de recherche (annexe A) : elle trace les idées, résultats de la littérature et pistes explorées puis écartées (`[ARCHIVED]`, `[REJECTED]`) pendant la construction de l'hypothèse, afin d'éviter de redécouvrir un résultat déjà connu ; elle ne redéfinit aucun objet normatif de `hypothesis.md`. Les autres dossiers ne sont créés que lorsqu'un besoin réel apparaît, conformément au §2.
