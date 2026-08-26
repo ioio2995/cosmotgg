@@ -1,5 +1,7 @@
 # Annexe A — Cartographie des idées et structures mathématiques explorées
 
+**Statut : synchronisée avec `hypothesis.md` v0.2 — mémoire de recherche, brouillon, non gelée.**
+
 ## A.1 Objet de l’annexe
 
 Cette annexe conserve les principales idées rencontrées pendant la construction de CosmoTGG, y compris celles qui ne font plus partie de l’hypothèse centrale.
@@ -708,7 +710,9 @@ Rovelli et Smerlak ont également analysé cette relation dans le cadre du temps
 
 # A.10 Fluctuations quantiques et apparition d’un régime classique
 
-## A.10.1 Critère naïf de fluctuation relative
+## A.10.1 Ancienne intuition de fluctuation relative (archivée comme telle)
+
+**[ARCHIVED — intuition, distincte du critère de Kuo–Ford]**
 
 L’idée explorée était :
 
@@ -732,6 +736,8 @@ $$
 
 pour une observable relativement bien définie.
 
+Cette quantité \(\Delta X/|\langle X\rangle|\) (reprise dans `hypothesis.md` §12 sous la forme \(R_{\mathcal G}\)) est un **indicateur possible** de faible fluctuation, **ni nécessaire ni suffisant** pour établir une limite classique, et son usage est limité aux observables dont la moyenne est non nulle et convenablement bornée loin de zéro dans le régime testé. Elle doit être explicitement distinguée du critère de Kuo–Ford ci-dessous, qui porte une définition et une normalisation propres.
+
 ---
 
 ## A.10.2 Kuo–Ford
@@ -739,6 +745,32 @@ pour une observable relativement bien définie.
 **[KNOWN]**
 
 Kuo et Ford ont étudié dès 1993 une mesure sans dimension des fluctuations du tenseur énergie-impulsion afin d’évaluer la validité de la gravité semi-classique.
+
+Leur critère s'écrit sous sa forme propre :
+
+$$
+\boxed{
+\Delta(x)
+=
+\left|
+\frac{
+\langle:T_{00}^2(x):\rangle
+-
+\langle:T_{00}(x):\rangle^2
+}{
+\langle:T_{00}^2(x):\rangle
+}
+\right|
+}
+$$
+
+et :
+
+$$
+\Delta\ll1
+$$
+
+est leur indicateur de petites fluctuations dans le cadre étudié.
 
 Leur idée fondamentale est que :
 
@@ -760,11 +792,11 @@ $$
 R=1
 $$
 
-ne constitue **pas** une frontière démontrée entre géométrie quantique et géométrie classique.
+ne constitue **pas** une frontière démontrée entre géométrie quantique et géométrie classique. Le critère \(\Delta\ll1\) de Kuo–Ford n'est pas non plus présenté comme une frontière universelle entre géométrie quantique et classique : c'est leur indicateur de petites fluctuations dans le cadre étudié.
 
 Le résultat dépend de l’observable, de l’état, du lissage spatial/temporel et des corrélations.
 
-**Statut : notre ancien \(R_C\) est archivé comme intuition ; il ne constitue pas un nouveau critère physique.**
+**Statut : notre ancien \(R_C\) est archivé comme intuition (A.10.1) ; il ne constitue pas un nouveau critère physique et ne doit pas être confondu avec le critère de Kuo–Ford (A.10.2).**
 
 ---
 
@@ -982,6 +1014,8 @@ $$
 
 Mais cela ne constitue pas encore une prédiction non circulaire de la valeur observée de \(G\).
 
+**Réserve (universalité vs. microphysique) :** dans les scénarios de gravité induite de type Sakharov, la valeur de \(G_{\rm eff}\) peut dépendre du contenu microscopique et de l'échelle UV. Cela ne doit pas être confondu avec la question de l'universalité du couplage dans la théorie effective obtenue (cf. `hypothesis.md` §13) : l'universalité recherchée par CosmoTGG signifie qu'un même coefficient gouverne la réponse géométrique aux différentes sources admissibles dans une phase et une classe de systèmes déclarées, pas une indépendance absolue de toute microphysique.
+
 ---
 
 # A.15 Gravité comme thermodynamique / équilibre d’intrication
@@ -1024,13 +1058,15 @@ $$
 \boxed{\text{d’où vient }G\ ?}
 $$
 
+**Précision de portée :** Jacobson déplace la question de l'origine de \(G\) vers le coefficient entropie/aire ; il ne la résout pas. Le résultat ne dérive donc pas la valeur de \(G\) à partir de zéro.
+
 ---
 
-## A.15.2 Jacobson 2015
+## A.15.2 Jacobson 2016 (Entanglement Equilibrium)
 
 **[KNOWN — sous hypothèses spécifiques]**
 
-Jacobson montre également qu’une condition de stationnarité de l’entropie d’intrication du vide dans de petites boules géodésiques peut être reliée à l’équation d’Einstein semi-classique au premier ordre.
+Jacobson montre également qu’une condition de stationnarité de l’entropie d’intrication du vide dans de petites boules géodésiques **à volume fixé** peut être reliée à l’équation d’Einstein semi-classique au premier ordre (Physical Review Letters 116, 201101, 2016 ; arXiv:1505.04753).
 
 Ce résultat donne un précédent concret à :
 
@@ -1042,7 +1078,7 @@ $$
 }
 $$
 
-Il suppose cependant déjà des structures géométriques telles que les petites boules géodésiques.
+Il suppose cependant déjà des structures géométriques telles que les petites boules géodésiques, et l'hypothèse entropique utilisée contient déjà un coefficient aire/entropie faisant intervenir le couplage gravitationnel. Ce n'est donc pas une dérivation de \(G\).
 
 ---
 
@@ -1150,6 +1186,45 @@ n’est pas automatiquement une durée mesurée en secondes.
 
 La calibration du temps physique reste une question distincte.
 
+### Convention de signe
+
+Avec \(K=-\ln\rho\), CosmoTGG adopte la convention physique \(O(s)=e^{+iKs}Oe^{-iKs}\) (`hypothesis.md` §4). Cette convention correspond au choix de signe utilisé par Connes–Rovelli pour le temps thermique et est opposée à une convention mathématique courante du paramètre modulaire de Tomita–Takesaki. Elle est conservée dans tout CosmoTGG et n'a pas été inversée lors de la présente correction.
+
+---
+
+## A.18.2 Dynamique relationnelle sans horloge externe : littérature établie
+
+**[KNOWN]**
+
+La notion générale de dynamique relationnelle sans temps externe possède plusieurs formulations établies dans la littérature, distinctes de la Thermal Time Hypothesis :
+
+* Page et Wootters (1983) montrent qu'une évolution observée peut être décrite relativement aux lectures d'une horloge interne dans un état global stationnaire ;
+* les observables relationnelles / observables de Dirac constituent une autre famille de formulations relationnelles du changement ;
+* Höhn, Smith et Lock (2021) montrent une équivalence entre plusieurs formulations modernes de dynamique quantique relationnelle.
+
+### Frontière propre à CosmoTGG
+
+Compte tenu de cette littérature, la question CosmoTGG n'est plus « peut-on avoir un changement relationnel sans temps externe ? » mais :
+
+$$
+\boxed{
+\text{Peut-on construire un temps relationnel physique à partir des relations
+entre plusieurs structures modulaires, sans ajouter un degré de liberté
+fondamental désigné comme horloge, et en utilisant la même famille de
+structures relationnelles que celle dont la géométrie est supposée émerger ?}
+}
+$$
+
+(cf. `hypothesis.md` §7). La composition et l'orientation existent pour le groupe modulaire lui-même mais restent à démontrer pour l'éventuel temps physique relationnel dérivé.
+
+---
+
+## A.18.3 Du modèle fini de type I à la théorie modulaire algébrique
+
+**[OPEN]**
+
+La réalisation matricielle finie \(\rho_X/K_X=-\ln\rho_X\) utilisée dans `hypothesis.md` §4 est un modèle de type I employé comme banc d'essai minimal. Elle ne constitue pas encore la formulation adaptée aux algèbres locales de théorie quantique des champs, souvent de type III. Le passage à une structure modulaire algébrique appropriée à la QFT (théorie d'Araki des opérateurs modulaires relatifs) reste un verrou scientifique **[OPEN]** de CosmoTGG : \(\text{TYPE\_I\_TO\_ALGEBRAIC\_MODULAR\_BRIDGE}=\text{OPEN}\).
+
 ---
 
 # A.19 Courbure de Berry modulaire
@@ -1158,17 +1233,7 @@ La calibration du temps physique reste une question distincte.
 
 Une famille d’Hamiltoniens modulaires permet de définir une connexion de Berry modulaire.
 
-Dans certaines constructions AdS/CFT, sa courbure est reliée à la courbure de Riemann du bulk :
-
-$$
-\boxed{
-\mathcal F_{\rm mod}
-\longleftrightarrow
-R_{\mu\nu\rho\sigma}.
-}
-$$
-
-Czech, de Boer, Ge et Lamprou montrent explicitement cette relation dans le domaine holographique semi-classique considéré.
+Dans certaines constructions AdS/CFT, sous leurs hypothèses propres, certaines données de connexion/courbure modulaire (\(\mathcal F_{\rm mod}\)) sont reliées à des données géométriques du bulk, notamment à des composantes de la courbure de Riemann. Czech, Lamprou, McCandlish et Sully, ainsi que Czech, de Boer, Ge et Lamprou, montrent explicitement cette relation dans le domaine holographique semi-classique considéré.
 
 ### Pertinence CosmoTGG
 
@@ -1182,17 +1247,7 @@ $$
 }
 $$
 
-Mais :
-
-$$
-\boxed{
-\mathcal F_{\rm mod}
-=
-R_{\mu\nu\rho\sigma}
-}
-$$
-
-n’est **pas** une identité générale de la mécanique quantique.
+Mais CosmoTGG ne suppose aucune identité générale entre courbure modulaire et courbure de l'espace-temps : la relation \(\mathcal F_{\rm mod}\leftrightarrow R_{\mu\nu\rho\sigma}\) observée dans ces constructions holographiques n’est **pas** une identité générale de la mécanique quantique.
 
 La construction sans bulk géométrique préalable constitue précisément l’un des tests CosmoTGG.
 
@@ -1278,6 +1333,10 @@ $$
 $$
 
 Il ne nécessite aucune nouvelle constante physique.
+
+### Domaine de validité et limite de portée
+
+Le domaine de travail v0.2 est celui d'un état réduit joint fidèle \(\rho_{AB}>0\), ce qui garantit la fidélité des marginales \(\rho_A,\rho_B\) dans ce cadre fini (`hypothesis.md` §5). \(\mathcal R_{AB}\) est une combinaison opératorielle définie pour ce modèle fini ; elle ne doit pas être identifiée au logarithme de l'opérateur modulaire relatif général de Tomita–Takesaki/Araki dans le cas non commutatif.
 
 ---
 
@@ -1392,6 +1451,8 @@ $$
 **[OPEN]**
 
 Il reste à démontrer que les deux branches proviennent réellement d’une même structure dynamique plutôt que d’être seulement deux constructions possibles à partir du même état.
+
+Le test T4 (`hypothesis.md` §15) formalise cette question. Sa condition « relation stable et non accidentelle » n'est pas suffisamment opératoire : \(\text{T4\_OPERATIONAL\_CRITERION}=\text{OPEN}\). T4 ne pourra être exécuté qu'après définition et préenregistrement d'un critère capable de distinguer (A) deux constructions mathématiques indépendantes utilisant les mêmes données \(\rho\) de (B) deux manifestations contraintes d'une structure commune. Cette formalisation sera traitée dans un lot scientifique ultérieur.
 
 ---
 
@@ -1575,6 +1636,16 @@ mais aucune dérivation n’est actuellement disponible.
 
 ---
 
+### Q7 — Comment calibrer dimensionnellement un coefficient émergent, et quel est le statut de \(c\) ?
+
+$$
+\boxed{\text{OPEN}}
+$$
+
+Avant toute comparaison entre \(\kappa_*\) et \(8\pi G/c^4\), les observables émergentes doivent recevoir une interprétation dimensionnelle physique, définie indépendamment de toute mesure gravitationnelle cible : \(\text{DIMENSIONAL\_CALIBRATION}=\text{OPEN}\) (`hypothesis.md` §13). \(c\) n'est pas utilisé comme échelle microscopique de calibration dans le modèle fondamental v0.2 ; son statut fondamental ou émergent dans une éventuelle théorie complète reste **[OPEN]**.
+
+---
+
 # A.25 Carte synthétique
 
 | Idée explorée                                   | Structure mathématique connue    | Statut CosmoTGG                 |
@@ -1608,7 +1679,7 @@ mais aucune dérivation n’est actuellement disponible.
 
 **[A1]** CODATA 2022, valeurs recommandées des constantes fondamentales : unités de Planck et constantes fondamentales.
 
-**[A2]** Kuo, C.-I. & Ford, L. H. (1993), *Semiclassical Gravity Theory and Quantum Fluctuations*, Physical Review D 47, 4510. DOI 10.1103/PhysRevD.47.4510.
+**[A2]** Kuo, C.-I. & Ford, L. H. (1993), *Semiclassical Gravity Theory and Quantum Fluctuations*, Physical Review D 47, 4510, arXiv:gr-qc/9304008. DOI 10.1103/PhysRevD.47.4510.
 
 **[A3]** Hu, B. L. & Verdaguer, E. (2008), *Stochastic Gravity: Theory and Applications*, Living Reviews in Relativity 11, 3.
 
@@ -1622,17 +1693,27 @@ mais aucune dérivation n’est actuellement disponible.
 
 **[A8]** Visser, M. (2002), *Sakharov's Induced Gravity: a Modern Perspective*, Modern Physics Letters A 17, 977–992, arXiv:gr-qc/0204062.
 
-**[A9]** Connes, A. & Rovelli, C. (1994), *Von Neumann Algebra Automorphisms and Time-Thermodynamics Relation in General Covariant Quantum Theories*, Classical and Quantum Gravity 11, 2899–2917.
+**[A9]** Connes, A. & Rovelli, C. (1994), *Von Neumann Algebra Automorphisms and Time-Thermodynamics Relation in General Covariant Quantum Theories*, Classical and Quantum Gravity 11, 2899–2917, arXiv:gr-qc/9406019.
 
-**[A10]** Jacobson, T. (1995), *Thermodynamics of Spacetime: The Einstein Equation of State*, Physical Review Letters 75, 1260.
+**[A10]** Jacobson, T. (1995), *Thermodynamics of Spacetime: The Einstein Equation of State*, Physical Review Letters 75, 1260, arXiv:gr-qc/9504004.
 
 **[A11]** Blanco, D. D., Casini, H., Hung, L.-Y. & Myers, R. C. (2013), *Relative Entropy and Holography*, arXiv:1305.3182.
 
-**[A12]** Faulkner, T., Guica, M., Hartman, T., Myers, R. C. & Van Raamsdonk, M. (2014), *Gravitation from Entanglement in Holographic CFTs*, JHEP 03 (2014) 051.
+**[A12]** Faulkner, T., Guica, M., Hartman, T., Myers, R. C. & Van Raamsdonk, M. (2014), *Gravitation from Entanglement in Holographic CFTs*, JHEP 03 (2014) 051, arXiv:1312.7856.
 
-**[A13]** Jacobson, T. (2015), *Entanglement Equilibrium and the Einstein Equation*, arXiv:1505.04753.
+**[A13]** Jacobson, T. (2016), *Entanglement Equilibrium and the Einstein Equation*, Physical Review Letters 116, 201101, arXiv:1505.04753.
 
 **[A14]** Czech, B., de Boer, J., Ge, D. & Lamprou, L. (2019), *A Modular Sewing Kit for Entanglement Wedges*, JHEP 11 (2019) 094, arXiv:1903.04493.
+
+**[A15]** Czech, B., Lamprou, L., McCandlish, S. & Sully, J. (2018), *Modular Berry Connection for Entangled Subregions in AdS/CFT*, Physical Review Letters 120, 091601, arXiv:1712.07123. DOI 10.1103/PhysRevLett.120.091601.
+
+**[A16]** Umegaki, H. (1962), *Conditional expectation in an operator algebra, IV (Entropy and information)*, Kodai Mathematical Seminar Reports 14(2), 59–85. DOI 10.2996/kmj/1138844604.
+
+**[A17]** Araki, H. (1976), *Relative Entropy of States of von Neumann Algebras*, Publications of the Research Institute for Mathematical Sciences 11(3), 809–833. DOI 10.2977/prims/1195191148.
+
+**[A18]** Page, D. N. & Wootters, W. K. (1983), *Evolution without evolution: Dynamics described by stationary observables*, Physical Review D 27, 2885. DOI 10.1103/PhysRevD.27.2885.
+
+**[A19]** Höhn, P. A., Smith, A. R. H. & Lock, M. P. E. (2021), *Trinity of relational quantum dynamics*, Physical Review D 104, 066001, arXiv:1912.00033. DOI 10.1103/PhysRevD.104.066001.
 
 ---
 

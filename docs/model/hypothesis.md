@@ -2,7 +2,7 @@
 
 ## Temps, Géométrie et Gravitation depuis une structure quantique relationnelle
 
-**Statut : note conceptuelle de travail — v0.1**
+**Statut : note conceptuelle de travail — v0.2, corrigée après première contre-expertise scientifique, en attente de seconde revue**
 
 ### 1. Question de recherche
 
@@ -117,17 +117,25 @@ $$
 
 ## [KNOWN]
 
-Dans un système quantique fini, pour un état de densité strictement positif \(\rho\), on peut définir :
+CosmoTGG n'impose pas que l'état global \(\rho_{ABC\ldots}\) soit mixte ou de rang plein : un état global peut être pur.
+
+En revanche, dans la réalisation matricielle finie utilisée actuellement, lorsqu'un état réduit \(\rho_X\) est utilisé pour définir un Hamiltonien modulaire fini sur l'algèbre complète, cet état réduit doit être **fidèle**, c'est-à-dire strictement positif / de rang plein en dimension finie :
 
 $$
-\boxed{K=-\ln\rho}
+\boxed{\rho_X>0}
+$$
+
+On définit alors :
+
+$$
+\boxed{K_X=-\ln\rho_X}
 $$
 
 à une constante additive près selon la convention de normalisation.
 
-\(K\) est appelé Hamiltonien modulaire.
+\(K_X\) est appelé Hamiltonien modulaire.
 
-Dans le cadre plus général des algèbres de von Neumann, la théorie de Tomita–Takesaki fournit la structure modulaire appropriée ; la simple formule matricielle ci-dessus est notre réalisation finie minimale.
+Dans le cadre plus général des algèbres de von Neumann, la théorie de Tomita–Takesaki fournit la structure modulaire appropriée pour des états non nécessairement de rang plein (via restriction au support ou théorie modulaire algébrique) ; ces extensions existent mais ne font pas partie de la définition opérationnelle finie de v0.2. La simple formule matricielle ci-dessus est notre réalisation finie minimale de type I, utilisée comme banc d'essai.
 
 Connes et Rovelli ont proposé que le flot modulaire déterminé par l’état puisse fournir le temps physique d’une théorie généralement covariante : c’est la **Thermal Time Hypothesis**. Il s’agit d’une hypothèse physique, non d’un théorème affirmant que tout flot modulaire est le temps physique. ([arXiv][1])
 
@@ -135,15 +143,37 @@ Pour une observable \(O\), le modèle fini possède le flot :
 
 $$
 \boxed{
-O(s)=e^{iKs}Oe^{-iKs}
+O(s)=e^{+iKs}Oe^{-iKs}
 }
 $$
 
 où \(s\) est un paramètre modulaire sans identification préalable à une durée mesurée en secondes.
 
+Avec \(K=-\ln\rho\), CosmoTGG adopte la convention physique \(O(s)=e^{+iKs}Oe^{-iKs}\). Cette convention correspond au choix de signe utilisé par Connes–Rovelli pour le temps thermique et est opposée à une convention mathématique courante du paramètre modulaire de Tomita–Takesaki. Toute comparaison ultérieure doit conserver cette convention. ([arXiv][1])
+
+## [OPEN]
+
+La formulation actuelle \(\rho_X\)/\(K_X=-\ln\rho_X\) est une réalisation finie de type I utilisée comme banc d'essai minimal. Elle ne constitue pas encore la formulation adaptée aux algèbres locales de théorie quantique des champs, souvent de type III. Dans le cadre général des algèbres de von Neumann, l'entropie relative et les structures modulaires sont formulées à partir d'opérateurs modulaires relatifs, notamment dans la théorie d'Araki. ([DOI][10])
+
+$$
+\boxed{
+\text{TYPE\_I\_TO\_ALGEBRAIC\_MODULAR\_BRIDGE}
+}
+$$
+
+Le passage du modèle matriciel fini de type I à une structure modulaire algébrique appropriée à la QFT est un verrou scientifique **[OPEN]** de CosmoTGG.
+
 ---
 
 # 5. La relation quantique entre deux sous-systèmes
+
+Le domaine de travail v0.2 est celui d'un état réduit joint fidèle :
+
+$$
+\boxed{\rho_{AB}>0}
+$$
+
+ce qui garantit également la fidélité des marginales \(\rho_A,\rho_B\) dans ce cadre fini.
 
 Pour \(A\) et \(B\), définissons :
 
@@ -185,7 +215,7 @@ $$
 \ln(\rho_A\otimes\rho_B).
 $$
 
-Ce n’est **pas un nouvel objet physique postulé**. C’est simplement une combinaison des opérateurs modulaires connus.
+Ce n’est **pas un nouvel objet physique postulé**. C’est simplement une combinaison des opérateurs modulaires connus. \(\mathcal R_{AB}\) est une combinaison opératorielle définie pour le modèle fini de CosmoTGG ; elle ne doit pas être identifiée au logarithme de l'opérateur modulaire relatif général de Tomita–Takesaki/Araki dans le cas non commutatif.
 
 Or l’information mutuelle quantique satisfait :
 
@@ -199,7 +229,15 @@ D\!\left(
 \right),
 $$
 
-où \(D(\rho\Vert\sigma)\) est l’entropie relative quantique. Cette identité est standard en théorie de l’information quantique. ([arXiv][2])
+où \(D(\rho\Vert\sigma)\) est l’entropie relative d'Umegaki. Cette identité est standard en théorie de l’information quantique. ([DOI][9], [DOI][10])
+
+Pour que \(D(\rho\Vert\sigma)\) soit finie, la condition générale à rappeler est :
+
+$$
+\boxed{\operatorname{supp}(\rho)\subseteq\operatorname{supp}(\sigma)}
+$$
+
+Cette condition n'est pas une exigence de rang plein général : dans le domaine fidèle \(\rho_{AB}>0\) considéré ici, elle est automatiquement satisfaite.
 
 On obtient donc immédiatement :
 
@@ -260,7 +298,15 @@ Elle découle notamment du comportement de l’entropie relative entre deux éta
 
 ## [DERIVED]
 
-Pour l’information mutuelle, on obtient au premier ordre, sous les conditions régulières précédentes :
+Pour l’information mutuelle, on obtient au premier ordre, sous les hypothèses suivantes :
+
+* famille différentiable d'états normalisés ;
+* \(\operatorname{Tr}(\delta\rho_{AB})=0\) ;
+* état de référence fidèle dans le voisinage considéré ;
+* \(\mathcal R_{AB}\) évalué à l'état de référence ;
+* la variation reste dans l'espace des états physiques ;
+
+l'identité :
 
 $$
 \boxed{
@@ -272,6 +318,8 @@ $$
 \right).
 }
 $$
+
+La variation des marginales \(\rho_A\) et \(\rho_B\) est bien incluse dans cette identité : elle n'est pas négligée, elle est portée implicitement par \(\delta\rho_{AB}\) via \(\mathcal R_{AB}\). Cette identité, comme celle du §5, reste un résultat standard de théorie de l'information quantique — elle n'est présentée ici comme aucun résultat nouveau propre à CosmoTGG.
 
 Donc le même état relationnel détermine :
 
@@ -289,6 +337,13 @@ Cela constitue notre premier raccord non arbitraire.
 
 Un état détermine une structure modulaire et donc un flot modulaire.
 
+La littérature existante propose déjà plusieurs formulations d'une dynamique quantique relationnelle sans temps externe :
+
+* Page et Wootters montrent dès 1983 qu'une évolution observée peut être décrite relativement aux lectures d'une horloge interne dans un état global stationnaire ; ([DOI][11])
+* les observables relationnelles / observables de Dirac constituent une autre famille de formulations relationnelles du changement ;
+* Höhn, Smith et Lock montrent une équivalence entre plusieurs formulations modernes de dynamique quantique relationnelle ; ([arXiv][12])
+* Connes et Rovelli proposent déjà l'utilisation du flot modulaire comme origine du temps thermique ([arXiv][1]).
+
 ## [HYPOTHESIS]
 
 CosmoTGG propose de ne pas identifier immédiatement :
@@ -297,7 +352,24 @@ $$
 s=t.
 $$
 
-Le contenu physique recherché est **relationnel**.
+$$
+\boxed{
+\text{MODULAR\_PARAMETER}\neq\text{PHYSICAL\_TIME}
+}
+$$
+
+Le simple fait qu'un \(K\) génère un flot modulaire n'est pas, à lui seul, une validation du test T1 (§15).
+
+Le contenu physique recherché est **relationnel**. Compte tenu de la littérature ci-dessus, la question propre à CosmoTGG n'est pas « peut-on avoir un changement relationnel sans temps externe ? » — cette question générale possède déjà des réponses dans la littérature citée. La question resserrée est :
+
+$$
+\boxed{
+\text{Peut-on construire un temps relationnel physique à partir des relations
+entre plusieurs structures modulaires, sans ajouter un degré de liberté
+fondamental désigné comme horloge, et en utilisant la même famille de
+structures relationnelles que celle dont la géométrie est supposée émerger ?}
+}
+$$
 
 Pour deux sous-ensembles \(A\) et \(B\), on cherche si leurs flots peuvent définir une quantité indépendante d’une horloge extérieure correspondant à :
 
@@ -339,6 +411,8 @@ Il reste à démontrer qu’un paramètre relationnel ainsi construit possède, 
 * relation au temps propre ;
 * calibration physique.
 
+La composition et l'orientation existent déjà pour le groupe modulaire lui-même ; elles restent à démontrer pour l'éventuel temps physique relationnel dérivé de la famille \(\{\rho_{ij},K_{ij}\}\).
+
 ---
 
 # 8. Deuxième branche : la géométrie
@@ -361,17 +435,9 @@ $$
 
 La littérature sur la **modular Berry connection** montre qu’une famille d’Hamiltoniens modulaires variant avec la région considérée possède une connexion naturelle. Dans une CFT bidimensionnelle avec dual holographique, certaines boucles de cette connexion calculent des longueurs dans \(AdS_3\). ([arXiv][4])
 
-Plus fortement, dans certaines constructions holographiques semi-classiques, la courbure de Berry modulaire a été directement reliée à la courbure de Riemann de l’espace-temps dual :
+Plus fortement, dans certaines constructions holographiques semi-classiques, une courbure de Berry modulaire a été directement reliée à des données de courbure de l'espace-temps dual. ([arXiv][5])
 
-$$
-\boxed{
-\mathcal F_{\rm mod}
-\longleftrightarrow
-R_{\mu\nu\rho\sigma}^{\rm bulk}.
-}
-$$
-
-Ce résultat est établi sous des hypothèses holographiques précises ; il ne constitue pas une identité universelle entre structure modulaire et espace-temps. ([arXiv][5])
+Dans les constructions holographiques citées, sous leurs hypothèses propres, certaines données de connexion/courbure modulaire sont reliées à des données géométriques du bulk. CosmoTGG ne suppose aucune identité générale entre courbure modulaire et courbure de l'espace-temps ; ce résultat est établi sous des hypothèses holographiques précises et ne constitue pas une identité universelle entre structure modulaire et espace-temps.
 
 ## [HYPOTHESIS]
 
@@ -472,7 +538,9 @@ $$
 
 associée à une entropie proportionnelle à l’aire des horizons locaux conduit à l’équation d’Einstein. Il interprète explicitement cette dernière comme une équation d’état de l’espace-temps. ([arXiv][7])
 
-En 2015, il a montré qu’une hypothèse de stationnarité/maximalité de l’entropie d’intrication du vide pour de petites boules géodésiques conduit, sous certaines hypothèses, à l’équation d’Einstein semi-classique au premier ordre. ([arXiv][8])
+Le coefficient de proportionnalité entre entropie et aire fixe le couplage gravitationnel. Le résultat ne dérive donc pas la valeur de \(G\) à partir de zéro : Jacobson déplace la question de l'origine de \(G\) vers le coefficient entropie/aire, il ne la résout pas.
+
+En 2016, il a montré qu’une hypothèse de stationnarité/maximalité de l’entropie d’intrication du vide pour de petites boules géodésiques **à volume fixé** conduit, sous certaines hypothèses, à l’équation d’Einstein semi-classique au premier ordre. ([arXiv][8]) Cette hypothèse entropique contient déjà un coefficient aire/entropie faisant intervenir le couplage gravitationnel : ce résultat est un précédent pour équilibre d'intrication → dynamique géométrique, mais pas une dérivation de \(G\).
 
 Cela fournit un précédent important pour :
 
@@ -504,7 +572,7 @@ $$
 \hat{\mathcal G}_N.
 $$
 
-Son régime quasi classique devrait satisfaire au minimum :
+On peut considérer :
 
 $$
 \boxed{
@@ -515,11 +583,12 @@ R_{\mathcal G}(N)
 }{
 |\langle\mathcal G_N\rangle|
 }
-\ll1.
 }
 $$
 
-Cette condition est nécessaire comme critère de faible fluctuation, mais elle n’est pas suffisante à elle seule pour établir une limite classique.
+\(R_{\mathcal G}\) est un **indicateur possible** de faible fluctuation relative (\(R_{\mathcal G}\ll1\)), **ni nécessaire ni suffisant** pour établir une limite classique. Son utilisation est limitée aux observables pour lesquelles \(|\langle\mathcal G_N\rangle|\) est non nul et convenablement borné loin de zéro dans le régime testé. Si la moyenne peut s'annuler, une autre normalisation devra être définie et préenregistrée ; cette normalisation reste **[OPEN]** et n'est pas choisie dans le présent document.
+
+T3 (§15) devra établir un régime collectif quasi classique au moyen de diagnostics de fluctuation/cohérence explicitement définis et préenregistrés. \(R_{\mathcal G}\) peut faire partie de ces diagnostics uniquement dans son domaine de validité ; le PASS de T3 ne dépend donc pas de ce seul quotient.
 
 Il faudra également vérifier :
 
@@ -594,13 +663,15 @@ $$
 
 lorsque le nombre de degrés de liberté devient grand.
 
-La propriété décisive est **l’universalité** :
+La propriété décisive est **l’universalité**, au sens suivant : dans une phase effective et une classe de systèmes explicitement déclarées, le même coefficient effectif \(\kappa_*\) doit gouverner la réponse géométrique aux différentes sources admissibles, à corrections contrôlées près. Cette condition n'exige pas que \(\kappa_*\) soit indépendant de toute microphysique.
 
-$$
-\kappa_*
-$$
+Dans les scénarios de gravité induite de type Sakharov, la valeur de \(G_{\rm eff}\) peut dépendre du contenu microscopique et de l'échelle UV. Cela ne doit pas être confondu avec la question de l'universalité du couplage dans la théorie effective obtenue.
 
-ne doit pas dépendre arbitrairement de la composition microscopique de l’état.
+## [OPEN] DIMENSIONAL_CALIBRATION
+
+Avant toute comparaison entre un coefficient émergent \(\kappa_*\) et \(8\pi G/c^4\), les observables émergentes doivent avoir reçu une interprétation dimensionnelle physique. Cette calibration doit être définie indépendamment de toute mesure gravitationnelle utilisée comme cible. La règle NO_GRAVITY_SCALE_INPUT (§14) reste inchangée. Aucune procédure concrète de calibration n'est définie dans ce document : \(\text{DIMENSIONAL\_CALIBRATION}=\text{OPEN}\).
+
+\(c\) n'est pas utilisé comme échelle microscopique de calibration dans le modèle fondamental v0.2. Il n'intervient dans l'expression \(8\pi G/c^4\) qu'au stade de la comparaison finale avec l'écriture physique de l'équation d'Einstein, après émergence d'une structure causale et d'une conversion entre unités temporelles et spatiales. Le statut fondamental ou émergent de \(c\) dans une éventuelle théorie complète reste **[OPEN]**.
 
 Seulement après cette démonstration serait-il légitime de tester :
 
@@ -658,15 +729,29 @@ L’utilisation de \(\hbar\) et des structures standards de mécanique quantique
 
 | Test                              | Question                                                                                           | PASS                                                      |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **T1 — Relational Flow**          | Les états réduits permettent-ils de comparer intrinsèquement les changements de sous-systèmes ?    | Aucun temps externe nécessaire                            |
+| **T1 — Relational Flow**          | Les états réduits permettent-ils de comparer intrinsèquement les changements de sous-systèmes ?    | Construction explicite d'un changement relatif entre au moins deux sous-structures, calculée depuis \(\{\rho_{ij},K_{ij}\}\), sans temps externe et sans degré de liberté supplémentaire désigné comme horloge fondamentale (cf. §7) |
 | **T2 — Modular Geometry**         | Une famille de structures modulaires produit-elle une connexion et une courbure non arbitraires ?  | Construction définie uniquement depuis les états          |
-| **T3 — Classicalization**         | La structure relationnelle possède-t-elle une limite quasi classique ?                             | Fluctuations relatives faibles + cohérence collective     |
-| **T4 — Common Origin**            | Une même \(\delta\rho\) modifie-t-elle flot et courbure selon une structure commune ?              | Relation stable et non accidentelle                       |
+| **T3 — Classicalization**         | La structure relationnelle possède-t-elle une limite quasi classique ?                             | Régime collectif quasi classique établi par des diagnostics de fluctuation/cohérence explicitement définis et préenregistrés (cf. §12) ; \(R_{\mathcal G}\) peut y contribuer uniquement dans son domaine de validité |
+| **T4 — Common Origin**            | Une même \(\delta\rho\) modifie-t-elle flot et courbure selon une structure commune ?              | T4_OPERATIONAL_CRITERION = **OPEN** (cf. note ci-dessous) |
 | **T5 — Continuum**                | La courbure relationnelle tend-elle vers une géométrie continue ?                                  | Reconstruction effective de \(g_{\mu\nu}\) ou équivalent  |
-| **T6 — Gravity**                  | La géométrie répond-elle universellement au contenu énergétique ?                                  | \(\kappa_{\rm eff}\rightarrow\kappa_*\) universel          |
-| **T7 — Newton/Einstein coupling** | \(\kappa_*\) correspond-il au couplage gravitationnel observé ?                                    | \(8\pi G/c^4\) obtenu sans \(G\) en entrée                 |
+| **T6 — Gravity**                  | La géométrie répond-elle universellement au contenu énergétique ?                                  | \(\kappa_{\rm eff}\rightarrow\kappa_*\) universel au sens du §13 (phase/classe de systèmes déclarées), sans exiger l'indépendance de toute microphysique |
+| **T7 — Newton/Einstein coupling** | \(\kappa_*\) correspond-il au couplage gravitationnel observé ?                                    | (1) calibration dimensionnelle indépendante de toute mesure gravitationnelle cible définie ; (2) \(\kappa_*\) comparé à \(8\pi G/c^4\) ; (3) aucune valeur de \(G\) ni de longueur de Planck utilisée pour construire ou calibrer le modèle |
 
 Chaque test doit pouvoir produire **FAIL**.
+
+### Note sur T1
+
+Le test T1 n'est pas satisfait par la seule existence séparée d'un flot modulaire pour chaque \(K_i\) ou \(K_{ij}\) (cf. §7, MODULAR_PARAMETER ≠ PHYSICAL_TIME).
+
+### Note sur T4
+
+T4 ne pourra être exécuté qu'après définition et préenregistrement d'un critère opératoire capable de distinguer :
+
+A. deux constructions mathématiques indépendantes utilisant les mêmes données \(\rho\) ;
+
+B. deux manifestations contraintes d'une structure commune.
+
+La formulation « relation stable et non accidentelle » ne constitue pas, à elle seule, un critère de PASS. Cette formalisation sera traitée dans un lot scientifique ultérieur.
 
 ---
 
@@ -748,25 +833,36 @@ $$
 
 ### Références fondatrices minimales
 
-Connes & Rovelli (1994), *Von Neumann Algebra Automorphisms and Time-Thermodynamics Relation in General Covariant Quantum Theories* — temps thermique et flot modulaire. ([arXiv][1])
+Connes & Rovelli (1994), *Von Neumann Algebra Automorphisms and Time-Thermodynamics Relation in General Covariant Quantum Theories*, Classical and Quantum Gravity 11 — temps thermique, flot modulaire et convention de signe adoptée par CosmoTGG (§4). ([arXiv][1])
 
-Jacobson (1995), *Thermodynamics of Spacetime: The Einstein Equation of State* — équation d’Einstein comme équation d’état. ([arXiv][7])
+Umegaki (1962), *Conditional expectation in an operator algebra, IV (Entropy and information)*, Kodai Mathematical Seminar Reports 14(2), 59–85 — entropie relative d'Umegaki. ([DOI][9])
+
+Araki (1976), *Relative Entropy of States of von Neumann Algebras*, Publications RIMS 11(3), 809–833 — condition de finitude \(\operatorname{supp}(\rho)\subseteq\operatorname{supp}(\sigma)\) et opérateur modulaire relatif. ([DOI][10])
+
+Page & Wootters (1983), *Evolution without evolution: Dynamics described by stationary observables*, Physical Review D 27, 2885 — dynamique relationnelle sans temps externe. ([DOI][11])
+
+Höhn, Smith & Lock (2021), *Trinity of relational quantum dynamics*, Physical Review D 104, 066001 — équivalence de formulations relationnelles modernes. ([arXiv][12])
+
+Jacobson (1995), *Thermodynamics of Spacetime: The Einstein Equation of State* — équation d’Einstein comme équation d’état ; \(G\) déplacé vers le coefficient entropie/aire, non dérivé. ([arXiv][7])
 
 Blanco, Casini, Hung & Myers (2013), *Relative Entropy and Holography* — première loi de l’intrication \(\delta S=\delta\langle K\rangle\). ([arXiv][3])
 
-Faulkner et al. (2013), *Gravitation from Entanglement in Holographic CFTs* — première loi de l’intrication et équations gravitationnelles linéarisées dans le cadre holographique. ([arXiv][6])
+Faulkner, Guica, Hartman, Myers & Van Raamsdonk (2014), *Gravitation from Entanglement in Holographic CFTs*, JHEP 03 (2014) 051 — première loi de l’intrication et équations gravitationnelles linéarisées dans le cadre holographique. ([arXiv][6])
 
-Jacobson (2015), *Entanglement Equilibrium and the Einstein Equation* — équilibre d’intrication et équation d’Einstein semi-classique. ([arXiv][8])
+Jacobson (2016), *Entanglement Equilibrium and the Einstein Equation*, Physical Review Letters 116, 201101 — équilibre d’intrication et équation d’Einstein semi-classique, sous condition de petites boules géodésiques à volume fixé ; pas une dérivation de \(G\). ([arXiv][8])
 
-Czech et al. (2017), *Modular Berry Connection* — connexion modulaire et longueurs holographiques. ([arXiv][4])
+Czech, Lamprou, McCandlish & Sully (2018), *Modular Berry Connection for Entangled Subregions in AdS/CFT*, Physical Review Letters 120, 091601 — connexion modulaire et longueurs holographiques. ([arXiv][4])
 
-Czech, de Boer, Ge & Lamprou (2019), *A Modular Sewing Kit for Entanglement Wedges* — relation entre courbure de Berry modulaire et courbure de Riemann du bulk holographique. ([arXiv][5])
+Czech, de Boer, Ge & Lamprou (2019), *A Modular Sewing Kit for Entanglement Wedges*, JHEP 11 (2019) 094 — relation entre courbure de Berry modulaire et courbure de Riemann du bulk holographique, dans le cadre holographique étudié. ([arXiv][5])
 
 [1]: https://arxiv.org/abs/gr-qc/9406019 "Von Neumann Algebra Automorphisms and Time-Thermodynamics Relation in General Covariant Quantum Theories"
-[2]: https://arxiv.org/pdf/2305.18519 "Quantum chi-squared tomography and mutual information"
 [3]: https://arxiv.org/abs/1305.3182 "Relative Entropy and Holography"
-[4]: https://arxiv.org/abs/1712.07123 "Modular Berry Connection"
+[4]: https://arxiv.org/abs/1712.07123 "Modular Berry Connection for Entangled Subregions in AdS/CFT"
 [5]: https://arxiv.org/abs/1903.04493 "A Modular Sewing Kit for Entanglement Wedges"
 [6]: https://arxiv.org/abs/1312.7856 "Gravitation from Entanglement in Holographic CFTs"
 [7]: https://arxiv.org/abs/gr-qc/9504004 "Thermodynamics of Spacetime: The Einstein Equation of State"
 [8]: https://arxiv.org/abs/1505.04753 "Entanglement Equilibrium and the Einstein Equation"
+[9]: https://doi.org/10.2996/kmj/1138844604 "Conditional expectation in an operator algebra, IV (Entropy and information)"
+[10]: https://doi.org/10.2977/prims/1195191148 "Relative Entropy of States of von Neumann Algebras"
+[11]: https://doi.org/10.1103/PhysRevD.27.2885 "Evolution without evolution: Dynamics described by stationary observables"
+[12]: https://arxiv.org/abs/1912.00033 "Trinity of relational quantum dynamics"
