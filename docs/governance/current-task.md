@@ -113,6 +113,26 @@ Une objection `BLOCKING` peut arrêter le lot. Un élément `NON_BLOCKING_BACKLO
 
 ---
 
+## Règle active — gel documentaire pendant l'implémentation et canal `current-task.md`
+
+Intégrée par le lot `GOV-IMPLEMENTATION-NARRATIVE-1` :
+
+```text
+TOY_IMPLEMENTATION_DOCUMENT_FREEZE = ENABLED
+DOCUMENT_REOPEN_CONDITION          = FUNDAMENTAL_BLOCKING_ONLY
+
+CURRENT_TASK_ROLE                           = SHARED_OPERATIONAL_COMMUNICATION_CHANNEL
+CURRENT_TASK_EXCLUDED_FROM_DOCUMENT_FREEZE  = TRUE
+CURRENT_TASK_WRITABLE_DURING_IMPLEMENTATION = TRUE
+CURRENT_TASK_IMPLICIT_WRITE_AUTHORIZATION   = TRUE
+```
+
+À partir du premier lot d'implémentation de code d'un toy, `specification.md` et `implementation-design.md` de ce toy sont `READ_ONLY_DURING_IMPLEMENTATION` et ne sont réouverts que pour un blocage fondamental démontré, avec arbitrage ChatGPT/Lionel puis mandat documentaire borné (`docs/governance/documentation-governance.md` §11.1–§11.2). Le récit scientifique courant de l'expérience est porté par le notebook du toy (`docs/governance/documentation-governance.md` §11.3), pas par une succession de micro-lots documentaires (`docs/governance/collaboration-governance.md` §14.4).
+
+`docs/governance/current-task.md` reste modifiable par `docs`, `code` et `physic` pendant leurs lots respectifs, y compris lorsqu'il n'est pas listé explicitement parmi les fichiers autorisés du mandat, mais uniquement pour l'enregistrement factuel prévu par `docs/governance/collaboration-governance.md` §14.1–§14.3 : cela ne crée pas de lot `docs`, ne change pas la science gelée, ne change pas la gouvernance, et n'autorise pas seul le lot suivant.
+
+---
+
 ## Rôles spécialisés disponibles
 
 ```text
@@ -174,6 +194,18 @@ MODEL0A_DIAGNOSTIC_STRUCTURE = LOG_COMMUTATOR_PLUS_ORDINARY_GROUP_DEFECT
 MODEL0A_DIAGNOSTICS_DESIGN   = PROPOSED
 ```
 
+Application immédiate à `model0a` de la règle de gel documentaire ci-dessus (`GOV-IMPLEMENTATION-NARRATIVE-1`) : l'implémentation de `model0a` a déjà commencé (`MODEL0A_STATE_HEAD`).
+
+```text
+MODEL0A_SPECIFICATION            = READ_ONLY_DURING_IMPLEMENTATION
+MODEL0A_IMPLEMENTATION_DESIGN    = READ_ONLY_DURING_IMPLEMENTATION
+MODEL0A_NORMAL_DOCS_LOTS         = DISABLED_DURING_IMPLEMENTATION
+MODEL0A_EXPERIMENTAL_NARRATIVE_TARGET = experiments/toy0a/toy0a.ipynb
+MODEL0A_DOCUMENT_REOPEN_CONDITION = FUNDAMENTAL_BLOCKING_ONLY
+```
+
+Ceci ne change aucun contenu scientifique de `docs/toy-models/toy0a/specification.md` ou `docs/toy-models/toy0a/implementation-design.md`.
+
 ```text
 T1_CORE_FOUNDATION_AUDIT = PASS
 ```
@@ -224,9 +256,9 @@ La gouvernance normative applicable aux notebooks Jupyter d'exécution des toy m
 ```text
 BRANCHE                     = master
 LOT_COURANT                 = NONE
-DERNIER_JALON_VALIDE        = structure analytique de qualification du cocycle intégrée (specification.md §9) ; implementation-design.md étendu avec diagnostics.py
+DERNIER_JALON_VALIDE        = gel documentaire toy en implémentation + canal current-task.md partagé intégrés (GOV-IMPLEMENTATION-NARRATIVE-1) ; règle appliquée à model0a
 DOCUMENTS_APPLICABLES       = docs/governance/*, docs/model/hypothesis.md, docs/model/hypothesis-annex-a.md, docs/toy-models/toy0a/specification.md, docs/toy-models/toy0a/implementation-design.md
-TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter ; spécification scientifique PROPOSED de model0a (toy0a) ; revue ChatGPT PASS de specification.md ; synchronisation du workflow de conception model0a (physic/Opus réservés à l'escalade scientifique structurelle) ; fermeture LOCAL_DIMENSION=(2,2) et STATE_FAMILY=TWO_QUBIT_FIXED_MARGINAL_CORRELATION_FAMILY ; création implementation-design.md ; implémentation states.py (MODEL0A_STATE_HEAD=d6b80f5) ; structure analytique de qualification du cocycle (LOG_COMMUTATOR_OBSTRUCTION, ORDINARY_GROUP_DEFECT, table N0/N1/N2) ; extension implementation-design.md avec diagnostics.py
+TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter ; spécification scientifique PROPOSED de model0a (toy0a) ; revue ChatGPT PASS de specification.md ; synchronisation du workflow de conception model0a (physic/Opus réservés à l'escalade scientifique structurelle) ; fermeture LOCAL_DIMENSION=(2,2) et STATE_FAMILY=TWO_QUBIT_FIXED_MARGINAL_CORRELATION_FAMILY ; création implementation-design.md ; implémentation states.py (MODEL0A_STATE_HEAD=d6b80f5) ; structure analytique de qualification du cocycle (LOG_COMMUTATOR_OBSTRUCTION, ORDINARY_GROUP_DEFECT, table N0/N1/N2) ; extension implementation-design.md avec diagnostics.py ; intégration du gel documentaire toy-en-implémentation et du canal current-task.md partagé (collaboration-governance.md §14, documentation-governance.md §11, agents/*.md) ; application de la règle à model0a
 TRAVAIL_NON_REALISE         = implémentation model0a/diagnostics.py ; tests diagnostics ; state_parameter_values ; modular parameter domain ; numerical tolerances ; plan de validation toy0a ; notebook toy0a ; ajout dépendance Jupyter ; définition opérationnelle de T1 ; exécution T1
 PROCHAINE_ACTION_AUTORISEE  = bounded implementation of model0a diagnostics by code / Claude Sonnet 5
 QUESTIONS_OUVERTES          = T4_OPERATIONAL_CRITERION, DIMENSIONAL_CALIBRATION, TYPE_I_TO_ALGEBRAIC_MODULAR_BRIDGE

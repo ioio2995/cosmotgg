@@ -126,6 +126,10 @@ GIT_PERMISSION
 
 L'agent n'ouvre jamais le lot suivant automatiquement.
 
+### 4.1 Canal opérationnel `current-task.md`
+
+Conformément à `docs/governance/collaboration-governance.md` §14, `docs/governance/current-task.md` est implicitement autorisé en écriture pour la seule mise à jour opérationnelle du lot courant, même lorsqu'il n'est pas listé explicitement dans `AUTHORIZED_FILES_OR_AREAS`. Cette exception ne s'étend à aucun autre fichier et ne donne au rôle `code` aucune autorité de gouvernance, d'arbitrage scientifique ou d'auto-autorisation du lot suivant (`docs/governance/collaboration-governance.md` §14.2). L'ordre de mise à jour et le traitement d'un lot `BLOCKED` suivent `docs/governance/collaboration-governance.md` §14.3.
+
 ---
 
 ## 5. Frontière science / ingénierie
@@ -154,6 +158,8 @@ L'agent n'ouvre jamais le lot suivant automatiquement.
 - la gouvernance transverse, sauf mandat autorisant explicitement cette modification précise.
 
 La commodité d'implémentation n'est jamais une raison de modifier la science gelée.
+
+À partir du premier lot d'implémentation de code d'un toy, `specification.md` et `implementation-design.md` de ce toy sont `READ_ONLY_DURING_IMPLEMENTATION` (`docs/governance/documentation-governance.md` §11.1) : `code` ne les modifie pas, et n'en demande la réouverture que via le mécanisme `IMPLEMENTATION_BLOCKING = FROZEN_SPECIFICATION_CONFLICT` du §6 ci-dessous.
 
 ---
 

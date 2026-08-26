@@ -410,6 +410,71 @@ Opus reste une escalade ciblée pour la contre-expertise scientifique, les démo
 
 La discipline de coût ne consiste plus à sélectionner un modèle inférieur à Sonnet pour une modification versionnée. Elle repose sur un contexte propre, un périmètre borné, des lectures ciblées et l'absence d'audit global par défaut.
 
-## 13. Évolution
+## 14. Canal opérationnel partagé : `current-task.md`
+
+`docs/governance/current-task.md` est un canal de communication opérationnelle partagé entre les rôles.
+
+```text
+CURRENT_TASK_ROLE                           = SHARED_OPERATIONAL_COMMUNICATION_CHANNEL
+CURRENT_TASK_EXCLUDED_FROM_DOCUMENT_FREEZE  = TRUE
+CURRENT_TASK_WRITABLE_DURING_IMPLEMENTATION = TRUE
+```
+
+Il peut être mis à jour par `docs`, `code` et `physic` pendant leurs lots respectifs, ainsi que par ChatGPT et Lionel ORCIL via les mandats. Le gel documentaire d'un toy en implémentation (`docs/governance/documentation-governance.md` §11.1) ne s'applique pas à `current-task.md`.
+
+### 14.1 Autorisation implicite d'écriture
+
+Lorsqu'un agent reçoit un mandat valide sur le dépôt, `docs/governance/current-task.md` est automatiquement autorisé en écriture pour la seule mise à jour opérationnelle liée à ce lot, même si le fichier n'apparaît pas explicitement dans les fichiers ou zones autorisés du mandat.
+
+```text
+CURRENT_TASK_IMPLICIT_WRITE_AUTHORIZATION = TRUE
+```
+
+Cette exception ne s'applique à aucun autre fichier. Elle couvre uniquement l'enregistrement factuel de : lot, rôle, statut, HEAD de base, HEAD final ou tête d'implémentation locale le cas échéant, HEAD distant le cas échéant, résultats de tests, blocages, éléments non bloquants, travail réalisé, travail non réalisé, phase opérationnelle résultante, prochaine action déjà autorisée par le mandat.
+
+### 14.2 Limites de l'autorité d'un agent dans `current-task.md`
+
+Le caractère partagé de `current-task.md` ne donne aucun nouveau pouvoir d'arbitrage.
+
+```text
+AGENT_CAN_RECORD_FACTS          = YES
+AGENT_CAN_RECORD_BLOCKING       = YES
+AGENT_CAN_RECORD_TEST_RESULTS   = YES
+AGENT_CAN_RECORD_OWN_LOT_STATUS = YES
+
+AGENT_CAN_CHANGE_FROZEN_SCIENCE         = NO
+AGENT_CAN_CHANGE_GOVERNANCE             = NO
+AGENT_CAN_SELF_AUTHORIZE_NEXT_LOT       = NO
+AGENT_CAN_DECLARE_SCIENTIFIC_ACCEPTANCE = NO
+AGENT_CAN_DECLARE_T1_PASS               = NO
+```
+
+Un agent n'invente jamais une nouvelle `PROCHAINE_ACTION_AUTORISEE`. Il peut seulement : reporter celle explicitement contenue dans son mandat lorsqu'elle reste applicable ; inscrire que la prochaine action est en attente d'arbitrage ChatGPT/Lionel après un `BLOCKED` ; enregistrer la prochaine étape explicitement autorisée par le mandat courant.
+
+La modification de `current-task.md` par un agent `code` ou `physic` pour enregistrer l'état de son propre lot ne constitue pas un lot `docs`, un changement scientifique documentaire, un changement de conception ou un changement de gouvernance :
+
+```text
+DOES_NOT_CREATE_A_DOCS_LOT = TRUE
+```
+
+C'est une mise à jour opérationnelle.
+
+### 14.3 Ordre de mise à jour et lots `BLOCKED`
+
+Pour un lot autorisant commit/push, la séquence recommandée est : implémentation, tests, détermination du statut du lot, mise à jour de `current-task.md`, `git diff`/`git diff --check`, stage explicite, commit, push, vérification du HEAD distant, rapport. `current-task.md` peut appartenir au même commit que le lot qu'il décrit.
+
+Pour un lot `READ_ONLY`, `current-task.md` n'est pas modifié, sauf si le mandat autorise explicitement une mutation opérationnelle. Un audit `READ_ONLY` ne se transforme jamais automatiquement en commit.
+
+Si un lot d'implémentation est `BLOCKED` avant commit, `current-task.md` n'est mis à jour que si le mandat l'autorise explicitement à produire une modification malgré le `BLOCKED` ; sinon l'agent rapporte le `BLOCKED` sans mutation Git. Le mandat courant reste souverain sur `COMMIT_ON_PASS`, `NO_COMMIT_ON_BLOCKED` et `READ_ONLY`.
+
+### 14.4 Lots documentaires pendant l'implémentation d'un toy
+
+Après le démarrage de l'implémentation d'un toy (`docs/governance/documentation-governance.md` §11), un rôle `docs` n'est pas sollicité uniquement pour raconter ce qui vient d'être codé, recopier des résultats de tests, introduire l'étape exploratoire suivante ou commenter une découverte intermédiaire : ces informations relèvent de `current-task.md` pour l'état opérationnel minimal et du notebook du toy pour le récit scientifique (`docs/governance/documentation-governance.md` §11.3).
+
+Un lot `docs` reste pertinent pour : la gouvernance, une correction fondamentale autorisée, un nouveau contrat scientifique avant implémentation, un plan de validation avant exécution confirmatoire, un `closure-report.md` en fin de cycle, ou une documentation explicitement normative.
+
+---
+
+## 15. Évolution
 
 Toute modification de cette charte exige une décision explicite, la mise à jour des documents qui la référencent si leur sens est affecté, la vérification du diff réel et la validation de Lionel.

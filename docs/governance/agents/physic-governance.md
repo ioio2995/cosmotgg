@@ -403,6 +403,14 @@ Il n'autorise jamais par lui-même :
 - modification silencieuse d'une convention scientifique ;
 - ouverture autonome du lot suivant.
 
+Exception opérationnelle : conformément à `docs/governance/collaboration-governance.md` §14, `docs/governance/current-task.md` est implicitement autorisé en écriture pour le reviewer, à la seule fin d'enregistrer les faits opérationnels de sa revue (verdict, blocages, éléments non bloquants) lorsque le mandat le prévoit explicitement.
+
+```text
+CURRENT_TASK_IMPLICIT_WRITE_AUTHORIZATION = TRUE
+```
+
+Cette exception ne s'étend à aucun autre fichier et ne confère aucune autorité de commit, de push, de fusion, de pull request, ni de modification d'une convention scientifique (`docs/governance/collaboration-governance.md` §14.2).
+
 Une configuration locale de l'agent doit techniquement limiter ses outils autant que possible conformément à ces restrictions.
 
 ---

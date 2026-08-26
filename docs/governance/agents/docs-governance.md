@@ -155,6 +155,18 @@ L'agent :
 
 Une incohérence hors périmètre est signalée, pas corrigée.
 
+### 5.1 Canal opérationnel `current-task.md`
+
+Conformément à `docs/governance/collaboration-governance.md` §14, `docs/governance/current-task.md` est implicitement autorisé en écriture pour la seule mise à jour opérationnelle du lot courant, même lorsqu'il n'est pas listé explicitement parmi les fichiers autorisés du mandat.
+
+```text
+CURRENT_TASK_IMPLICIT_WRITE_AUTHORIZATION = TRUE
+```
+
+Cette exception ne s'étend à aucun autre fichier et ne donne au rôle `docs` aucune autorité d'arbitrage supplémentaire (`docs/governance/collaboration-governance.md` §14.2).
+
+Après le démarrage de l'implémentation d'un toy (`docs/governance/documentation-governance.md` §11), le rôle `docs` n'est pas sollicité pour un lot dont le seul objet serait de raconter le code déjà écrit, de recopier des résultats de tests ou de commenter une observation intermédiaire : ces éléments relèvent de `current-task.md` et du notebook du toy (`docs/governance/collaboration-governance.md` §14.4). `specification.md` et `implementation-design.md` d'un toy en implémentation sont alors `READ_ONLY_DURING_IMPLEMENTATION` (`docs/governance/documentation-governance.md` §11.1) et ne sont réouverts que selon `DOCUMENT_REOPEN_CONDITION = FUNDAMENTAL_BLOCKING_ONLY` (§11.2 du même document).
+
 ---
 
 ## 6. Fidélité scientifique

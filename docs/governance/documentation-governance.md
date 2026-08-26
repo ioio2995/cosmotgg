@@ -193,3 +193,73 @@ docs/model/hypothesis-annex-a.md                                — gelé (FROZE
 ```
 
 Aucun document sous `docs/decisions/`, `docs/toy-models/`, `experiments/` ou `schemas/` n'existe encore. `docs/model/hypothesis.md` est la première source scientifique du projet : elle pose la question de recherche et l'hypothèse centrale de CosmoTGG, distingue explicitement `[KNOWN]`, `[DERIVED]`, `[HYPOTHESIS]` et `[OPEN]`, et est au statut `FROZEN` (v0.2) conformément au §5 et au §7, le contenu scientifique de référence étant celui du commit `SCIENTIFIC_CONTENT_HEAD = 589b0727ad880670435bfbb50a268d7472e5410f`. Ce gel documentaire ne signifie pas une validation de la vérité physique de l'hypothèse : les paramètres `GAP-1` à `GAP-6` restent explicitement `OPEN`. `docs/model/hypothesis-annex-a.md` complète cette source comme mémoire de recherche (annexe A), gelée en synchronisation avec `hypothesis.md` v0.2 : elle trace les idées, résultats de la littérature et pistes explorées puis écartées (`[ARCHIVED]`, `[REJECTED]`) pendant la construction de l'hypothèse, afin d'éviter de redécouvrir un résultat déjà connu ; elle ne redéfinit aucun objet normatif de `hypothesis.md`. Les autres dossiers ne sont créés que lorsqu'un besoin réel apparaît, conformément au §2.
+
+## 11. Cycle documentaire d'un toy après démarrage de l'implémentation
+
+### 11.1 Gel de la spécification et de la conception d'implémentation
+
+Principe :
+
+```text
+TOY_IMPLEMENTATION_DOCUMENT_FREEZE = ENABLED
+```
+
+À partir du premier lot d'implémentation de code d'un toy, `specification.md` et `implementation-design.md` de ce toy deviennent :
+
+```text
+READ_ONLY_DURING_IMPLEMENTATION
+```
+
+pour le cycle d'implémentation courant.
+
+```text
+CODE_LOT_DOES_NOT_IMPLY_DOCS_LOT = TRUE
+```
+
+L'ajout d'une fonction, d'un test, d'un diagnostic, d'un refactor, d'un graphique, d'un résultat exploratoire ou d'une observation numérique ne déclenche pas automatiquement une modification de `specification.md` ou de `implementation-design.md`.
+
+### 11.2 Condition de réouverture
+
+```text
+DOCUMENT_REOPEN_CONDITION = FUNDAMENTAL_BLOCKING_ONLY
+```
+
+La réouverture de `specification.md` ou de `implementation-design.md` pendant l'implémentation n'est autorisée que si un blocage fondamental démontre que le contrat doit changer, par exemple : une définition normative mathématiquement incorrecte ; une contradiction scientifique démontrée ; une impossibilité structurelle d'implémenter le contrat ; une hypothèse ou un invariant gelé incompatible avec l'implémentation ; un changement structurel indispensable du modèle explicitement arbitré par ChatGPT/Lionel.
+
+Ne constituent pas une raison suffisante : un nouveau diagnostic exploratoire, un résultat intéressant, un besoin de commentaire, l'ajout d'une fonction, un changement de nom technique, un refactor, un graphique supplémentaire, une nouvelle observation du comportement du toy.
+
+Toute réouverture exige, dans cet ordre : un verdict `BLOCKED` démontré, un arbitrage explicite de ChatGPT/Lionel, puis un mandat documentaire borné.
+
+### 11.3 Rôle narratif du notebook
+
+Le rôle normatif du notebook d'exécution d'un toy reste défini par `docs/governance/software-architecture-governance.md` §23 (`NOTEBOOK_ROLE = EXECUTABLE_SCIENTIFIC_REPORT`, `NOTEBOOK_IS_NORMATIVE_SOURCE = FALSE`, `NOTEBOOK_IS_CODE_LIBRARY = FALSE`) ; la présente section ne le redéfinit pas.
+
+À partir du démarrage de l'implémentation d'un toy, ce notebook porte également le récit scientifique courant de l'expérience — question étudiée, motivation d'une étape, cheminement expérimental, introduction des diagnostics, équations utiles à la compréhension, appels au code testé, contrôles, tableaux et graphiques, résultats, interprétation, limites, résultat négatif éventuel, motivation de l'étape suivante — plutôt qu'une succession de micro-lots documentaires. Formulation conceptuelle complémentaire à `docs/governance/software-architecture-governance.md` §23 :
+
+```text
+MARKDOWN_NORMATIVE = CONTRACT
+PYTHON_CODE        = MECHANISM
+NOTEBOOK           = EXECUTABLE_EXPERIMENTAL_NARRATIVE
+```
+
+Cette formulation n'affaiblit aucune restriction déjà posée par `docs/governance/software-architecture-governance.md` §23.3 : le notebook ne contient pas comme seule définition une primitive générique, une définition normative du modèle, un oracle scientifique, un seuil d'acceptation, une tolérance normative, ou une logique PASS/FAIL.
+
+### 11.4 Plan de validation et gel confirmatoire
+
+Un `validation-plan.md` n'est pas nécessaire pendant l'exploration normale d'un toy. Il devient nécessaire avant une exécution réellement confirmatoire :
+
+```text
+CONFIRMATORY_PROTOCOL_FREEZE_BEFORE_EXECUTION = REQUIRED
+```
+
+Le protocole confirmatoire doit être défini puis gelé avant l'exécution correspondante. Une fois l'exécution confirmatoire commencée :
+
+```text
+validation-plan.md = READ_ONLY_DURING_CONFIRMATORY_EXECUTION
+```
+
+Il ne peut pas être modifié en fonction des résultats observés. Toute correction fondamentale suit le même mécanisme qu'au §11.2 (`BLOCKED`, arbitrage, puis nouveau protocole ou nouvelle version explicite). Le présent paragraphe clarifie le cycle documentaire du plan de validation ; il ne modifie aucune règle scientifique existante du pare-feu confirmatoire (`docs/governance/software-architecture-governance.md` §23.7–§23.8).
+
+### 11.5 Closure report
+
+`closure-report.md` reste le document de synthèse et de décision de fermeture d'un toy lorsque celui-ci est formellement clos (§3). Il n'est pas entretenu après chaque étape intermédiaire de l'implémentation.
