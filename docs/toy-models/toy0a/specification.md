@@ -4,9 +4,9 @@
 
 Ce document définit `model0a`, première construction candidate du toy `toy0a`.
 
-Il intègre des décisions scientifiques déjà arbitrées par ChatGPT (revue physique bornée `MODEL0A_T1_BOUNDARY_REVIEW = PASS_WITH_CHATGPT_CORRECTIONS` ; fermeture de `LOCAL_DIMENSION` et de `STATE_FAMILY` au lot `MODEL0A-DESIGN-1`). Il n'ouvre, ne clôt et n'arbitre aucune décision scientifique par lui-même.
+Il intègre des décisions scientifiques déjà arbitrées par ChatGPT (revue physique bornée `MODEL0A_T1_BOUNDARY_REVIEW = PASS_WITH_CHATGPT_CORRECTIONS` ; fermeture de `LOCAL_DIMENSION` et de `STATE_FAMILY` au lot `MODEL0A-DESIGN-1` ; structure analytique de qualification du cocycle au lot `MODEL0A-DIAGNOSTICS-DESIGN-1`). Il n'ouvre, ne clôt et n'arbitre aucune décision scientifique par lui-même.
 
-Ce document n'est pas un plan de validation, n'inclut aucun code, aucun notebook, aucune valeur numérique de paramètre d'état, aucun domaine de paramètre modulaire et aucun seuil numérique.
+Ce document n'est pas un plan de validation, n'inclut aucun code, aucun notebook, aucune valeur numérique de paramètre d'état, aucun domaine de paramètre modulaire, aucune norme ni seuil scalaire.
 
 ---
 
@@ -366,7 +366,168 @@ alors le cocycle n'est pas identiquement réductible à \(\exp(-is\,\mathcal R_{
 
 ---
 
-## 9. Faux positif central
+## 9. Structure analytique de qualification du cocycle
+
+Cette section enregistre la structure analytique retenue par ChatGPT (lot `MODEL0A-DIAGNOSTICS-DESIGN-1`) pour qualifier le cocycle au-delà de son seul tangent \(\mathcal R_{AB}\). Elle ne définit ni temps physique, ni critère d'acceptation de T1, ni seuil numérique.
+
+### 9.1 Notations
+
+Pour la paire primaire \(\rho=\rho_{AB}\), \(\sigma=\sigma_{AB}=\rho_A\otimes\rho_B\), on pose dans cette section :
+
+$$
+A=\ln(\rho),
+\qquad
+B=\ln(\sigma),
+$$
+
+et l'on rappelle (§6) :
+
+$$
+\mathcal R_{AB} = A - B.
+$$
+
+Le cocycle reste :
+
+$$
+v_s = \exp(-isA)\exp(+isB).
+$$
+
+### 9.2 Premier ordre
+
+Identité déjà enregistrée (§6) :
+
+$$
+v_0 = I,
+\qquad
+\left.\frac{d}{ds}v_s\right|_{s=0} = -i\,\mathcal R_{AB}.
+$$
+
+### 9.3 Second ordre
+
+Identité analytique :
+
+$$
+v_s
+=
+I
+- is\,\mathcal R_{AB}
++ \frac{s^2}{2}\big([A,B] - \mathcal R_{AB}^2\big)
++ O(s^3),
+$$
+
+avec \(A=\ln(\rho)\), \(B=\ln(\sigma)\).
+
+```text
+STATUS = STRUCTURAL_ANALYTIC
+```
+
+Aucune interprétation temporelle physique n'est attribuée à ce développement.
+
+### 9.4 Obstruction de non-commutativité — `LOG_COMMUTATOR_OBSTRUCTION`
+
+Diagnostic matriciel :
+
+$$
+C_{AB} = [\ln(\rho),\ln(\sigma)] = \ln(\rho)\ln(\sigma) - \ln(\sigma)\ln(\rho).
+$$
+
+`C_AB` n'est appelé ni courbure (`curvature`), ni générateur temporel (`time generator`), ni générateur causal (`causal generator`), ni gravité (`gravity`).
+
+Équivalence enregistrée pour des états fidèles :
+
+$$
+C_{AB} = 0 \iff [\rho,\sigma] = 0.
+$$
+
+Justification : le logarithme est une fonction spectrale injective sur les matrices strictement positives ; si \(\rho\) et \(\sigma\) commutent, leurs logarithmes commutent ; si leurs logarithmes commutent, leurs exponentielles \(\rho\) et \(\sigma\) commutent.
+
+### 9.5 Défaut de groupe ordinaire — `ORDINARY_GROUP_DEFECT`
+
+$$
+G(s_1,s_2) = v_{s_1+s_2} - v_{s_1}v_{s_2}.
+$$
+
+**Important :** le cocycle de Connes satisfait sa propre identité de cocycle (§7). `G` mesure uniquement son défaut à être un groupe unitaire ordinaire sous multiplication directe. `G` n'est jamais appelé « cocycle defect » sans cette qualification, car le cocycle lui-même n'est pas défectueux.
+
+### 9.6 Identité locale
+
+$$
+\left.\frac{\partial^2 G}{\partial s_1\,\partial s_2}\right|_{(0,0)}
+=
+[\ln(\rho),\ln(\sigma)]
+=
+C_{AB}.
+$$
+
+```text
+STATUS = STRUCTURAL_ANALYTIC
+```
+
+Cette identité relie l'obstruction statique \(C_{AB}\) à la première obstruction locale à la propriété de groupe ordinaire du cocycle.
+
+### 9.7 Table normative de qualification N0 / N1 / N2
+
+**N0 = `PRODUCT_TRIVIAL_REGIME`** : \(\rho=\sigma\).
+
+$$
+I(A:B)=0,\quad \mathcal R_{AB}=0,\quad C_{AB}=0,\quad v_s=I,\quad G(s_1,s_2)=0\ \ \forall s_1,s_2.
+$$
+
+**N1 = `COMMUTING_CORRELATED_REGIME`** : \(\rho\neq\sigma\), \([\rho,\sigma]=0\).
+
+$$
+I(A:B)>0,\quad \mathcal R_{AB}\neq0,\quad C_{AB}=0,\quad v_s=\exp(-is\,\mathcal R_{AB}),\quad G(s_1,s_2)=0\ \ \forall s_1,s_2.
+$$
+
+**Important :** N1 \(\neq\) `T1_FAIL`.
+
+**N2 = `NONCOMMUTING_CORRELATED_REGIME`** : \([\rho,\sigma]\neq0\).
+
+$$
+I(A:B)>0,\quad \mathcal R_{AB}\neq0,\quad C_{AB}\neq0,
+$$
+
+\(v_s\) n'est pas identiquement \(\exp(-is\,\mathcal R_{AB})\), et \(G(s_1,s_2)\) n'est pas identiquement nul.
+
+**Important :** il n'est pas affirmé que \(G(s_1,s_2)\neq0\) pour toute paire particulière \((s_1,s_2)\) ; il peut exister des zéros accidentels. La propriété structurale porte sur `NOT_IDENTICALLY_ZERO`. Et N2 \(\neq\) `T1_PASS`.
+
+### 9.8 Interprétation autorisée
+
+La structure ci-dessus permet de distinguer :
+
+- la corrélation (\(I(A:B)\)) ;
+- la commutativité/non-commutativité modulaire (\(C_{AB}\)) ;
+- la structure de groupe ordinaire ou non ordinaire du cocycle (\(G\)).
+
+Elle permet de tester si le cocycle contient une structure d'ordre supérieur à son seul tangent \(\mathcal R_{AB}\).
+
+Formulation maximale autorisée :
+
+> « Le cocycle fournit une organisation paramétrique calculable dont la structure au-delà du premier ordre distingue le régime commutant du régime non commutant. »
+
+Ne sont pas écrits : `emergent time`, `time flow established`, `arrow of time`, `causal order`.
+
+### 9.9 Statut de l'information
+
+```text
+COCYCLE_ADDS_NEW_INFORMATION_BEYOND_FULL_PAIR = NO
+```
+
+car \(v_s\) est entièrement déterminé par \((\rho,\sigma)\).
+
+```text
+COCYCLE_ADDS_STRUCTURE_BEYOND_FIRST_ORDER_R_AB = YES
+```
+
+au sens où son développement au-delà du tangent dépend notamment de \([\ln(\rho),\ln(\sigma)]\). Cette distinction n'est pas transformée en affirmation physique.
+
+### 9.10 Absence de scalaire normatif
+
+Cette section ne définit aucun \(\|C_{AB}\|\), \(\|G\|\), seuil, score normalisé, ratio, ni indicateur scalaire de temps. De telles normes pourront être utilisées ultérieurement comme diagnostics numériques/de présentation si un futur plan de validation les préenregistre explicitement ; elles ne font pas partie de la définition scientifique actuelle.
+
+---
+
+## 10. Faux positif central
 
 ```text
 PARAMETER_ELIMINATION_ALONE = INSUFFICIENT
@@ -388,7 +549,7 @@ physical_time.
 
 ---
 
-## 10. Frontière HSMI
+## 11. Frontière HSMI
 
 Borne interprétative :
 
@@ -412,7 +573,7 @@ Cette borne ne constitue pas un échec de `model0a`.
 
 ---
 
-## 11. Référence relationnelle
+## 12. Référence relationnelle
 
 ```text
 FUNDAMENTAL_PRIVILEGED_CLOCK = FORBIDDEN
@@ -432,7 +593,7 @@ emergent time
 
 ---
 
-## 12. Voies exclues de toy0a
+## 13. Voies exclues de toy0a
 
 Sont exclues de `toy0a` :
 
@@ -447,7 +608,7 @@ Sont exclues de `toy0a` :
 
 ---
 
-## 13. Ce que toy0a pourra tester
+## 14. Ce que toy0a pourra tester
 
 `toy0a` pourra ultérieurement qualifier/falsifier :
 
@@ -460,7 +621,7 @@ Sont exclues de `toy0a` :
 
 ---
 
-## 14. Ce que toy0a ne pourra pas établir
+## 15. Ce que toy0a ne pourra pas établir
 
 `toy0a` ne peut pas établir :
 
@@ -481,7 +642,7 @@ Il ne peut pas falsifier l'existence de toute construction possible de temps rel
 
 ---
 
-## 15. Paramètres qui restent `OPEN`
+## 16. Paramètres qui restent `OPEN`
 
 ```text
 LOCAL_DIMENSION               = CLOSED — cf. §2, (2, 2)
@@ -494,24 +655,24 @@ MODEL0A_ACCEPTANCE_CRITERION  = OPEN
 CONFIRMATORY_PROTOCOL         = NOT_DEFINED
 ```
 
-`LOCAL_DIMENSION` et `STATE_FAMILY` ont été fermés au lot `MODEL0A-DESIGN-1` par décision scientifique ChatGPT (§2, §3). Aucune autre valeur n'est fixée dans ce document.
+`LOCAL_DIMENSION` et `STATE_FAMILY` ont été fermés au lot `MODEL0A-DESIGN-1` par décision scientifique ChatGPT (§2, §3). La structure analytique de qualification du cocycle (§9) a été fermée au lot `MODEL0A-DIAGNOSTICS-DESIGN-1`, sans fixer de valeur numérique, de seuil ou de norme (§9.10). Aucune autre valeur n'est fixée dans ce document.
 
 ---
 
-## 16. Sources
+## 17. Sources
 
 Alain Connes, *Une classification des facteurs de type III*, Ann. Sci. ENS 6 (1973) 133–252, DOI [10.24033/asens.1247](https://doi.org/10.24033/asens.1247).
 
 H.-W. Wiesbrock, *Half-Sided Modular Inclusions of von-Neumann-Algebras*, Commun. Math. Phys. 157 (1993) 83–92, DOI [10.1007/BF02098019](https://doi.org/10.1007/BF02098019).
 
-Parrikar, Rajgadia, Singh, Sorce, *Relational bulk reconstruction from modular flow*, JHEP 07 (2024) 138, [arXiv:2403.02377](https://arxiv.org/abs/2403.02377) — utilisée uniquement pour la présentation explicite moderne des identités modulaires générales citées aux §6–7, pas pour son interprétation holographique.
+Parrikar, Rajgadia, Singh, Sorce, *Relational bulk reconstruction from modular flow*, JHEP 07 (2024) 138, [arXiv:2403.02377](https://arxiv.org/abs/2403.02377) — utilisée uniquement pour la présentation explicite moderne des identités modulaires générales citées aux §6–7 et §9, pas pour son interprétation holographique.
 
 ---
 
-## 17. Statut et prochaine étape
+## 18. Statut et prochaine étape
 
 ```text
 MODEL0A_SPECIFICATION_STATUS = ACCEPTED_AS_DESIGN_BASIS
 ```
 
-La prochaine étape autorisée est l'implémentation bornée de la famille d'états de `model0a` par le rôle `code` (Claude Sonnet 5), sur la base du présent document et de `docs/toy-models/toy0a/implementation-design.md`.
+La prochaine étape autorisée est l'implémentation bornée des diagnostics de qualification du cocycle de `model0a` (§9) par le rôle `code` (Claude Sonnet 5), sur la base du présent document et de `docs/toy-models/toy0a/implementation-design.md`.
