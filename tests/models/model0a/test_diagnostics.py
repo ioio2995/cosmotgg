@@ -13,7 +13,7 @@ import pytest
 
 from cosmotgg.core.information import log_density_difference, mutual_information
 from cosmotgg.core.modular import finite_connes_cocycle, hermitian_log
-from cosmotgg.core.states import partial_trace
+from cosmotgg.core.states import partial_trace, validate_density_matrix
 from cosmotgg.models.model0a.diagnostics import (
     log_commutator_obstruction,
     model0a_reference_state,
@@ -366,3 +366,175 @@ def test_cov7_n2_classification_preserved_under_local_unitary():
 
     commutator = rho_transformed @ sigma_transformed - sigma_transformed @ rho_transformed
     assert not np.allclose(commutator, ZERO_4X4, atol=1e-8)
+
+
+# ---------------------------------------------------------------------------
+# NC1 — OFF_DIAGONAL_NOT_SUFFICIENT
+#
+# eta != 0 alone does NOT imply [rho,sigma] != 0 / C_AB != 0 / G != 0.
+#
+# NON_NORMATIVE_NEGATIVE_CONTROL_FIXTURE: a=0.3, b=0.7 (a+b=1), c=0,
+# eta=0.05. With a+b=1, sigma_00 = a*b = (1-a)*(1-b) = sigma_11: the
+# off-diagonal eta coherence between |00> and |11> acts inside a
+# degenerate subspace of sigma, so rho and sigma still commute despite
+# eta != 0. This fixture is structurally COMMUTING_CORRELATED_REGIME
+# (N1) even though eta != 0: it shows that "eta = 0" is a convenient
+# canonical N1 slice (spec §3.3), not a necessary definition of N1.
+# ---------------------------------------------------------------------------
+
+NC1_A, NC1_B, NC1_C, NC1_ETA = 0.3, 0.7, 0.0, 0.05
+
+
+def _nc1_state():
+    return two_qubit_fixed_marginal_correlation_state(NC1_A, NC1_B, NC1_C, NC1_ETA)
+
+
+def test_nc1_fixture_has_degenerate_sigma_diagonal():
+    # Structural precondition making the control meaningful: a+b=1 makes
+    # sigma_00 = sigma_11 (a*b = (1-a)*(1-b) when a+b=1).
+    assert np.isclose(NC1_A + NC1_B, 1.0)
+
+
+def test_nc1_fixture_is_faithful():
+    rho = _nc1_state()
+    validate_density_matrix(rho, require_faithful=True, **_diagnostics_kwargs())
+
+
+def test_nc1_fixture_has_nonzero_off_diagonal_coherence():
+    rho = _nc1_state()
+    assert abs(rho[0, 3]) > 0
+    assert abs(rho[3, 0]) > 0
+
+
+def test_nc1_fixture_differs_from_reference_state():
+    rho = _nc1_state()
+    sigma = model0a_reference_state(rho)
+    assert not np.allclose(rho, sigma)
+
+
+def test_nc1_fixture_is_correlated():
+    rho = _nc1_state()
+    mutual_info = mutual_information(rho, dimensions=DIMENSIONS, **_diagnostics_kwargs())
+    assert mutual_info > 0
+
+
+def test_nc1_fixture_commutes_with_reference_state():
+    rho = _nc1_state()
+    sigma = model0a_reference_state(rho)
+    commutator = rho @ sigma - sigma @ rho
+    assert np.allclose(commutator, ZERO_4X4, atol=1e-8)
+
+
+def test_nc1_log_commutator_obstruction_vanishes():
+    c_ab = log_commutator_obstruction(_nc1_state(), **_diagnostics_kwargs())
+    assert np.allclose(c_ab, ZERO_4X4, atol=1e-8)
+
+
+@pytest.mark.parametrize(
+    "s1, s2",
+    [(0.3, 0.4), (1.1, -0.7), (-0.2, 0.9)],
+    ids=["pair1", "pair2", "pair3"],
+)
+def test_nc1_ordinary_group_defect_vanishes(s1, s2):
+    # NON_NORMATIVE_TEST_FIXTURE modular-parameter pairs. No claim over
+    # all of R^2 is made: this checks the identity on several
+    # deterministic pairs only.
+    g = ordinary_group_defect(_nc1_state(), s1, s2, **_diagnostics_kwargs())
+    assert np.allclose(g, ZERO_4X4, atol=1e-8)
+
+
+# ---------------------------------------------------------------------------
+# NC2 — MUTUAL_INFORMATION_MAGNITUDE_IS_NOT_A_COMMUTATIVITY_CLASSIFIER
+#
+# A commuting-correlated state can have strictly larger I(A:B) than a
+# noncommuting-correlated state. Mutual information alone does not
+# classify commutativity, and no threshold on I is introduced.
+#
+# NON_NORMATIVE_NEGATIVE_CONTROL_FIXTURE.
+# ---------------------------------------------------------------------------
+
+NC2_A, NC2_B = 0.3, 0.4
+NC2_COMMUTING_C, NC2_COMMUTING_ETA = 0.08, 0.0
+NC2_NONCOMMUTING_C, NC2_NONCOMMUTING_ETA = 0.02, 0.01
+NC2_S1, NC2_S2 = 0.3, 0.4
+
+
+def _nc2_commuting_state():
+    return two_qubit_fixed_marginal_correlation_state(
+        NC2_A, NC2_B, NC2_COMMUTING_C, NC2_COMMUTING_ETA
+    )
+
+
+def _nc2_noncommuting_state():
+    return two_qubit_fixed_marginal_correlation_state(
+        NC2_A, NC2_B, NC2_NONCOMMUTING_C, NC2_NONCOMMUTING_ETA
+    )
+
+
+def test_nc2_commuting_fixture_has_larger_mutual_information():
+    mutual_info_commuting = mutual_information(
+        _nc2_commuting_state(), dimensions=DIMENSIONS, **_diagnostics_kwargs()
+    )
+    mutual_info_noncommuting = mutual_information(
+        _nc2_noncommuting_state(), dimensions=DIMENSIONS, **_diagnostics_kwargs()
+    )
+    assert mutual_info_commuting > mutual_info_noncommuting
+
+
+def test_nc2_commuting_fixture_is_structurally_commuting():
+    rho = _nc2_commuting_state()
+    sigma = model0a_reference_state(rho)
+    commutator = rho @ sigma - sigma @ rho
+    assert np.allclose(commutator, ZERO_4X4, atol=1e-8)
+
+    c_ab = log_commutator_obstruction(rho, **_diagnostics_kwargs())
+    assert np.allclose(c_ab, ZERO_4X4, atol=1e-8)
+
+    g = ordinary_group_defect(rho, NC2_S1, NC2_S2, **_diagnostics_kwargs())
+    assert np.allclose(g, ZERO_4X4, atol=1e-8)
+
+
+def test_nc2_noncommuting_fixture_is_structurally_noncommuting():
+    rho = _nc2_noncommuting_state()
+    sigma = model0a_reference_state(rho)
+    commutator = rho @ sigma - sigma @ rho
+    assert not np.allclose(commutator, ZERO_4X4, atol=1e-8)
+
+    c_ab = log_commutator_obstruction(rho, **_diagnostics_kwargs())
+    assert not np.allclose(c_ab, ZERO_4X4, atol=1e-8)
+
+    # Regression on this specific deterministic fixture/pair only (not a
+    # claim that G != 0 for every (s1, s2); see NC3 below).
+    g = ordinary_group_defect(rho, NC2_S1, NC2_S2, **_diagnostics_kwargs())
+    assert not np.allclose(g, ZERO_4X4, atol=1e-8)
+
+
+# ---------------------------------------------------------------------------
+# NC3 — G_NOT_IDENTICALLY_ZERO vs G_NONZERO_FOR_EVERY_PAIR
+#
+# In a noncommuting (N2) regime, G is NOT identically zero, but it does
+# have necessary accidental zeros on the s1=0 and s2=0 axes, because
+# v_0 = I: G(0,s2) = v_s2 - v_0 v_s2 = 0 and G(s1,0) = v_s1 - v_s1 v_0 = 0
+# exactly, for any s1, s2. This must never be read as "G != 0 for all
+# (s1, s2)".
+# ---------------------------------------------------------------------------
+
+
+def test_nc3_n2_fixture_has_nonzero_log_commutator_obstruction():
+    c_ab = log_commutator_obstruction(_n2_state(), **_diagnostics_kwargs())
+    assert not np.allclose(c_ab, ZERO_4X4, atol=1e-8)
+
+
+def test_nc3_ordinary_group_defect_vanishes_when_s1_is_zero():
+    g = ordinary_group_defect(_n2_state(), 0.0, S2, **_diagnostics_kwargs())
+    assert np.allclose(g, ZERO_4X4, atol=1e-8)
+
+
+def test_nc3_ordinary_group_defect_vanishes_when_s2_is_zero():
+    g = ordinary_group_defect(_n2_state(), S1, 0.0, **_diagnostics_kwargs())
+    assert np.allclose(g, ZERO_4X4, atol=1e-8)
+
+
+def test_nc3_ordinary_group_defect_is_nonzero_for_generic_pair():
+    g = ordinary_group_defect(_n2_state(), S1, S2, **_diagnostics_kwargs())
+    assert not np.allclose(g, ZERO_4X4, atol=1e-8)
