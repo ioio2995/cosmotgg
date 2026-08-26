@@ -22,7 +22,7 @@ Ce document sera mis à jour à chaque jalon.
 ```text
 PROJECT_STATUS = ACTIVE_RESEARCH
 CURRENT_LOT    = NONE
-PHASE          = MODEL0A_QUALIFICATION_NOTEBOOK_RUNTIME_READY
+PHASE          = MODEL0A_QUALIFICATION_NOTEBOOK_PENDING_CHATGPT_REVIEW
 ```
 
 La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Le lot `T1-CORE-FOUNDATION-0A` (fondation `core` préalable au test de réfutabilité T1) a été implémenté et la gouvernance des notebooks Jupyter d'exécution des toy models a été intégrée (§ci-dessous). Une première spécification scientifique `PROPOSED` de `model0a` (`docs/toy-models/toy0a/specification.md`) a été créée par le lot `MODEL0A-SPEC-1` puis revue par ChatGPT (`MODEL0A_CHATGPT_SPEC_REVIEW = PASS`) et acceptée par Lionel ORCIL comme base de conception (`MODEL0A_SPECIFICATION_STATUS = ACCEPTED_AS_DESIGN_BASIS`). Le lot `MODEL0A-DESIGN-1` a fermé `LOCAL_DIMENSION` et `STATE_FAMILY` par décision ChatGPT et créé le design d'implémentation minimal (`docs/toy-models/toy0a/implementation-design.md`). La famille d'états a ensuite été implémentée (`MODEL0A_STATE_HEAD = d6b80f51d4f7262307ad38722219025390221684`, `MODEL0A_STATE_IMPL_1 = ACCEPTED`). Le lot `MODEL0A-DIAGNOSTICS-DESIGN-1` a intégré la structure analytique de qualification du cocycle (§9 de `specification.md`) et étendu `implementation-design.md` avec le module `diagnostics.py` ; ces diagnostics (`model0a_reference_state`, `log_commutator_obstruction`, `ordinary_group_defect`) ont ensuite été implémentés et testés par le lot `MODEL0A-DIAGNOSTICS-IMPL-1` ; aucun plan de validation et aucun notebook ne sont encore engagés.
@@ -149,7 +149,7 @@ Aucun lot n'a encore été confié à un rôle spécialisé.
 
 ```text
 CURRENT_LOT = NONE
-PHASE       = MODEL0A_QUALIFICATION_NOTEBOOK_RUNTIME_READY
+PHASE       = MODEL0A_QUALIFICATION_NOTEBOOK_PENDING_CHATGPT_REVIEW
 ```
 
 Le rôle `docs` a créé la première spécification scientifique `PROPOSED` de `model0a` (`docs/toy-models/toy0a/specification.md`), sur décisions déjà arbitrées par ChatGPT (revue physique bornée). Les deux lots précédents ont été menés à terme : l'implémentation bornée du socle `core` (`T1-CORE-FOUNDATION-0A`) et l'intégration de la gouvernance des notebooks Jupyter d'exécution des toy models (`NOTEBOOK-GOVERNANCE-1`). Le lot antérieur à ces deux-là (rôle `docs`) avait effectué le gel documentaire (`VALIDATED_FOR_FREEZE` → `FROZEN`) de `docs/model/hypothesis.md` et `docs/model/hypothesis-annex-a.md` (v0.2), suite à la seconde contre-expertise `physic` PASS et à l'arbitrage scientifique de ChatGPT.
@@ -198,9 +198,14 @@ Le lot `MODEL0A-DIAGNOSTICS-IMPL-1` (rôle `code`) a implémenté ces diagnostic
 
 ```text
 MODEL0A_DIAGNOSTICS_IMPLEMENTATION = PASS
-MODEL0A_DIAGNOSTICS_HEAD           = SELF (commit introduisant cette mise à jour ; voir `git log`)
+MODEL0A_DIAGNOSTICS_HEAD           = 49b629a2ba5de5d50bcc488b7400dbc90425a178
 MODEL0A_DIAGNOSTICS                = LOG_COMMUTATOR_PLUS_ORDINARY_GROUP_DEFECT
 MODEL0A_DIAGNOSTICS_TESTS          = 166 PASS (143 baseline + 23 nouveaux)
+
+MODEL0A_DIAGNOSTICS_REVIEW         = ACCEPTED
+MODEL0A_DIAGNOSTICS_ACCEPTED_HEAD  = 49b629a2ba5de5d50bcc488b7400dbc90425a178
+
+JUPYTER_RUNTIME_HEAD               = 2de8c4703a2f2d9941885da1cdf8232c070adb6d
 ```
 
 Application immédiate à `model0a` de la règle de gel documentaire ci-dessus (`GOV-IMPLEMENTATION-NARRATIVE-1`) : l'implémentation de `model0a` a déjà commencé (`MODEL0A_STATE_HEAD`).
@@ -212,6 +217,17 @@ MODEL0A_NORMAL_DOCS_LOTS         = DISABLED_DURING_IMPLEMENTATION
 MODEL0A_EXPERIMENTAL_NARRATIVE_TARGET = experiments/toy0a/toy0a.ipynb
 MODEL0A_DOCUMENT_REOPEN_CONDITION = FUNDAMENTAL_BLOCKING_ONLY
 ```
+
+Le lot `MODEL0A-NOTEBOOK-QUALIFICATION-1-R1` (rôle `code`) a créé et exécuté le premier récit scientifique exécutable de `toy0a` :
+
+```text
+MODEL0A_NOTEBOOK                 = experiments/toy0a/toy0a.ipynb
+MODEL0A_NOTEBOOK_SOURCE_HEAD     = 2de8c4703a2f2d9941885da1cdf8232c070adb6d
+MODEL0A_NOTEBOOK_EXECUTION_CLASS = QUALIFICATION_NONCONFIRMATORY
+MODEL0A_NOTEBOOK_STATUS          = IMPLEMENTED_EXECUTED_PENDING_CHATGPT_REVIEW
+```
+
+Exécution top-to-bottom dans un kernel Python neuf (`nbclient`), sans état caché, sorties conservées telles qu'issues de cette exécution. Aucun paramètre `OPEN` n'est fermé par ce notebook.
 
 Ceci ne change aucun contenu scientifique de `docs/toy-models/toy0a/specification.md` ou `docs/toy-models/toy0a/implementation-design.md`.
 
@@ -277,11 +293,11 @@ Ces dépendances sont des dépendances optionnelles d'exécution scientifique (`
 ```text
 BRANCHE                     = master
 LOT_COURANT                 = NONE
-DERNIER_JALON_VALIDE        = ajout du runtime minimal d'exécution notebook (nbformat, nbclient, ipykernel) après blocage technique du lot MODEL0A-NOTEBOOK-QUALIFICATION-1 (JUPYTER_RUNTIME_MISSING), lot correctif JUPYTER-RUNTIME-1
+DERNIER_JALON_VALIDE        = création et exécution top-to-bottom du premier notebook de qualification exécutable de toy0a (experiments/toy0a/toy0a.ipynb), lot MODEL0A-NOTEBOOK-QUALIFICATION-1-R1
 DOCUMENTS_APPLICABLES       = docs/governance/*, docs/model/hypothesis.md, docs/model/hypothesis-annex-a.md, docs/toy-models/toy0a/specification.md, docs/toy-models/toy0a/implementation-design.md
-TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter ; spécification scientifique PROPOSED de model0a (toy0a) ; revue ChatGPT PASS de specification.md ; synchronisation du workflow de conception model0a (physic/Opus réservés à l'escalade scientifique structurelle) ; fermeture LOCAL_DIMENSION=(2,2) et STATE_FAMILY=TWO_QUBIT_FIXED_MARGINAL_CORRELATION_FAMILY ; création implementation-design.md ; implémentation states.py (MODEL0A_STATE_HEAD=d6b80f5) ; structure analytique de qualification du cocycle (LOG_COMMUTATOR_OBSTRUCTION, ORDINARY_GROUP_DEFECT, table N0/N1/N2) ; extension implementation-design.md avec diagnostics.py ; intégration du gel documentaire toy-en-implémentation et du canal current-task.md partagé (collaboration-governance.md §14, documentation-governance.md §11, agents/*.md) ; application de la règle à model0a ; implémentation de model0a/diagnostics.py (model0a_reference_state, log_commutator_obstruction, ordinary_group_defect) et de tests/models/model0a/test_diagnostics.py (lot MODEL0A-DIAGNOSTICS-IMPL-1) ; tentative de notebook de qualification bloquée sur runtime Jupyter absent (lot MODEL0A-NOTEBOOK-QUALIFICATION-1, aucune modification) ; ajout de l'extra optionnel `notebook` (nbformat==5.10.4, nbclient==0.11.0, ipykernel==7.3.0) à pyproject.toml et vérification par smoke test (lot JUPYTER-RUNTIME-1)
-TRAVAIL_NON_REALISE         = experiments/toy0a/toy0a.ipynb ; state_parameter_values ; modular parameter domain ; numerical tolerances ; plan de validation toy0a ; définition opérationnelle de T1 ; exécution T1
-PROCHAINE_ACTION_AUTORISEE  = retry MODEL0A-NOTEBOOK-QUALIFICATION-1 by code / Claude Sonnet 5
+TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter ; spécification scientifique PROPOSED de model0a (toy0a) ; revue ChatGPT PASS de specification.md ; synchronisation du workflow de conception model0a (physic/Opus réservés à l'escalade scientifique structurelle) ; fermeture LOCAL_DIMENSION=(2,2) et STATE_FAMILY=TWO_QUBIT_FIXED_MARGINAL_CORRELATION_FAMILY ; création implementation-design.md ; implémentation states.py (MODEL0A_STATE_HEAD=d6b80f5) ; structure analytique de qualification du cocycle (LOG_COMMUTATOR_OBSTRUCTION, ORDINARY_GROUP_DEFECT, table N0/N1/N2) ; extension implementation-design.md avec diagnostics.py ; intégration du gel documentaire toy-en-implémentation et du canal current-task.md partagé (collaboration-governance.md §14, documentation-governance.md §11, agents/*.md) ; application de la règle à model0a ; implémentation de model0a/diagnostics.py (model0a_reference_state, log_commutator_obstruction, ordinary_group_defect) et de tests/models/model0a/test_diagnostics.py (lot MODEL0A-DIAGNOSTICS-IMPL-1) ; tentative de notebook de qualification bloquée sur runtime Jupyter absent (lot MODEL0A-NOTEBOOK-QUALIFICATION-1, aucune modification) ; ajout de l'extra optionnel `notebook` (nbformat==5.10.4, nbclient==0.11.0, ipykernel==7.3.0) à pyproject.toml et vérification par smoke test (lot JUPYTER-RUNTIME-1) ; création et exécution top-to-bottom du premier notebook de qualification exécutable de toy0a, experiments/toy0a/toy0a.ipynb (lot MODEL0A-NOTEBOOK-QUALIFICATION-1-R1)
+TRAVAIL_NON_REALISE         = state_parameter_values ; modular parameter domain ; numerical tolerances ; plan de validation toy0a ; définition opérationnelle de T1 ; exécution T1
+PROCHAINE_ACTION_AUTORISEE  = remote notebook commit review by ChatGPT
 QUESTIONS_OUVERTES          = T4_OPERATIONAL_CRITERION, DIMENSIONAL_CALIBRATION, TYPE_I_TO_ALGEBRAIC_MODULAR_BRIDGE
 BACKLOG_NON_BLOQUANT        = K_ADDITIVE_CONSTANT_CONVENTION_FOR_R_AB, T1_NONTRIVIALITY_CRITERION, RELATIONAL_CLOCK_BOUNDARY_WORDING
 ```
