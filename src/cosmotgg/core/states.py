@@ -304,3 +304,81 @@ def partial_trace(
     for i in keep_list:
         kept_dim *= dims[i]
     return result_tensor.reshape(kept_dim, kept_dim)
+
+
+def conditional_expectation(
+    operator, *, dimensions: Sequence[int], keep: Sequence[int]
+) -> np.ndarray:
+    """Traciale conditional expectation onto the kept factors.
+
+    `E(operator) = partial_trace(operator, dimensions=dimensions,
+    keep=keep) / d_traced`, where `d_traced = product(dimensions[i] for
+    i not in keep)` is the total dimension of the traced-out subsystems.
+    All validation (square operator, `product(dimensions) ==
+    operator.shape[0]`, valid/unique/strictly-increasing `keep`) is
+    delegated entirely to `partial_trace`: this function performs no
+    second, divergent validation logic. `d_traced` is computed from the
+    already-validated `dimensions`/`keep` and is therefore itself
+    fail-closed by construction (it can never be zero, since every
+    local dimension validated by `partial_trace` is strictly positive).
+
+    Semantics: the returned operator acts on the tensor product of the
+    kept factors only, in the deterministic order already imposed by
+    `partial_trace`. It is **not** automatically re-embedded into the
+    full tensor-product space: under the canonical identification
+    `I_traced ⊗ B(H_keep) ≅ B(H_keep)`, it represents the traciale
+    conditional expectation onto the subalgebra of operators acting on
+    the kept factors, but the caller is responsible for any subsequent
+    re-embedding (e.g. `I_traced ⊗ E(operator)`) if the full space is
+    needed downstream.
+
+    In the finite type-I setting declared by this module, this
+    conditional expectation is linear, completely positive, unital
+    (`E(I) = I_keep` under the identification above), and preserves the
+    normalized trace: `Tr(E(operator)) / d_keep == Tr(operator) /
+    d_total`. It is the canonical traciale conditional expectation onto
+    the kept factors; it is not claimed to be state-preserving for an
+    arbitrary state, nor is any type-III or general von Neumann algebra
+    statement made.
+
+    Special case `keep = all subsystems`: `d_traced = 1` and
+    `E(operator) == operator` (this is `partial_trace` with all
+    subsystems kept, divided by `1`).
+    """
+    reduced = partial_trace(operator, dimensions=dimensions, keep=keep)
+
+    dims = _validate_dimensions(dimensions, name="dimensions")
+    keep_set = set(keep)
+
+    d_traced = 1
+    for i, d in enumerate(dims):
+        if i not in keep_set:
+            d_traced *= d
+
+    return reduced / d_traced
+
+
+def traceless_part(operator) -> np.ndarray:
+    """Traceless part of a finite square operator: `X - Tr(X)/d * I_d`.
+
+    `operator` must be a square 2D array of nonzero dimension `d` with
+    finite entries; any other shape, zero dimension, or non-finite
+    entry is rejected fail-closed with `ValueError`. No hermiticity, no
+    positivity, and no trace normalization is assumed: `operator` is a
+    generic finite square operator, not necessarily a density matrix.
+    No tolerance is applied anywhere in this function; the subtraction
+    is exact. `operator` is never symmetrized, normalized, or otherwise
+    repaired: this function only subtracts the exact trace-proportional
+    identity component.
+    """
+    arr = np.asarray(operator)
+    if arr.ndim != 2 or arr.shape[0] != arr.shape[1]:
+        raise ValueError("operator must be a square 2D array")
+    d = arr.shape[0]
+    if d == 0:
+        raise ValueError("operator must have a nonzero dimension")
+    if not np.all(np.isfinite(arr)):
+        raise ValueError("operator must contain only finite values")
+
+    arr = arr.astype(complex, copy=False)
+    return arr - (np.trace(arr) / d) * np.eye(d, dtype=complex)

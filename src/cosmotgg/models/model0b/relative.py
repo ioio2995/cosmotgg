@@ -3,7 +3,9 @@
 Normative source: `docs/toy-models/toy0b/specification.md` §8–§14.
 
 This module assembles `cosmotgg.core.states.validate_density_matrix`,
-`cosmotgg.core.states.partial_trace`, and
+`cosmotgg.core.states.partial_trace`,
+`cosmotgg.core.states.conditional_expectation`,
+`cosmotgg.core.states.traceless_part`, and
 `cosmotgg.core.modular.modular_hamiltonian` into the relative modular
 generator `Delta_(A:C|B)` (`OVERLAP_RELATIVE_MODULAR_GENERATOR`, §8,
 §12) on the overlap subsystem `B` of the fixed `(2, 2, 2)`
@@ -13,10 +15,13 @@ inner derivation `D(O_B) = -i[Delta_B, O_B]`
 
 It does not reimplement any generic primitive already available in
 `cosmotgg.core`: no matrix logarithm, no modular Hamiltonian, no
-partial trace, no commutator primitive. The trace-free reduction
-`tl_B` (§11 of the specification) has no generic `cosmotgg.core`
-counterpart and is kept private and model-specific here, per
-`docs/toy-models/toy0b/implementation-design.md` §2, §6.
+partial trace, no commutator primitive, no conditional expectation, no
+trace-free reduction. The trace-preserving conditional expectation of
+§9 and the trace-free reduction `tl_B` of §11 are both promoted,
+model-independent primitives of `cosmotgg.core.states`
+(`conditional_expectation`, `traceless_part`); this module only
+composes them with the fixed `(2, 2, 2)` factorization and the §12
+sign convention of `model0b`.
 
 `docs/toy-models/toy0b/specification.md` §19 records
 `FINITE_FLOW_PARAMETER_PROBLEM = OPEN`: this module implements neither
@@ -32,24 +37,16 @@ from __future__ import annotations
 import numpy as np
 
 from cosmotgg.core.modular import modular_hamiltonian
-from cosmotgg.core.states import partial_trace, validate_density_matrix
+from cosmotgg.core.states import (
+    conditional_expectation,
+    partial_trace,
+    traceless_part,
+    validate_density_matrix,
+)
 
 _ABC_DIMENSIONS = (2, 2, 2)
 _PAIR_DIMENSIONS = (2, 2)
 _QUBIT_DIMENSION = 2
-
-
-def _traceless(matrix: np.ndarray) -> np.ndarray:
-    """Trace-free reduction `tl_B(X) = X - Tr(X)/d_B * I_B`, `d_B = 2` (§11).
-
-    Model-specific, private. Operates on an already-reduced `2x2`
-    operator on `H_B` alone (no multi-factor tensor structure at this
-    point), using plain `numpy.trace`/`numpy.eye`, not
-    `cosmotgg.core.states.partial_trace`.
-    """
-    return matrix - (np.trace(matrix) / _QUBIT_DIMENSION) * np.eye(
-        _QUBIT_DIMENSION, dtype=complex
-    )
 
 
 def overlap_relative_modular_generator(
@@ -83,13 +80,16 @@ def overlap_relative_modular_generator(
     2. `K_AB = modular_hamiltonian(rho_AB, ...)`,
        `K_BC = modular_hamiltonian(rho_BC, ...)` (§8);
     3. the trace-preserving conditional expectations onto `B` (§9),
-       `E_A = partial_trace(K_AB, dimensions=(2, 2), keep=[1]) / 2` and
-       `E_C = partial_trace(K_BC, dimensions=(2, 2), keep=[0]) / 2` (the
-       division by `2 = d_A = d_C` is the explicit normalization of the
+       `E_A = conditional_expectation(K_AB, dimensions=(2, 2), keep=[1])`
+       and
+       `E_C = conditional_expectation(K_BC, dimensions=(2, 2), keep=[0])`
+       (`cosmotgg.core.states.conditional_expectation` divides by
+       `d_traced = 2 = d_A = d_C`, the explicit normalization of the
        conditional expectation of §9; omitting it would change the
        numerical value of `Delta_B` and is a distinct implementation
        defect from anything covered elsewhere in this module);
-    4. the trace-free reduction `tl_B` (§11) applied to each of `E_A`,
+    4. the trace-free reduction `tl_B` (§11,
+       `cosmotgg.core.states.traceless_part`) applied to each of `E_A`,
        `E_C`;
     5. `Delta_B = -tl_B(E_A) + tl_B(E_C)` (§12 sign convention, fixed).
 
@@ -119,10 +119,10 @@ def overlap_relative_modular_generator(
     k_ab = modular_hamiltonian(rho_ab, **modular_kwargs)
     k_bc = modular_hamiltonian(rho_bc, **modular_kwargs)
 
-    e_a = partial_trace(k_ab, dimensions=_PAIR_DIMENSIONS, keep=[1]) / _QUBIT_DIMENSION
-    e_c = partial_trace(k_bc, dimensions=_PAIR_DIMENSIONS, keep=[0]) / _QUBIT_DIMENSION
+    e_a = conditional_expectation(k_ab, dimensions=_PAIR_DIMENSIONS, keep=[1])
+    e_c = conditional_expectation(k_bc, dimensions=_PAIR_DIMENSIONS, keep=[0])
 
-    return -_traceless(e_a) + _traceless(e_c)
+    return -traceless_part(e_a) + traceless_part(e_c)
 
 
 def _validate_square_finite_operator(matrix, *, expected_dimension: int, name: str) -> np.ndarray:
