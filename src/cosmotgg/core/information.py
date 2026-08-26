@@ -18,7 +18,9 @@ import numpy as np
 from cosmotgg.core.modular import hermitian_log
 from cosmotgg.core.states import (
     _hermitian_eigendecomposition,
+    _validate_dimensions,
     _validate_positive_semidefinite,
+    _validate_tolerance,
     _validate_trace,
     partial_trace,
     validate_density_matrix,
@@ -96,6 +98,8 @@ def relative_entropy(
 
     Both spectra are obtained via `numpy.linalg.eigh`; no `scipy` is used.
     """
+    support_tolerance = _validate_tolerance(support_tolerance, name="support_tolerance")
+
     rho_arr, rho_eigvals, rho_eigvecs = _hermitian_eigendecomposition(
         rho, hermiticity_tolerance=hermiticity_tolerance, name="rho"
     )
@@ -159,7 +163,7 @@ def mutual_information(
     `rho_ab` may be non-faithful; all three entropies accept
     positive-semidefinite states.
     """
-    dims = tuple(int(d) for d in dimensions)
+    dims = _validate_dimensions(dimensions, name="dimensions")
     if len(dims) != 2:
         raise ValueError(
             "mutual_information expects exactly two explicit local "

@@ -1,6 +1,7 @@
 """Model-free unit tests for cosmotgg.core.information."""
 
 import numpy as np
+import pytest
 
 from cosmotgg.core.information import (
     log_density_difference,
@@ -129,3 +130,43 @@ def test_mutual_information_of_classically_correlated_state():
 
     i = mutual_information(rho_ab, dimensions=(2, 2), **_entropy_kwargs())
     assert abs(i - np.log(2.0)) < 1e-8
+
+
+def test_mutual_information_rejects_non_integer_dimension_without_coercion():
+    rho_ab = np.eye(4, dtype=complex) / 4.0
+    with pytest.raises(ValueError):
+        mutual_information(rho_ab, dimensions=(2.0, 2), **_entropy_kwargs())
+
+
+# ---------------------------------------------------------------------------
+# Tolerance validation (fail-closed, no default)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "bad_tolerance", [-1e-9, float("nan"), float("inf")], ids=["negative", "nan", "inf"]
+)
+def test_relative_entropy_rejects_bad_support_tolerance(bad_tolerance):
+    rho = np.array([[0.7, 0.0], [0.0, 0.3]], dtype=complex)
+    with pytest.raises(ValueError):
+        relative_entropy(
+            rho,
+            rho,
+            hermiticity_tolerance=TOL,
+            trace_tolerance=TOL,
+            positivity_tolerance=TOL,
+            support_tolerance=bad_tolerance,
+        )
+
+
+def test_relative_entropy_accepts_zero_support_tolerance_when_support_matches_exactly():
+    rho = np.array([[1.0, 0.0], [0.0, 0.0]], dtype=complex)
+    d = relative_entropy(
+        rho,
+        rho,
+        hermiticity_tolerance=TOL,
+        trace_tolerance=TOL,
+        positivity_tolerance=TOL,
+        support_tolerance=0.0,
+    )
+    assert abs(d) < 1e-8

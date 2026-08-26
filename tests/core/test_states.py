@@ -188,3 +188,85 @@ def test_partial_trace_non_ascending_keep_rejected():
     rho_abc = np.eye(8, dtype=complex) / 8.0
     with pytest.raises(ValueError):
         partial_trace(rho_abc, dimensions=(2, 2, 2), keep=[1, 0])
+
+
+@pytest.mark.parametrize(
+    "dimensions",
+    [(2.5, 2), ("2", 2), (True, 4)],
+    ids=["float_dim", "str_dim", "bool_dim"],
+)
+def test_partial_trace_rejects_non_integer_dimensions_without_coercion(dimensions):
+    rho_ab = np.eye(4, dtype=complex) / 4.0
+    with pytest.raises(ValueError):
+        partial_trace(rho_ab, dimensions=dimensions, keep=[0])
+
+
+# ---------------------------------------------------------------------------
+# Tolerance validation (fail-closed, no default)
+# ---------------------------------------------------------------------------
+
+BAD_TOLERANCES = [-1e-9, float("nan"), float("inf")]
+
+
+@pytest.mark.parametrize("bad_tolerance", BAD_TOLERANCES, ids=["negative", "nan", "inf"])
+def test_validate_density_matrix_rejects_bad_hermiticity_tolerance(bad_tolerance):
+    rho = np.array([[0.7, 0.0], [0.0, 0.3]], dtype=complex)
+    with pytest.raises(ValueError):
+        validate_density_matrix(
+            rho,
+            require_faithful=False,
+            hermiticity_tolerance=bad_tolerance,
+            trace_tolerance=TOL,
+            positivity_tolerance=TOL,
+        )
+
+
+@pytest.mark.parametrize("bad_tolerance", BAD_TOLERANCES, ids=["negative", "nan", "inf"])
+def test_validate_density_matrix_rejects_bad_trace_tolerance(bad_tolerance):
+    rho = np.array([[0.7, 0.0], [0.0, 0.3]], dtype=complex)
+    with pytest.raises(ValueError):
+        validate_density_matrix(
+            rho,
+            require_faithful=False,
+            hermiticity_tolerance=TOL,
+            trace_tolerance=bad_tolerance,
+            positivity_tolerance=TOL,
+        )
+
+
+@pytest.mark.parametrize("bad_tolerance", BAD_TOLERANCES, ids=["negative", "nan", "inf"])
+def test_validate_density_matrix_rejects_bad_positivity_tolerance(bad_tolerance):
+    rho = np.array([[0.7, 0.0], [0.0, 0.3]], dtype=complex)
+    with pytest.raises(ValueError):
+        validate_density_matrix(
+            rho,
+            require_faithful=False,
+            hermiticity_tolerance=TOL,
+            trace_tolerance=TOL,
+            positivity_tolerance=bad_tolerance,
+        )
+
+
+def test_validate_density_matrix_accepts_zero_tolerances_on_exact_state():
+    rho = np.array([[0.7, 0.0], [0.0, 0.3]], dtype=complex)
+    result = validate_density_matrix(
+        rho,
+        require_faithful=False,
+        hermiticity_tolerance=0.0,
+        trace_tolerance=0.0,
+        positivity_tolerance=0.0,
+    )
+    assert np.allclose(result, rho)
+
+
+def test_validate_density_matrix_accepts_zero_positivity_tolerance_at_exact_boundary():
+    # lambda_min == 0.0 exactly: PSD check `lambda_min >= -0.0` holds exactly.
+    rho = np.array([[1.0, 0.0], [0.0, 0.0]], dtype=complex)
+    result = validate_density_matrix(
+        rho,
+        require_faithful=False,
+        hermiticity_tolerance=0.0,
+        trace_tolerance=0.0,
+        positivity_tolerance=0.0,
+    )
+    assert np.allclose(result, rho)

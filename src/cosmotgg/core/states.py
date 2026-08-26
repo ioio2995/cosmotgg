@@ -25,9 +25,68 @@ SCIENTIFIC_METADATA = {
 
 # ---------------------------------------------------------------------------
 # Internal auxiliaries shared across cosmotgg.core (states / information /
-# modular). Factored here to avoid duplicating shape, hermiticity, trace and
-# positivity checks in every module. Not part of the public API.
+# modular). Factored here to avoid duplicating shape, hermiticity, trace,
+# positivity, dimension and tolerance checks in every module. Not part of
+# the public API.
 # ---------------------------------------------------------------------------
+
+
+def _validate_tolerance(tolerance, *, name: str) -> float:
+    """Validate that `tolerance` is a real, finite, non-negative scalar.
+
+    Fail-closed (raise `ValueError`) on: NaN, `+inf`, `-inf`, negative
+    values, complex values, non-scalar arrays/sequences, `bool`/`numpy.bool_`,
+    and any other non-numeric type (e.g. `str`). A tolerance of exactly
+    `0.0` is a valid, accepted value. No coercion is performed beyond
+    reading the already-numeric scalar value; there is no default value.
+    """
+    if isinstance(tolerance, (bool, np.bool_)):
+        raise ValueError(f"{name} must be a real numeric scalar, not bool: got {tolerance!r}")
+
+    arr = np.asarray(tolerance)
+    if arr.ndim != 0:
+        raise ValueError(f"{name} must be a scalar, got shape={arr.shape}")
+    if not np.issubdtype(arr.dtype, np.number):
+        raise ValueError(
+            f"{name} must be a real numeric scalar, got {type(tolerance).__name__}: {tolerance!r}"
+        )
+    if np.iscomplexobj(arr):
+        raise ValueError(f"{name} must be real, not complex: got {tolerance!r}")
+
+    value = float(arr)
+    if not np.isfinite(value):
+        raise ValueError(f"{name} must be finite, got {value}")
+    if value < 0.0:
+        raise ValueError(f"{name} must be >= 0, got {value}")
+    return value
+
+
+def _validate_dimensions(dimensions, *, name: str) -> tuple:
+    """Validate a non-empty sequence of already-integer, positive local dimensions.
+
+    Accepted element types: `int`, `numpy.integer` (excluding `bool` /
+    `numpy.bool_`, which are technically integer-like but are rejected here
+    to avoid a silent `True`/`False` -> `1`/`0` dimension). Rejected element
+    types include, non-exhaustively: `bool`, `numpy.bool_`, `float`,
+    `numpy.floating`, `str`, `complex`.
+
+    No coercion is performed: a rejected value is never converted, only
+    validated; on success the original values are returned unchanged.
+    """
+    dims_list = list(dimensions)
+    if len(dims_list) == 0:
+        raise ValueError(f"{name} must be a non-empty sequence")
+    for d in dims_list:
+        if isinstance(d, (bool, np.bool_)):
+            raise ValueError(f"{name} entries must be integers, not bool: got {d!r}")
+        if not isinstance(d, (int, np.integer)):
+            raise ValueError(
+                f"{name} entries must already be integers (int or numpy.integer), "
+                f"got {type(d).__name__}: {d!r}"
+            )
+        if d <= 0:
+            raise ValueError(f"{name} entries must be strictly positive, got {d!r}")
+    return tuple(dims_list)
 
 
 def _validate_square_hermitian(
@@ -35,12 +94,14 @@ def _validate_square_hermitian(
 ) -> np.ndarray:
     """Validate a finite, square, 2D, hermitian array and return it as complex.
 
-    Checks performed: 2D shape, square shape, nonzero dimension, finite
-    values, hermiticity within `hermiticity_tolerance`. The returned array
-    has the same numerical values as the input, only cast to complex dtype
-    for uniform downstream linear algebra; no value is corrected,
-    symmetrized, or renormalized.
+    Checks performed: `hermiticity_tolerance` itself is validated
+    (`_validate_tolerance`); then 2D shape, square shape, nonzero
+    dimension, finite values, hermiticity within `hermiticity_tolerance`.
+    The returned array has the same numerical values as the input, only
+    cast to complex dtype for uniform downstream linear algebra; no value
+    is corrected, symmetrized, or renormalized.
     """
+    hermiticity_tolerance = _validate_tolerance(hermiticity_tolerance, name="hermiticity_tolerance")
     arr = np.asarray(matrix)
     if arr.ndim != 2:
         raise ValueError(f"{name} must be a 2D array, got ndim={arr.ndim}")
@@ -79,6 +140,7 @@ def _hermitian_eigendecomposition(
 def _validate_trace(
     matrix: np.ndarray, *, trace_tolerance: float, expected: float, name: str
 ) -> None:
+    trace_tolerance = _validate_tolerance(trace_tolerance, name="trace_tolerance")
     trace = np.trace(matrix)
     deviation = abs(trace - expected)
     if deviation > trace_tolerance:
@@ -92,6 +154,7 @@ def _validate_positive_semidefinite(
     eigvals: np.ndarray, *, positivity_tolerance: float, name: str
 ) -> None:
     """Numerical PSD check: `lambda_min >= -positivity_tolerance`."""
+    positivity_tolerance = _validate_tolerance(positivity_tolerance, name="positivity_tolerance")
     lambda_min = eigvals[0]
     if lambda_min < -positivity_tolerance:
         raise ValueError(
@@ -105,6 +168,7 @@ def _validate_faithful(
     eigvals: np.ndarray, *, positivity_tolerance: float, name: str
 ) -> None:
     """Faithfulness check: `lambda_min > positivity_tolerance`."""
+    positivity_tolerance = _validate_tolerance(positivity_tolerance, name="positivity_tolerance")
     lambda_min = eigvals[0]
     if not (lambda_min > positivity_tolerance):
         raise ValueError(
@@ -192,11 +256,7 @@ def partial_trace(
     if arr.ndim != 2 or arr.shape[0] != arr.shape[1]:
         raise ValueError("operator must be a square 2D array")
 
-    dims = tuple(int(d) for d in dimensions)
-    if len(dims) == 0:
-        raise ValueError("dimensions must be a non-empty sequence")
-    if any(d <= 0 for d in dims):
-        raise ValueError("dimensions must be strictly positive integers")
+    dims = _validate_dimensions(dimensions, name="dimensions")
 
     total_dim = 1
     for d in dims:
