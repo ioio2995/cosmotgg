@@ -21,11 +21,11 @@ Ce document sera mis à jour à chaque jalon.
 
 ```text
 PROJECT_STATUS = ACTIVE_RESEARCH
-CURRENT_LOT    = T1-CORE-FOUNDATION-0A
-PHASE          = CORE_FOUNDATION_IMPLEMENTATION_PENDING
+CURRENT_LOT    = NONE
+PHASE          = MODEL0A_SCIENTIFIC_DESIGN_PENDING
 ```
 
-La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Le lot `T1-CORE-FOUNDATION-0A` (fondation `core` préalable au test de réfutabilité T1) est ouvert ; aucun modèle jouet, plan de validation ou implémentation logicielle n'est encore engagé.
+La gouvernance transverse (`collaboration-governance.md`, `documentation-governance.md`, `software-architecture-governance.md`) et les contrats des rôles spécialisés (`docs/governance/agents/`) sont en place. Le lot `T1-CORE-FOUNDATION-0A` (fondation `core` préalable au test de réfutabilité T1) a été implémenté et la gouvernance des notebooks Jupyter d'exécution des toy models a été intégrée (§ci-dessous) ; aucun modèle jouet, plan de validation ou notebook n'est encore engagé.
 
 ---
 
@@ -128,11 +128,11 @@ Aucun lot n'a encore été confié à un rôle spécialisé.
 ## Lot courant
 
 ```text
-CURRENT_LOT = T1-CORE-FOUNDATION-0A
-PHASE       = CORE_FOUNDATION_IMPLEMENTATION_PENDING
+CURRENT_LOT = NONE
+PHASE       = MODEL0A_SCIENTIFIC_DESIGN_PENDING
 ```
 
-Lot ouvert (rôle `docs`) pour synchroniser l'état documentaire avant la première implémentation logicielle du projet, préalable au test de réfutabilité T1. Base du lot : `EXPECTED_HEAD = bfc87a34255bcb9482ffbd0fbcf7d9255aa1fadf`. Le lot précédent (rôle `docs`) avait effectué le gel documentaire (`VALIDATED_FOR_FREEZE` → `FROZEN`) de `docs/model/hypothesis.md` et `docs/model/hypothesis-annex-a.md` (v0.2), suite à la seconde contre-expertise `physic` PASS et à l'arbitrage scientifique de ChatGPT.
+Aucun lot n'est ouvert à l'issue du présent commit. Les deux lots précédents ont été menés à terme : l'implémentation bornée du socle `core` (`T1-CORE-FOUNDATION-0A`) et l'intégration de la gouvernance des notebooks Jupyter d'exécution des toy models (`NOTEBOOK-GOVERNANCE-1`). Le lot antérieur à ces deux-là (rôle `docs`) avait effectué le gel documentaire (`VALIDATED_FOR_FREEZE` → `FROZEN`) de `docs/model/hypothesis.md` et `docs/model/hypothesis-annex-a.md` (v0.2), suite à la seconde contre-expertise `physic` PASS et à l'arbitrage scientifique de ChatGPT.
 
 ```text
 T1_CORE_FOUNDATION_AUDIT = PASS
@@ -154,18 +154,41 @@ CORE_API_GENERALITY_DECISION = entropy primitives must not be artificially restr
 
 `modular_hamiltonian` reste restreint au domaine *faithful* requis par `docs/model/hypothesis.md` v0.2.
 
+```text
+T1_CORE_FOUNDATION_IMPLEMENTATION = PASS
+
+CORE_FOUNDATION_HEAD     = 4c4fbf650b3e099c738b90ed9ac3d72952e29bed
+CORE_FOUNDATION_TESTS    = 75 PASS
+CORE_FOUNDATION_BLOCKING = NONE
+```
+
+Ce `PASS` est un `ENGINEERING_PASS` (tests unitaires et invariants d'architecture verts sur le socle `core` générique) et non une `SCIENTIFIC_CONFIRMATION` : aucun résultat scientifique n'est validé par ce lot.
+
+```text
+NOTEBOOK_GOVERNANCE = INTEGRATED
+
+NOTEBOOK_ROLE                          = EXECUTABLE_SCIENTIFIC_REPORT
+NOTEBOOK_NORMATIVE_SOURCE              = NO
+NOTEBOOK_CODE_LIBRARY                  = NO
+NOTEBOOK_CAN_CONTAIN_COMMITTED_RESULTS = YES_WITH_PROVENANCE_AND_AUTHORIZED_EXECUTION
+NOTEBOOK_CONFIRMATORY_FIREWALL         = SAME_AS_OTHER_CONFIRMATORY_EXECUTION
+JUPYTER_RUNTIME_DEPENDENCY             = NOT_ADDED_YET
+```
+
+La gouvernance normative applicable aux notebooks Jupyter d'exécution des toy models est intégrée dans `docs/governance/software-architecture-governance.md` §23 et `docs/governance/documentation-governance.md` §2–§4. Aucun notebook, aucun dossier `experiments/` et aucune dépendance Jupyter ne sont créés par ce lot.
+
 ---
 
 ## Mémoire de session
 
 ```text
 BRANCHE                     = master
-LOT_COURANT                 = T1-CORE-FOUNDATION-0A
-DERNIER_JALON_VALIDE        = hypothèse fondatrice CosmoTGG v0.2 gelée
+LOT_COURANT                 = NONE
+DERNIER_JALON_VALIDE        = socle core générique implémenté et gouvernance notebook intégrée
 DOCUMENTS_APPLICABLES       = docs/governance/*, docs/model/hypothesis.md, docs/model/hypothesis-annex-a.md
-TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué
-TRAVAIL_NON_REALISE         = implémentation du socle core ; model0a ; définition opérationnelle de T1 ; tests scientifiques T1
-PROCHAINE_ACTION_AUTORISEE  = implémentation bornée du socle core T1-CORE-FOUNDATION-0A par le rôle code après revue du commit distant par ChatGPT
+TRAVAIL_REALISE             = rédaction v0.1 ; première revue physic ; corrections v0.2 ; seconde revue physic PASS ; arbitrage ChatGPT PASS ; gel documentaire v0.2 ; audit architectural T1-CORE-FOUNDATION-0A PASS ; arbitrage architecture/core effectué ; implémentation socle core ; correctif fail-closed ; gouvernance Jupyter
+TRAVAIL_NON_REALISE         = définition scientifique de model0a ; implémentation model0a ; notebook toy0a ; ajout dépendance Jupyter ; définition opérationnelle de T1 ; exécution T1
+PROCHAINE_ACTION_AUTORISEE  = revue du commit de gouvernance par ChatGPT, puis cadrage scientifique de model0a après décision explicite de Lionel ORCIL
 QUESTIONS_OUVERTES          = T4_OPERATIONAL_CRITERION, DIMENSIONAL_CALIBRATION, TYPE_I_TO_ALGEBRAIC_MODULAR_BRIDGE
-BACKLOG_NON_BLOQUANT        = K_ADDITIVE_CONSTANT_CONVENTION_FOR_R_AB, T1_NONTRIVIALITY_CRITERION, RELATIONAL_CLOCK_BOUNDARY_WORDING
+BACKLOG_NON_BLOQUANT        = K_ADDITIVE_CONSTANT_CONVENTION_FOR_R_AB, T1_NONTRIVIALITY_CRITERION, RELATIONAL_CLOCK_BOUNDARY_WORDING, JUPYTER_RUNTIME_DEPENDENCY (état technique non ajouté, cf. §23.14 software-architecture-governance.md)
 ```

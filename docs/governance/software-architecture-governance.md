@@ -204,7 +204,7 @@ SCIENTIFIC_METADATA.status ∈ {
 }
 ```
 
-Cette taxonomie est volontairement minimale et fermée. Aucune autre valeur n'est autorisée ; aucune troisième catégorie n'est créée localement dans le code sans passer par §23.
+Cette taxonomie est volontairement minimale et fermée. Aucune autre valeur n'est autorisée ; aucune troisième catégorie n'est créée localement dans le code sans passer par §24.
 
 **`established`**
 
@@ -630,6 +630,16 @@ L’audit doit vérifier explicitement :
 - qu’aucune abstraction future spéculative n’a été introduite ;
 - que les constructions scientifiques nouvelles placées dans `core` sont correctement tracées.
 
+Lorsqu’un notebook Jupyter fait partie du lot audité, l’audit vérifie également :
+
+- l’absence de logique scientifique définie uniquement dans le notebook (§23.3) ;
+- l’absence de duplication d’une brique `core`/`model` déjà existante ;
+- que les dépendances du notebook restent limitées à `model`/`core` (§23.2) ;
+- l’absence de dépendance de `tests/` vers un notebook ;
+- la présence d’une provenance lorsque des résultats sont conservés (§23.11) ;
+- le respect du firewall confirmatoire (§23.8) ;
+- l’absence d’état caché revendiqué dans une exécution archivée (§23.9).
+
 L’audit peut regrouper les composants similaires et ne doit pas devenir une formalité disproportionnée par rapport au lot.
 
 ---
@@ -655,7 +665,7 @@ Toute modification de leur sens exige :
 
 1. une justification scientifique documentée ;
 2. l’identification explicite de l’oracle modifié et de la raison ;
-3. l’application de la procédure normative définie au §23 ;
+3. l’application de la procédure normative définie au §24 ;
 4. une nouvelle validation explicite du modèle affecté.
 
 La seule nécessité de faire repasser les tests après une évolution du `core` ne constitue jamais une justification suffisante.
@@ -769,6 +779,32 @@ Ces points restent des contrôles obligatoires de l’audit et de la revue du di
 
 Une règle n’est déclarée « automatiquement vérifiée » que si le test couvre réellement l’invariant annoncé.
 
+### 19.5 Invariants relatifs aux notebooks
+
+```text
+NOTEBOOK_IS_NORMATIVE_SOURCE = FALSE
+NOTEBOOK_IS_CODE_LIBRARY = FALSE
+NOTEBOOK_ONLY_SCIENTIFIC_LOGIC = FORBIDDEN
+TESTS_DEPEND_ON_NOTEBOOK = FORBIDDEN
+CONFIRMATORY_NOTEBOOK_WITHOUT_AUTHORIZATION = FORBIDDEN
+HIDDEN_KERNEL_STATE_FOR_ARCHIVED_RESULT = FORBIDDEN
+```
+
+Conformément au §19.4, ces règles ne sont pas toutes vérifiables automatiquement de manière fiable :
+
+```text
+AUTOMATICALLY_CHECKABLE
+    TESTS_DEPEND_ON_NOTEBOOK
+        (absence d’import d’un fichier .ipynb depuis tests/)
+
+HUMAN/AGENT_REVIEW_REQUIRED
+    NOTEBOOK_IS_NORMATIVE_SOURCE
+    NOTEBOOK_IS_CODE_LIBRARY
+    NOTEBOOK_ONLY_SCIENTIFIC_LOGIC
+    CONFIRMATORY_NOTEBOOK_WITHOUT_AUTHORIZATION
+    HIDDEN_KERNEL_STATE_FOR_ARCHIVED_RESULT
+```
+
 ---
 
 ## 20. Ambiguïtés
@@ -816,7 +852,11 @@ Il est notamment interdit :
 - de modifier silencieusement une brique `core` pour satisfaire un nouveau modèle au détriment des modèles existants ;
 - de modifier un oracle ou un test d’acceptation d’un modèle accepté uniquement pour faire accepter une évolution de `core` ;
 - de dépendre d’un RNG global ou d’un ordre d’itération non contractualisé pour produire un résultat scientifique ;
-- de présenter comme invariant automatique une règle que les tests ne savent pas réellement vérifier.
+- de présenter comme invariant automatique une règle que les tests ne savent pas réellement vérifier ;
+- de définir dans un notebook une logique scientifique (primitive générique, observable, oracle, seuil, critère PASS/FAIL) qui n’appartient pas à `core` ou à `models/modelXX` (§23.3) ;
+- de faire dépendre un test `pytest` de l’exécution d’un notebook ;
+- de lancer une exécution confirmatoire depuis un notebook sans l’autorisation explicite exigée par le firewall confirmatoire (§23.8) ;
+- de revendiquer comme artefact d’exécution valide un notebook archivé reposant sur un état de kernel caché (§23.9).
 
 ---
 
@@ -856,7 +896,299 @@ La localisation logicielle d’une construction ne modifie jamais son statut sci
 
 ---
 
-## 23. Évolution de cette gouvernance
+## 23. Notebooks Jupyter d’exécution scientifique
+
+Principe :
+
+```text
+NOTEBOOK_ROLE = EXECUTABLE_SCIENTIFIC_REPORT
+```
+
+et :
+
+```text
+NOTEBOOK_IS_NORMATIVE_SOURCE = FALSE
+NOTEBOOK_IS_CODE_LIBRARY = FALSE
+```
+
+Un notebook Jupyter d’un modèle jouet (« toy ») est un artefact d’exécution scientifique versionné permettant de réunir :
+
+- contexte ;
+- équations de rappel ;
+- imports ;
+- configuration d’exécution ;
+- appels au code de production ;
+- tableaux ;
+- figures ;
+- résultats ;
+- interprétation ;
+- provenance.
+
+Il ne constitue jamais la source canonique :
+
+- des primitives `core` ;
+- de la définition du modèle ;
+- des paramètres normatifs ;
+- des oracles ;
+- des seuils ;
+- des critères PASS/FAIL ;
+- du protocole confirmatoire.
+
+### 23.1 Arborescence
+
+L’arborescence fonctionnelle du dépôt (§2) est complétée par l’espace d’exécution :
+
+```text
+experiments/
+└── toyN/
+    └── toyN.ipynb
+```
+
+Le nom réel d’un futur notebook suit l’identité du toy concerné, par exemple :
+
+```text
+experiments/toy0a/toy0a.ipynb
+```
+
+Ce dossier et ce fichier ne sont pas créés par la présente gouvernance : conformément au §2, les dossiers ne sont créés que lorsqu’un besoin réel apparaît.
+
+### 23.2 Direction des dépendances
+
+La direction des dépendances définie au §6 s’étend aux notebooks :
+
+```text
+notebook
+    ↓
+model
+    ↓
+core
+```
+
+Un notebook peut importer :
+
+```text
+cosmotgg.core
+cosmotgg.models.modelXX
+```
+
+selon les besoins du toy. Un notebook peut également appeler directement une primitive `core` lorsqu’aucun assemblage model-specific n’est nécessaire.
+
+Sont interdits :
+
+```text
+core   -X-> notebook
+model  -X-> notebook
+tests  -X-> notebook
+```
+
+En particulier, aucun code de production ne doit importer un fichier `.ipynb`, et aucun test `pytest` ne doit dépendre de l’exécution d’un notebook.
+
+### 23.3 Source canonique du code
+
+Le notebook consomme le code de production. Il ne le redéfinit pas.
+
+Toute fonction qui calcule une quantité scientifique utilisée dans les résultats d’un toy appartient, selon sa nature, à :
+
+```text
+src/cosmotgg/core/
+```
+
+ou :
+
+```text
+src/cosmotgg/models/modelXX/
+```
+
+avec les tests correspondants (§10, §11).
+
+Il est interdit de définir uniquement dans le notebook :
+
+- une primitive mathématique générique ;
+- un observable scientifique du modèle ;
+- une dynamique ou transformation propre au modèle ;
+- une fonction utilisée pour décider PASS/FAIL ;
+- un oracle ;
+- une règle de normalisation scientifique ;
+- un seuil ou une tolérance normative.
+
+Autrement dit :
+
+```text
+NOTEBOOK_ONLY_SCIENTIFIC_LOGIC = FORBIDDEN
+```
+
+### 23.4 Helpers locaux autorisés
+
+Un notebook peut contenir des helpers locaux strictement présentationnels, par exemple :
+
+- mise en forme de tableau ;
+- libellés ;
+- formatage d’affichage ;
+- construction de légende ;
+- mise en page d’une figure.
+
+Condition : leur modification ne doit pouvoir changer ni la valeur scientifique calculée ni le verdict du toy.
+
+Si un helper transforme réellement des données scientifiques, il doit être extrait vers `core` ou `models/modelXX` selon les critères des §3 et §4.
+
+### 23.5 Notebook et tests
+
+```text
+NOTEBOOK != UNIT_TEST
+NOTEBOOK != INTEGRATION_TEST
+NOTEBOOK != ACCEPTANCE_TEST
+```
+
+La stratégie de test définie aux §10, §11 et §12 reste inchangée :
+
+```text
+tests/core/
+tests/architecture/
+tests/models/modelXX/
+```
+
+Le notebook peut afficher les résultats de calculs ou de contrôles, mais ne remplace jamais les tests automatisés. Un résultat scientifique n’est pas considéré comme validé au seul motif qu’une cellule Jupyter s’exécute sans erreur.
+
+### 23.6 Notebook et documents normatifs
+
+La chaîne documentaire applicable à un toy est :
+
+```text
+specification.md
+    ↓
+implementation-design.md
+    ↓
+validation-plan.md / manifeste préenregistré
+    ↓
+code core + model
+    ↓
+notebook d’exécution
+    ↓
+closure-report.md
+```
+
+Le notebook constitue une vue exécutable et narrative de l’expérience. Le `closure-report.md` reste le document de synthèse et de fermeture du toy lorsque celui-ci est formellement clos.
+
+Le notebook ne peut modifier ou remplacer silencieusement une décision contenue dans la spécification, le plan de validation ou un manifeste préenregistré.
+
+### 23.7 Exécution non confirmatoire
+
+Un notebook peut être utilisé pendant la qualification, l’exploration autorisée ou le développement. Ses résultats doivent alors rester explicitement :
+
+```text
+NONCONFIRMATORY
+```
+
+Il ne peut pas convertir une exploration en test confirmatoire a posteriori.
+
+### 23.8 Exécution confirmatoire
+
+Le firewall confirmatoire existant s’applique intégralement aux notebooks. La valeur par défaut reste :
+
+```text
+CONFIRMATORY_EXECUTION = NOT_AUTHORIZED
+```
+
+Une campagne confirmatoire lancée depuis un notebook exige la même autorisation explicite que toute autre campagne.
+
+Pour une exécution confirmatoire, les paramètres, la grille, les tolérances, les oracles, les critères et le protocole doivent provenir des sources préenregistrées applicables. Le notebook ne peut pas les remplacer ou les surcharger silencieusement.
+
+Toute cellule permettant une modification interactive d’un paramètre confirmatoire doit être soit absente, soit incapable d’affecter la route confirmatoire autorisée.
+
+### 23.9 Exécution propre
+
+Avant qu’un notebook comportant des résultats soit considéré comme un artefact d’exécution valide, les conditions suivantes doivent être satisfaites :
+
+```text
+RESTART_KERNEL
+RUN_ALL_TOP_TO_BOTTOM
+NO_HIDDEN_STATE
+```
+
+L’exécution ne doit pas dépendre :
+
+- de variables créées lors d’une exécution antérieure ;
+- de cellules exécutées hors ordre ;
+- d’un état manuel caché du kernel ;
+- d’un fichier local non versionné non déclaré ;
+- d’un RNG global implicite.
+
+Une cellule doit pouvoir être comprise comme faisant partie d’une exécution séquentielle propre du notebook.
+
+### 23.10 Déterminisme
+
+Les règles de déterminisme du §14 s’appliquent aux notebooks. Si un notebook utilise de l’aléatoire, le générateur (`rng`) et la graine (`seed`) doivent provenir explicitement du protocole ou de la configuration d’exécution applicable. Aucun `np.random` global implicite ne doit être utilisé pour produire un résultat scientifique.
+
+### 23.11 Provenance
+
+Tout notebook dont les sorties sont conservées comme résultat ou preuve d’exécution doit exposer clairement une provenance comprenant au minimum :
+
+```text
+TOY_ID
+EXECUTION_CLASS
+SOURCE_HEAD
+PROTOCOL_REFERENCE
+```
+
+ainsi que la version Python, la version NumPy et les versions des autres dépendances scientifiques pertinentes, conformément au §14.3.
+
+```text
+EXECUTION_CLASS = QUALIFICATION | CONFIRMATORY
+```
+
+`SOURCE_HEAD` désigne le commit du code ou du protocole effectivement exécuté. Le notebook n’a pas à connaître son propre futur commit SHA.
+
+### 23.12 Sorties commitées
+
+Règle par défaut : un notebook de développement ou de qualification voit ses sorties nettoyées avant commit, sauf résultat explicitement conservé comme artefact utile.
+
+Pour un notebook destiné à archiver les résultats d’une exécution autorisée :
+
+```text
+COMMITTED_OUTPUTS = ALLOWED
+```
+
+uniquement si :
+
+- exécution propre top-to-bottom (§23.9) ;
+- provenance présente (§23.11) ;
+- contexte d’exécution déclaré ;
+- statut qualification/confirmatoire explicite.
+
+Les sorties commitées restent :
+
+```text
+DERIVED_EVIDENCE
+```
+
+et non source normative.
+
+### 23.13 Figures et tableaux
+
+Les figures et tableaux du notebook peuvent être construits à partir des résultats produits par le code source. La logique purement visuelle peut rester dans le notebook.
+
+En revanche, si une transformation de données affecte une quantité scientifique rapportée, cette transformation appartient au code testé de `core` ou de `models/modelXX` selon sa généralité (§3, §4).
+
+### 23.14 Dépendances Jupyter
+
+Le présent lot documentaire n’ajoute aucune dépendance.
+
+```text
+JUPYTER_DEPENDENCY = ADD_ONLY_WHEN_FIRST_NOTEBOOK_IS_IMPLEMENTED
+```
+
+L’ajout futur de Jupyter, ipykernel, nbformat ou équivalent devra :
+
+- répondre à un besoin concret ;
+- suivre la règle des dépendances du projet ;
+- être explicitement autorisé dans le mandat concerné ;
+- être intégré à l’environnement reproductible (§14.3).
+
+Aucune distribution ou paquet particulier n’est imposé par la présente gouvernance.
+
+---
+
+## 24. Évolution de cette gouvernance
 
 Toute modification de sens de cette gouvernance exige :
 

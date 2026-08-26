@@ -40,6 +40,8 @@ docs/
 
 experiments/
 └── toyN/
+    ├── ... manifeste/protocole applicable
+    └── toyN.ipynb
 
 schemas/
 └── toyN/
@@ -71,11 +73,18 @@ Une ancienne décision gelée n'est jamais réécrite pour masquer l'historique.
 
 ### `docs/toy-models/toyN/`
 
-Documentation propre à un modèle jouet : spécification, conception d'implémentation, plan de validation et clôture.
+Documentation propre à un modèle jouet : spécification, conception d'implémentation, plan de validation et clôture. Le `closure-report.md` reste le document de synthèse et de décision de fermeture d'un toy lorsque celui-ci est formellement clos ; le notebook d'exécution (`experiments/toyN/toyN.ipynb`) peut y être référencé comme `EXECUTABLE_EVIDENCE`, sans remplacer la décision de clôture.
 
 ### `experiments/toyN/`
 
-Manifestes et protocoles d'exécution pré-enregistrés.
+Le dossier n'existe que lorsqu'un besoin réel apparaît. Il contient les artefacts versionnés liés à l'exécution du toy, notamment selon les besoins :
+
+- manifestes préenregistrés ;
+- protocoles d'exécution ;
+- notebook Jupyter exécutable de présentation et de traçabilité de l'exécution ;
+- autres artefacts explicitement autorisés.
+
+Le notebook n'existe que lorsqu'il apporte une valeur réelle. Il est un artefact **dérivé** d'exécution ; il n'est jamais une source normative scientifique (voir `docs/governance/software-architecture-governance.md` §23).
 
 ### `schemas/toyN/`
 
@@ -101,6 +110,8 @@ Une gouvernance de rôle spécialisée sous `docs/governance/agents/` est subord
 6. schéma de données ;
 7. index et README ;
 8. document exploratoire.
+
+Le notebook d'exécution d'un toy (`experiments/toyN/toyN.ipynb`) ne prend jamais priorité sur une décision gelée, un manifeste préenregistré, une spécification, un plan de validation ou une gouvernance. En cas de divergence, la source normative prévaut ; le notebook est alors considéré obsolète ou incohérent et doit être régénéré ou corrigé. Le notebook n'est pas ajouté comme source normative concurrente dans la présente hiérarchie.
 
 Une conception d'implémentation applique à la fois la spécification scientifique et les gouvernances transverses. Elle ne peut déroger implicitement à une gouvernance gelée plus récente.
 
