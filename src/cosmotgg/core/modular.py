@@ -3,9 +3,11 @@
 This module implements the finite-dimensional, type-I modular theory
 primitives used as the numerical backbone of CosmoTGG: the hermitian matrix
 logarithm, the modular Hamiltonian `K = -log(rho)` (restricted to faithful
-states), the modular flow `O(s) = exp(+i K s) O exp(-i K s)`, and the finite
+states), the modular flow `O(s) = exp(+i K s) O exp(-i K s)`, the finite
 Connes cocycle `v_s(rho, sigma) = rho^(-is) sigma^(+is)` between two faithful
-density matrices on the same finite-dimensional algebra.
+density matrices on the same finite-dimensional algebra, and the Connes
+cocycle evaluated at the fixed analytic point `t = -i/2`,
+`connes_cocycle_at_minus_i_half(rho, sigma) = rho^(1/2) sigma^(-1/2)`.
 
 The sign convention of the modular flow is frozen by
 `docs/model/hypothesis.md` (`O(s) = e^{+iKs} O e^{-iKs}`, the Connes–Rovelli
@@ -18,6 +20,20 @@ The flow/cocycle parameter `s` is a finite real scalar. It carries no
 physical time interpretation, no unit, and no relation to an external
 spacetime metric or gravitational scale; it is intentionally not named
 `time`/`physical_time`/`t` anywhere in this API.
+
+With the standard Tomita-Takesaki notation for the Connes cocycle,
+`[D rho : D sigma]_t = rho^(+it) sigma^(-it)`, `finite_connes_cocycle` and
+this convention are related by a sign flip of the analytic parameter only:
+
+    finite_connes_cocycle(rho, sigma, s) == [D rho : D sigma]_(-s)
+
+`finite_connes_cocycle` only ever accepts a finite *real* scalar `s`
+(`_validate_modular_parameter`); it has no complex-parameter variant, and
+none is added by this module. `connes_cocycle_at_minus_i_half` is a
+separate, standalone primitive: it is the value of `[D rho : D sigma]_t` at
+the single fixed point `t = -i/2`, computed directly from `rho^(1/2)` and
+`sigma^(-1/2)`, and it is not, and cannot be, expressed as a call to
+`finite_connes_cocycle` with any real `s`.
 
 All numerical tolerances accepted by the public functions of this module are
 explicit, keyword-only, and have no default value.
@@ -205,6 +221,14 @@ def finite_connes_cocycle(
     No `scipy` dependency is used. `rho` and `sigma` are never silently
     normalized, symmetrized, or corrected.
 
+    With the standard Tomita-Takesaki notation `[D rho : D sigma]_t
+    = rho^(+it) sigma^(-it)`, this function computes
+    `finite_connes_cocycle(rho, sigma, s) == [D rho : D sigma]_(-s)`. `s` is
+    restricted to a finite real scalar here (see module docstring); no
+    complex-parameter variant of this function exists or is added by this
+    module. The fixed analytic point `t = -i/2` is provided instead by the
+    separate, standalone primitive `connes_cocycle_at_minus_i_half`.
+
     This is the finite Connes cocycle of Tomita–Takesaki modular theory
     (Connes, 1973): a generic, model-independent construction between any
     two faithful states on the same finite-dimensional algebra. It carries
@@ -240,3 +264,115 @@ def finite_connes_cocycle(
     )
 
     return u_rho @ u_sigma.conj().T
+
+
+def _hermitian_power(
+    matrix, power: float, *, hermiticity_tolerance: float, positivity_tolerance: float, name: str
+) -> np.ndarray:
+    """Spectral evaluation of `matrix**power` for a hermitian, faithful matrix.
+
+    `matrix` must be hermitian within `hermiticity_tolerance` and strictly
+    positive (`lambda_min > positivity_tolerance`), checked exactly as in
+    `hermitian_log` (via `_hermitian_eigendecomposition` then
+    `_validate_faithful`); otherwise this function fails closed with
+    `ValueError`. Computed by diagonalizing `matrix` (`numpy.linalg.eigh`)
+    and raising its (real, strictly positive) eigenvalues to the real
+    exponent `power`, then reconstructing the hermitian result in the
+    original eigenbasis. No `scipy` dependency is used; no clipping,
+    pseudoinverse, ridge, or other regularization is applied.
+
+    Private to this module; shared by `connes_cocycle_at_minus_i_half`
+    (`power = +0.5` and `power = -0.5`) to avoid duplicating the
+    diagonalization, faithfulness check, and spectral reconstruction logic
+    already used by `hermitian_log`/`modular_hamiltonian`. This is not a
+    general matrix-power API: `power` is a plain real scalar exponent, and
+    no complex exponent is accepted.
+    """
+    _, eigvals, eigvecs = _hermitian_eigendecomposition(
+        matrix, hermiticity_tolerance=hermiticity_tolerance, name=name
+    )
+    _validate_faithful(eigvals, positivity_tolerance=positivity_tolerance, name=name)
+
+    powered_eigvals = eigvals**power
+    return (eigvecs * powered_eigvals) @ eigvecs.conj().T
+
+
+def connes_cocycle_at_minus_i_half(
+    rho,
+    sigma,
+    *,
+    hermiticity_tolerance: float,
+    trace_tolerance: float,
+    positivity_tolerance: float,
+) -> np.ndarray:
+    """Connes cocycle at the fixed analytic point `t = -i/2`.
+
+    With the standard Tomita-Takesaki notation `[D rho : D sigma]_t
+    = rho^(+it) sigma^(-it)`, analytic continuation to the purely imaginary
+    point `t = -i/2` gives `[D rho : D sigma]_(-i/2) = rho^(1/2)
+    sigma^(-1/2)`, which is exactly what this function computes:
+
+        F = rho^(1/2) @ sigma^(-1/2)
+
+    `rho` and `sigma` must both be faithful (strictly positive) density
+    matrices of matching dimensions, each validated independently via
+    `validate_density_matrix` with `require_faithful=True`; non-faithful
+    inputs, mismatched dimensions, non-hermitian input, bad trace, or
+    non-positive-semidefinite input all fail closed with `ValueError`.
+
+    `rho^(1/2)` and `sigma^(-1/2)` are each computed by diagonalizing the
+    corresponding matrix (`numpy.linalg.eigh`) and applying the real
+    exponent (`+1/2` resp. `-1/2`) spectrally to its strictly positive
+    eigenvalues, then reconstructing the hermitian result in the original
+    eigenbasis (`_hermitian_power`). No `scipy` dependency is used; no
+    clipping, pseudoinverse, ridge, or other silent regularization is ever
+    applied.
+
+    This is a purely mathematical, model-independent identity between two
+    faithful density matrices on the same finite-dimensional algebra:
+    `F @ sigma @ F.conj().T == rho` holds exactly, by construction, for the
+    `F` returned by this function.
+
+    This function is unrelated, as an API, to `finite_connes_cocycle(rho,
+    sigma, s)`: that function implements `v_s(rho, sigma) = rho^(-is)
+    sigma^(+is)` for a finite *real* scalar `s` only (`finite_connes_cocycle(
+    rho, sigma, s) == [D rho : D sigma]_(-s)`; see module docstring).
+    `finite_connes_cocycle` never accepts a complex parameter, and there is
+    no real value of `s` for which it equals the result of this function.
+    This function is a separate, standalone primitive for the single fixed
+    point `t = -i/2`, not a special case reached through
+    `finite_connes_cocycle`.
+    """
+    validated_rho = validate_density_matrix(
+        rho,
+        require_faithful=True,
+        hermiticity_tolerance=hermiticity_tolerance,
+        trace_tolerance=trace_tolerance,
+        positivity_tolerance=positivity_tolerance,
+    )
+    validated_sigma = validate_density_matrix(
+        sigma,
+        require_faithful=True,
+        hermiticity_tolerance=hermiticity_tolerance,
+        trace_tolerance=trace_tolerance,
+        positivity_tolerance=positivity_tolerance,
+    )
+    if validated_rho.shape != validated_sigma.shape:
+        raise ValueError("rho and sigma must have matching dimensions")
+
+    sqrt_rho = _hermitian_power(
+        validated_rho,
+        0.5,
+        hermiticity_tolerance=hermiticity_tolerance,
+        positivity_tolerance=positivity_tolerance,
+        name="rho",
+    )
+    invsqrt_sigma = _hermitian_power(
+        validated_sigma,
+        -0.5,
+        hermiticity_tolerance=hermiticity_tolerance,
+        positivity_tolerance=positivity_tolerance,
+        name="sigma",
+    )
+
+    return sqrt_rho @ invsqrt_sigma
