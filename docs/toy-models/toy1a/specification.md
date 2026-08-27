@@ -119,6 +119,19 @@ DA
 
 Aucune interprétation spatiale du carré/arête/voisin. « Boucle » désigne uniquement une structure d'incidence relationnelle.
 
+### Orientation tensorielle canonique des arêtes
+
+```text
+EDGE_ORIENTATION_AB = A_TENSOR_B
+EDGE_ORIENTATION_BC = B_TENSOR_C
+EDGE_ORIENTATION_CD = C_TENSOR_D
+EDGE_ORIENTATION_DA = D_TENSOR_A
+```
+
+Ainsi \(M_{AB}\) est le lien de corrélation anti-linéaire \(B\to A\), \(M_{BC}\) le lien \(C\to B\), \(M_{CD}\) le lien \(D\to C\), et \(M_{DA}\) le lien \(A\to D\) ; la boucle fermée déclarée reste \(A \leftarrow B \leftarrow C \leftarrow D \leftarrow A\) (§15).
+
+Tout objet d'arête (\(P_{ij}\), \(S_{ij}\), \(\rho_{ij}\), \(M_{ij}\)) est représenté dans le produit tensoriel ordonné \(\mathcal H_i \otimes \mathcal H_j\) correspondant exactement à son indice. En particulier, l'arête \(DA\) est représentée dans \(\mathcal H_D \otimes \mathcal H_A\), distinct de l'ordre global \(A,B,C,D\) : \(\rho_{DA} \neq \rho_{AD}\) en tant que représentation matricielle brute. Ces deux représentations ne sont reliées que par un SWAP (§7, §12).
+
 Interdit :
 
 ```text
@@ -133,7 +146,7 @@ metric
 
 ## 5. Données d'arête maximalement intriquées
 
-Pour un unitaire \(M_{ij} \in U(2)\), définir :
+Pour un unitaire \(M_{ij} \in U(2)\), représenté dans l'ordre tensoriel \(\mathcal H_i \otimes \mathcal H_j\) fixé par l'orientation canonique d'arête (§4), définir :
 
 $$
 |\Phi(M_{ij})\rangle = (M_{ij} \otimes I)\,|\Phi^+\rangle,
@@ -167,7 +180,41 @@ Les matrices canoniques \(M\) sont une représentation de fixture uniquement. Le
 
 ## 6. État global
 
-Définir :
+### Notation d'inclusion non ambiguë
+
+Définir la notation d'inclusion (« embedding ») :
+
+$$
+\operatorname{Embed}_{ij}^{ABCD}(O_{ij})
+$$
+
+signifiant : \(O\) agit sur les facteurs \(i,j\) DANS CET ORDRE, l'identité agit sur les facteurs restants, et la matrice globale résultante est représentée dans l'ordre tensoriel global \(A,B,C,D\).
+
+Pour \(AB\), \(BC\), \(CD\), cet ordre coïncide avec l'ordre global (aucune permutation requise). Pour \(DA\), un oracle explicite d'élément de matrice est fourni :
+
+$$
+\big[\operatorname{Embed}_{DA}(O)\big]_{(abcd),(a'b'c'd')}
+=
+O_{(da),(d'a')}\;\delta_{bb'}\,\delta_{cc'}.
+$$
+
+### État global
+
+Définir, conceptuellement avec la notation d'inclusion ci-dessus :
+
+$$
+\rho_{ABCD}
+=
+\frac1{16}\Big[
+I
++ \varepsilon_{AB}\,\operatorname{Embed}_{AB}(S_{AB})
++ \varepsilon_{BC}\,\operatorname{Embed}_{BC}(S_{BC})
++ \varepsilon_{CD}\,\operatorname{Embed}_{CD}(S_{CD})
++ \varepsilon_{DA}\,\operatorname{Embed}_{DA}(S_{DA})
+\Big].
+$$
+
+Cette notation peut être abrégée, une fois la convention ci-dessus rendue explicite, en écrivant simplement :
 
 $$
 \rho_{ABCD}
@@ -178,8 +225,10 @@ I
 + \varepsilon_{BC}\,S_{BC}
 + \varepsilon_{CD}\,S_{CD}
 + \varepsilon_{DA}\,S_{DA}
-\Big].
+\Big],
 $$
+
+avec l'entente implicite d'inclusion ci-dessus pour chaque terme, en particulier pour \(\operatorname{Embed}_{DA}\). Aucune interprétation spatiale de l'inclusion/l'ordre.
 
 Tous les \(\varepsilon\) sont réels.
 
@@ -204,11 +253,31 @@ Strict. Aucune tolérance dans cette condition de domaine. Aucune recherche de d
 
 ## 7. Réductions
 
-Pour chaque arête déclarée :
+Pour chaque arête déclarée, dans son ordre tensoriel canonique (§4) :
 
 $$
 \rho_{ij} = (1-\varepsilon_{ij})\,\frac{I_{ij}}4 + \varepsilon_{ij}\,P_{ij}.
 $$
+
+### Contrat d'orientation de réduction
+
+Le contrat de réduction de production doit retourner \(\rho_{AB}\) en ordre \(A\otimes B\), \(\rho_{BC}\) en ordre \(B\otimes C\), \(\rho_{CD}\) en ordre \(C\otimes D\), et \(\rho_{DA}\) en ordre \(D\otimes A\).
+
+Si la primitive générique de trace partielle produit naturellement la dernière paire en ordre \(A\otimes D\) (ordre induit par le produit tensoriel global \(A,B,C,D\)), la couche `model1a` doit permuter explicitement le résultat vers \(D\otimes A\). Aucune hypothèse silencieuse sur l'ordre de conservation d'indices de la primitive de trace partielle.
+
+Oracle analytique explicite, en ordre \(D\otimes A\) :
+
+$$
+\rho_{DA} = (1-\varepsilon_{DA})\,\frac{I_{DA}}4 + \varepsilon_{DA}\,P_{DA}.
+$$
+
+\(\rho_{AD}\) peut optionnellement être exposé, uniquement si clairement nommé et relié par :
+
+$$
+\rho_{AD} = \mathrm{SWAP}\,\rho_{DA}\,\mathrm{SWAP}.
+$$
+
+Ceci n'est pas requis par `model1a`.
 
 Réductions à un site :
 
@@ -297,7 +366,7 @@ $$
 M_{ij} = \sqrt2\,\Psi_{\text{matrix}}.
 $$
 
-Exigence : \(M_{ij}\) unitaire, à tolérance d'implémentation explicite près. La phase globale reste arbitraire.
+Exigence : \(M_{ij}\) unitaire, à tolérance d'implémentation explicite près. Aucune tolérance par défaut n'est fournie : un \(M_{ij}\) non unitaire au-delà de la tolérance déclarée est rejeté (`ValueError`), sans réparation polaire, sans réparation par normalisation, sans réparation QR, sans projection vers l'unitaire le plus proche. La phase globale reste arbitraire.
 
 Carte de corrélation vectorielle anti-linéaire (structure de support) :
 
@@ -361,6 +430,14 @@ sur les tangentes d'opérateurs hermitiens sans trace.
 
 Ne pas diagonaliser indépendamment \(\rho_{ji}\) et choisir un contrat de phase/orientation non lié dans la composition du chemin de production. Aucune revendication d'inverse de carte pondérée.
 
+Pour l'arête de fermeture de boucle (arête stockée/orientée \(DA\), §4) :
+
+$$
+M_{AD} = M_{DA}^{\mathsf T}.
+$$
+
+Ne pas confondre la réorientation tensorielle \(DA \leftrightarrow AD\) avec une nouvelle diagonalisation arbitraire : la matrice inverse \(M_{AD}\) est dérivée de la même relation d'arête que \(M_{DA}\).
+
 ---
 
 ## 13. Transfert d'arête physique centré
@@ -389,6 +466,8 @@ PHYSICAL_CENTERED_EDGE_TRANSFER  = L = eps U
 ```
 
 Aucune normalisation arbitraire.
+
+Note de terminologie : l'étiquette `PHYSICAL_CENTERED_EDGE_TRANSFER` est conservée uniquement comme raccourci historique. « Physical » signifie ici *dérivé de la force de relation portée par la matrice densité*, et non un processus, canal ou observable de marée physique établi. Aucune interprétation CPTP/processus n'est introduite par cette étiquette. Le nom d'API de production préféré est `centered_edge_transfer`/`state_derived_centered_edge_transfer`, pas un nom contenant `physical_transfer`.
 
 ---
 
@@ -425,6 +504,8 @@ définir :
 $$
 H_A = M_{AB}\,\overline{M_{BC}}\,M_{CD}\,\overline{M_{DA}}.
 $$
+
+Cette expression utilise exactement \(M_{DA}\) dans l'orientation \(D\otimes A\) (§4, §12) : substituer silencieusement une matrice ordonnée de façon incorrecte (\(A\otimes D\)) ne doit jamais se produire ; le chemin de production doit reproduire l'holonomie canonique gelée (§23) à partir des réductions reconstruites depuis l'état global.
 
 \(H_A\) est unitaire. Sa matrice brute n'est définie qu'à une phase scalaire près.
 
@@ -867,7 +948,10 @@ Séparation de branche par rapport à T1 : `docs/model/t1-relational-physical-ch
 ## 33. Statut et prochaine étape
 
 ```text
-MODEL1A_SPECIFICATION_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL1A_SPECIFICATION_STATUS = PROPOSED_CORRECTED_PENDING_CHATGPT_REVIEW
+MODEL1A_DESIGN_CORRECTION    = EDGE_TENSOR_ORIENTATION_AND_FAIL_CLOSED_INPUT_CONTRACT
 ```
 
-La prochaine étape autorisée est la revue à distance de ce design par ChatGPT.
+Corrections apportées par le lot `MODEL1A-DESIGN-CORRECTION-1` : déclaration explicite de l'orientation tensorielle canonique de chaque arête (§4, `EDGE_ORIENTATION_AB/BC/CD/DA`), notation d'inclusion non ambiguë avec oracle explicite pour \(DA\) (§6), contrat d'orientation de réduction interdisant toute hypothèse silencieuse sur l'ordre de `partial_trace` (§7), contrat de lien inverse explicite \(M_{AD}=M_{DA}^{\mathsf T}\) (§12), réaffirmation de l'orientation \(D\otimes A\) utilisée par l'holonomie (§15), clarification fail-closed de la validation d'entrée du constructeur (§10), et note de terminologie sur l'étiquette historique `PHYSICAL_CENTERED_EDGE_TRANSFER` (§13). Aucun changement scientifique supplémentaire ; l'oracle canonique d'holonomie (§23) est préservé inchangé.
+
+La prochaine étape autorisée est la revue à distance de ce design corrigé par ChatGPT.

@@ -41,6 +41,8 @@ Ces primitives sont déjà `established` (`SCIENTIFIC_METADATA.status = "establi
 
 Aucune dépendance à `conditional_expectation`/`traceless_part` n'est requise par `model1a` : le lien directionnel et la réponse de boucle sont extraits directement des vecteurs/valeurs propres de \(\rho_{ij}\)/\(K_{ij}\) et de leur composition algébrique (spécification §9–§18), pas d'une espérance conditionnelle sur un sous-système de contexte.
 
+`partial_trace` ne garantit pas nativement que la paire \(D,A\) soit retournée dans l'ordre \(D\otimes A\) (spécification §7) : dans l'ordre tensoriel global \(A,B,C,D\), la trace partielle sur \(B,C\) produit naturellement la paire dans l'ordre \(A\otimes D\). `model1a/states.py` doit donc permuter explicitement ce résultat (SWAP) vers \(D\otimes A\) avant d'exposer `rho_DA`. Aucune hypothèse silencieuse sur l'ordre de conservation d'indices de `partial_trace` n'est faite ailleurs dans `model1a`.
+
 Possiblement de l'algèbre linéaire générique via `numpy` uniquement (diagonalisation hermitienne, produits matriciels, transposition/conjugaison).
 
 ---
@@ -128,7 +130,14 @@ Responsabilité scientifique strictement bornée aux spécification §4–§7 :
 - constantes de la donnée d'arête maximalement intriquée canonique : \(|\Phi^+\rangle\), \(P_{ij}\), \(S_{ij}\) (spécification §5), portées comme valeurs de module ou fonctions auxiliaires privées, sans revendication de base préférée au niveau de l'API publique ;
 - constructeur de l'état global `four_qubit_relational_loop_state(eps_AB, eps_BC, eps_CD, eps_DA, M_AB, M_BC, M_CD, M_DA, *, ...)` (spécification §6), assemblé par combinaison linéaire explicite de produits tensoriels ;
 - validation fail-closed du domaine fidèle suffisant (spécification §6), sans tolérance ni epsilon, frontière rejetée ;
-- réductions \(\rho_{ij}\) pour les quatre arêtes, \(\rho_A,\rho_B,\rho_C,\rho_D\), \(\rho_{AC},\rho_{BD}\) (spécification §7), obtenues via `cosmotgg.core.states.partial_trace` sur les dimensions déclarées `(2,2,2,2)`.
+- réductions \(\rho_{ij}\) pour les quatre arêtes, \(\rho_A,\rho_B,\rho_C,\rho_D\), \(\rho_{AC},\rho_{BD}\) (spécification §7), obtenues via `cosmotgg.core.states.partial_trace` sur les dimensions déclarées `(2,2,2,2)` ; pour `rho_DA`, permutation explicite (SWAP) du résultat brut de `partial_trace` (ordre naturel \(A\otimes D\)) vers l'ordre canonique \(D\otimes A\) (spécification §7, §4) — aucune hypothèse silencieuse sur l'ordre de sortie de la primitive.
+
+Contrat de validation d'entrée fail-closed du constructeur `four_qubit_relational_loop_state(...)` :
+
+- chaque entrée \(\varepsilon_{ij}\) doit être réelle, finie, scalaire ; un `bool`/`numpy.bool_` est rejeté ;
+- chaque entrée \(M_{ij}\) doit être de forme `(2,2)`, finie, et unitaire à une tolérance `max_entanglement_unitarity_tolerance` explicitement fournie par l'appelant, sans valeur par défaut ;
+- aucune réparation polaire, aucune réparation par normalisation, aucune réparation QR, aucune projection vers l'unitaire le plus proche ; un \(M_{ij}\) invalide lève `ValueError` ;
+- ce contrat ne change pas la famille mathématique déclarée (spécification §6) ; il rend uniquement le constructeur fail-closed sur son domaine déclaré.
 
 Ce module ne construit aucun contexte modulaire, aucun lien directionnel, aucune holonomie de boucle.
 
@@ -143,7 +152,7 @@ Responsabilité scientifique strictement bornée aux spécification §8–§14 :
 - extraction du lien directionnel \(M_{ij} = \sqrt2\,\Psi_{\text{matrix}}\) depuis le coefficient de l'état fondamental modulaire unique, avec vérification d'unitarité à tolérance explicite (spécification §10) ;
 - carte de corrélation vectorielle anti-linéaire \(J_{(i\leftarrow j)}\) (structure de support) et action primaire sur tangentes hermitiennes sans trace \(U_{(i\leftarrow j)}\) (spécification §10) ;
 - contrat de lien inverse \(M_{ji} = M_{ij}^{\mathsf T}\), \(U_{(j\leftarrow i)} \circ U_{(i\leftarrow j)} = \text{identité}\) (spécification §12), sans diagonalisation indépendante de \(\rho_{ji}\) ;
-- transfert d'arête physique centré \(L_{(i\leftarrow j)}(X) = 2\operatorname{Tr}_j[(I\otimes X)(\rho_{ij}-I_{ij}/4)]\), vérifié contre l'identité analytique gelée \(L_{(i\leftarrow j)} = \varepsilon_{ij}\,U_{(i\leftarrow j)}\) (spécification §13).
+- transfert d'arête physique centré \(L_{(i\leftarrow j)}(X) = 2\operatorname{Tr}_j[(I\otimes X)(\rho_{ij}-I_{ij}/4)]\), vérifié contre l'identité analytique gelée \(L_{(i\leftarrow j)} = \varepsilon_{ij}\,U_{(i\leftarrow j)}\) (spécification §13). Nom d'API de production préféré : `centered_edge_transfer`/`state_derived_centered_edge_transfer` ; pas de nom contenant `physical_transfer` (spécification §13, note de terminologie).
 
 Ce module ne construit aucune holonomie de boucle, aucune réponse de boucle.
 
@@ -153,7 +162,7 @@ Ce module ne construit aucune holonomie de boucle, aucune réponse de boucle.
 
 Responsabilité scientifique strictement bornée aux spécification §15–§22, §25 :
 
-- holonomie de boucle projective \(H_A = M_{AB}\,\overline{M_{BC}}\,M_{CD}\,\overline{M_{DA}}\) et action primaire indépendante de la phase \(\operatorname{Ad}_{H_A}\) (spécification §15) ;
+- holonomie de boucle projective \(H_A = M_{AB}\,\overline{M_{BC}}\,M_{CD}\,\overline{M_{DA}}\) et action primaire indépendante de la phase \(\operatorname{Ad}_{H_A}\) (spécification §15), utilisant exactement \(M_{DA}\) dans son orientation canonique \(D\otimes A\) (spécification §4, §12, §15) : aucune substitution silencieuse d'une matrice orientée \(A\otimes D\) de façon incorrecte n'est acceptée — régression d'orientation obligatoire (§9 ci-dessous) ;
 - contrôle de jauge pure : vérification que des repères unitaires locaux factorisables \(M_{ij}=G_iG_j^{\mathsf T}\) impliquent \(\operatorname{Ad}_{H_A}=\text{identité}\) (spécification §16) ;
 - force de boucle \(w_{\square} = \varepsilon_{AB}\varepsilon_{BC}\varepsilon_{CD}\varepsilon_{DA}\), dérivée des forces d'arête, jamais ajustée indépendamment (spécification §17) ;
 - transfert de boucle \(L_{\square}\), composition explicite des quatre transferts centrés, vérifié contre l'identité exacte \(L_{\square}(X)=w_{\square}\operatorname{Ad}_{H_A}(X)\) (spécification §17) ;
@@ -208,7 +217,8 @@ Sans fixer de valeur canonique définitive, les tests devront couvrir au minimum
 
 - construction de l'état global sur la fixture analytique primaire (\(M_{AB}=I\), \(M_{BC}=\sigma_X\), \(M_{CD}=I\), \(M_{DA}=\sigma_Y\), \(\varepsilon_{ij}=0.05\)) et sur la fixture de sensibilité d'inégalité de force (spécification §23) ;
 - rejet fail-closed hors du domaine fidèle suffisant (spécification §6) ;
-- réductions exactes \(\rho_{ij}\), \(\rho_A,\rho_B,\rho_C,\rho_D\), \(\rho_{AC},\rho_{BD}\) contre les formules analytiques du §7 (oracle indépendant).
+- rejet fail-closed des entrées \(\varepsilon_{ij}\) non réelles/non finies/non scalaires (y compris `bool`) et des entrées \(M_{ij}\) de forme incorrecte, non finies, ou non unitaires au-delà de `max_entanglement_unitarity_tolerance` (spécification §10, §6 ci-dessus) : `ValueError` attendu, sans réparation polaire/normalisation/QR/projection ;
+- réductions exactes \(\rho_{ij}\), \(\rho_A,\rho_B,\rho_C,\rho_D\), \(\rho_{AC},\rho_{BD}\) contre les formules analytiques du §7 (oracle indépendant), y compris \(\rho_{DA}\) explicitement en ordre \(D\otimes A\) et sa relation par SWAP à \(\rho_{AD}\) si ce dernier est exposé (spécification §7).
 
 **`test_links.py`** :
 
@@ -224,6 +234,7 @@ Sans fixer de valeur canonique définitive, les tests devront couvrir au minimum
 **`test_loop.py`** :
 
 - holonomie de boucle projective \(H_A\), \(\operatorname{Ad}_{H_A}\) contre l'oracle de la fixture analytique primaire (\(H_A=-i\sigma_Z\) à phase près, spécification §23) ;
+- **régression d'orientation obligatoire** : recomposer \(H_A\) depuis les réductions reconstruites de l'état global (pas depuis les \(M_{ij}\) fournis en fixture) et vérifier que le résultat coïncide avec l'oracle canonique ; substituer délibérément, dans un test dédié, une matrice \(M_{DA}\) ordonnée de façon incorrecte (\(A\otimes D\) au lieu de \(D\otimes A\)) doit produire un résultat détectablement différent de l'oracle canonique, jamais un passage silencieux (spécification §15) ;
 - **F0** (liens factorisables par sommet \(M_{ij}=G_iG_j^{\mathsf T}\)) : \(\operatorname{Ad}_{H_A}=\text{identité}\), `VERTEX_FACTORIZABLE_LINK_FAMILY = PROJECTIVELY_FLAT` (spécification §16) ;
 - **F1** (\(H_A=e^{i\phi}I\), \(\varepsilon\) non nuls) : \(R_{\square}=0\) (spécification §26) ;
 - force de boucle \(w_{\square}=\varepsilon_{AB}\varepsilon_{BC}\varepsilon_{CD}\varepsilon_{DA}\) et transfert de boucle \(L_{\square}\) contre l'identité exacte \(L_{\square}=w_{\square}\operatorname{Ad}_{H_A}\) (spécification §17) ;
@@ -287,7 +298,10 @@ Le récit scientifique de l'exécution appartiendra ensuite à `experiments/toy1
 ## 14. Statut et prochaine étape
 
 ```text
-MODEL1A_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL1A_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_CORRECTED_PENDING_CHATGPT_REVIEW
+MODEL1A_DESIGN_CORRECTION            = EDGE_TENSOR_ORIENTATION_AND_FAIL_CLOSED_INPUT_CONTRACT
 ```
 
-La prochaine étape autorisée est la revue à distance de ce design par ChatGPT.
+Corrections apportées par le lot `MODEL1A-DESIGN-CORRECTION-1` : note explicite sur la permutation requise du résultat de `partial_trace` pour `rho_DA` (§2, §5) ; contrat de validation d'entrée fail-closed du constructeur (`states.py`, §5) ; réaffirmation de l'orientation \(D\otimes A\) de \(M_{DA}\) dans l'holonomie et régression d'orientation obligatoire (`loop.py`, §7, §9) ; préférence de nommage `centered_edge_transfer`/`state_derived_centered_edge_transfer` (`links.py`, §6) ; tests supplémentaires de rejet fail-closed et d'orientation (§9). Aucun changement scientifique supplémentaire.
+
+La prochaine étape autorisée est la revue à distance de ce design corrigé par ChatGPT.
