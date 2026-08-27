@@ -700,6 +700,37 @@ PHASE                      = T1_RELATIONAL_PHYSICAL_CHANGE_DEFINITION_PENDING_CH
 PROCHAINE_ACTION_AUTORISEE = remote review of T1 relational physical change operational definition by ChatGPT
 ```
 
+Le lot `MODEL0E-DESIGN-1` (rôle `docs`) a créé, en un seul lot pré-implémentation, la spécification scientifique proposée et la conception d'implémentation de `model0e` (`docs/toy-models/toy0e/specification.md`, `docs/toy-models/toy0e/implementation-design.md`), transformant en contrat explicite le candidat de référence relationnelle discrète multi-modulaire, sur la base normative de `docs/model/t1-relational-physical-change-criteria.md` :
+
+```text
+T1_DISCRETE_MULTIMODULAR_REFERENCE_FEASIBILITY = ACCEPTED
+CANDIDATE                                       = DISCRETE_MULTI_MODULAR_RELATIONAL_REFERENCE_CYCLE
+
+MODEL0E_CLASS = T1_DISCRETE_MULTI_MODULAR_RELATIONAL_REFERENCE_QUALIFICATION_NONCONFIRMATORY
+
+MODEL0E_SPECIFICATION_STATUS         = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL0E_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+
+C4C_STATUS = PASS_CANDIDATE_STATE_LAW_LEVEL
+C7_STATUS  = PASS_CANDIDATE_FOR_DECLARED_FAMILY
+
+REFERENCE_LABEL_GAUGE = AFFINE_Z3_RELABELLING
+
+RELATIONAL_REFERENCE       = CANDIDATE_ONLY
+RELATIONAL_PHYSICAL_CHANGE = CANDIDATE_NOT_ESTABLISHED
+RELATIONAL_TIME            = NOT_ESTABLISHED
+
+T1_STATUS = OPEN_NOT_EXECUTED
+```
+
+`model0e` déclare la famille d'états `FOUR_PARTITE_DISCRETE_MULTIMODULAR_REFERENCE_FAMILY` sur \(\mathcal H_A\otimes\mathcal H_B\otimes\mathcal H_C\otimes\mathcal H_D = \mathbb C^3\otimes\mathbb C^3\otimes\mathbb C^2\otimes\mathbb C^2\) (\(A,B\) physiques qutrit, \(C,D\) contextes relationnels), une extraction de référence \(\mathbb Z_3\) par paire de contextes modulaires projetés non commutants (\(H_Q^X\)/\(H_N^X\)) sur chaque qutrit, sous portail de module égal explicite (§15, contrôle de faux positif F3) et jauge de relabellisation affine \(\mathbb Z_3\) (§17), des états conditionnels physiques réels \(\rho_{A|k}\) (§19, avancée centrale sur `model0d`), une loi fixe unique dérivée \(V_A\)/\(\Lambda\) sans état cible fourni indépendamment (`NUMBER_OF_INDEPENDENT_TARGET_STATE_INPUTS = ZERO`, §22, C4B), une seconde référence indépendamment dérivée sur \(A\) et une règle explicite de changement de référence (§28–§30, C7), sept contrôles de faux positifs F0–F6 (§33) et deux contrôles de sensibilité (asymétrie d'amplitude A/B, projection pondérée, §31–§32). L'audit architectural obligatoire (`docs/toy-models/toy0e/implementation-design.md` §3) conclut `CORE_PROMOTION_NEEDED = NO` : les opérations candidates (extraction spectrale ordonnée, carte de corrélation anti-linéaire, loi fixe dérivée, règle de changement de référence) restent dans `model0e`, sans promotion `core` au seul motif d'une généralité apparente, conformément au mandat. Aucun code, aucun notebook, aucune exécution T1 n'est produit par ce lot.
+
+```text
+CURRENT_LOT                = NONE
+PHASE                      = MODEL0E_DESIGN_PENDING_CHATGPT_REVIEW
+PROCHAINE_ACTION_AUTORISEE = remote model0e design review by ChatGPT
+```
+
 ---
 
 ## Mémoire de session
