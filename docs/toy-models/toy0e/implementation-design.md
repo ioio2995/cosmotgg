@@ -59,7 +59,8 @@ projecteur propre maximal (H_Q)    | model0e   | sélection « unique valeur pro
 portail de module égal (§15)       | model0e   | seuil/test candidat model0e, pas une brique core               | —                   | tests/models/model0e
 
 carte de corrélation anti-linéaire | model0e   | dépend de l'identification vecteur propre maximal <-> matrice  | numpy               | tests/models/model0e
-J_AB, M_AB (§21)                   |           | reshape, spécifique à la construction candidate model0e        |                     |
+J_AB, Jop_AB, M_AB (§21)           |           | reshape, spécifique à la construction candidate model0e        |                     |
+(vectorielle et opérateur)         |           |                                                                  |                     |
 
 loi fixe dérivée V_A, Lambda (§22) | model0e   | dérivation depuis rho_AB et U_B, spécifique au candidat         | numpy               | tests/models/model0e
 
@@ -154,7 +155,7 @@ Responsabilité scientifique strictement bornée aux spécification §19–§32 
 
 - états conditionnels physiques \(p_B(k)\), \(\rho_{A|k}\) à partir de \(\rho_{AB}\) et de la PVM de référence \(\{E_k^B\}\) (spécification §19) ;
 - statistiques \(p_A(j \mid k)\) pour C3 (spécification §20) ;
-- carte de corrélation anti-linéaire \(M_{AB}\), \(J_{AB}\) depuis le vecteur propre maximal de \(\rho_{AB}\) (spécification §21) ;
+- carte de corrélation anti-linéaire \(M_{AB}\), \(J_{AB}\) (vectorielle) et \(\operatorname{Jop}_{AB}\) (induite sur opérateurs) depuis le vecteur propre maximal de \(\rho_{AB}\) (spécification §21) ; tout opérateur (par exemple un projecteur \(E_k^B\)) transféré de \(B\) vers \(A\) utilise \(\operatorname{Jop}_{AB}\), jamais \(J_{AB}\) directement ;
 - loi fixe dérivée \(V_A\), \(\Lambda_{(k_2 \leftarrow k_1)}\) (spécification §22), sans transposition/conjugaison codée en dur, en dérivant \(V_A\) depuis \(\rho_{AB}\) et \(U_B\) ;
 - comparaison directe/loi pour C4C (spécification §25) ;
 - règle de changement de référence et carte d'étiquette \(\pi\) pour C7 (spécification §29).
@@ -186,14 +187,22 @@ C7  — reference nonprivilege           : matrice de recouvrement/pi, spécific
 Faux positifs (spécification §33), chacun réalisé par une fixture ou une perturbation test-only, sans nouvelle API de production :
 
 ```text
-F0 — eta = 0                                    -> tests/models/model0e/test_conditional.py
-F1 — mu_X = 0                                   -> tests/models/model0e/test_reference.py
-F2 — nu_X = 0                                   -> tests/models/model0e/test_reference.py
+F0 — eta = 0                                    -> tests/models/model0e/test_conditional.py  [TEST_ONLY_OFF_CONTRACT]
+F1 — mu_X = 0                                   -> tests/models/model0e/test_reference.py    [TEST_ONLY_OFF_CONTRACT]
+F2 — nu_X = 0                                   -> tests/models/model0e/test_reference.py    [TEST_ONLY_OFF_CONTRACT]
 F3 — semence de module inégal (test-only)       -> tests/models/model0e/test_reference.py
 F4 — trois états conditionnels arbitraires       -> tests/models/model0e/test_conditional.py
     (test-only, hors orbite Z3 dérivée)
 F5 — perturbation rho_AB trace-nulle (test-only) -> tests/models/model0e/test_conditional.py
 F6 — relabellisation affine Z3                   -> tests/models/model0e/test_reference.py
+```
+
+`F0`, `F1` et `F2` sont explicitement des `TEST_ONLY_OFF_CONTRACT_NEGATIVE_CONTROLS` (spécification §33) : ils construisent directement, en test uniquement, la réduction physique hors-contrat (\(\rho_{AB}(\eta=0)\), \(\rho_{XC}\) avec \(\mu_X=0\), \(\rho_{XD}\) avec \(\nu_X=0\)) puis appliquent la machinerie `core` déjà établie (`modular_hamiltonian`, `conditional_expectation`, `traceless_part`) à cette réduction. Ils **ne testent pas l'acceptation du constructeur d'état de production** de `model0e/states.py`. Aucune fonction de contournement (« bypass »), aucun constructeur public non sûr, et aucun indicateur optionnel `validate=False` / `allow_invalid_branch=True` / `testing=True` en production ne sont introduits pour ces contrôles.
+
+Le domaine de branche de production reste inchangé (spécification §8, §33) :
+
+```text
+PRODUCTION_STATE_CONSTRUCTOR = FAIL_CLOSED_ON_BRANCH_DOMAIN
 ```
 
 Ce sont des `NUMERICAL_QUALIFICATION_GUARDS`/contrôles structurels, pas des observables physiques normatives. Aucun seuil scientifique n'est fixé par ce document ; les tolérances numériques d'un futur protocole restent `OPEN` (spécification §38).
@@ -209,7 +218,9 @@ Sans fixer de valeur canonique définitive, les tests devront couvrir au minimum
 - construction de la famille d'états sur une fixture `NON_NORMATIVE_TEST_FIXTURE` symétrique et sur la fixture amplitude-asymétrique ;
 - rejet fail-closed hors du domaine fidèle suffisant (spécification §8) et des conditions de branche ;
 - réductions exactes \(\rho_{AB}, \rho_A, \rho_B, \rho_{AC}, \rho_{AD}, \rho_{BC}, \rho_{BD}\) contre les formules analytiques du §9 (oracle indépendant) ;
-- contrôle négatif **F0** (\(\eta=0\)) au niveau de l'état, préparatoire au contrôle C3 de `test_conditional.py`.
+- **tests de rejet de frontière de production, obligatoires et distincts des contrôles F0/F1/F2 hors-contrat ci-dessous** : le constructeur public de production doit rejeter \(\eta=0\), \(\mu_A=0\), \(\mu_B=0\), \(\nu_A=0\) et \(\nu_B=0\) (`CONTRACT_REJECTION = PASS`), sans indicateur optionnel de contournement.
+
+`test_states.py` ne construit pas lui-même les fixtures hors-contrat F0/F1/F2 (§33) : celles-ci sont construites directement dans `test_conditional.py`/`test_reference.py` (ci-dessous), pas via le constructeur public de `model0e/states.py`, et vérifient un mécanisme différent (`OFF_CONTRACT_FALSE_POSITIVE_MECHANISM = PASS`) de celui du rejet de frontière ci-dessus (`CONTRACT_REJECTION = PASS`).
 
 **`test_reference.py`** :
 
@@ -218,8 +229,8 @@ Sans fixer de valeur canonique définitive, les tests devront couvrir au minimum
 - propriétés exactes de la PVM \(\{E_k^X\}\) : orthogonalité, résolution de l'identité, covariance cyclique \(E_{k+1}=U_X E_k U_X^\dagger\), \(U_X^3=I\) (spécification §14) ;
 - portail de module égal \(|\langle n|q_0\rangle|^2 = 1/3\) (spécification §15) ;
 - covariance de base locale \(V_A \otimes V_B \otimes V_C \otimes V_D\) à jauge d'étiquette près (spécification §18) ;
-- **F1** (\(\mu_X=0\)) : `REFERENCE_EXTRACTION = FAIL` attendu ;
-- **F2** (\(\nu_X=0\)) : `REFERENCE_EXTRACTION = FAIL` attendu ;
+- **F1** (\(\mu_X=0\), `TEST_ONLY_OFF_CONTRACT`) : construction directe de la réduction \(\rho_{XC} = \frac16[I_{XC}+\gamma Z_C]\) (spécification §33, ne passe pas par le constructeur public de `model0e/states.py`), dérivation de \(K_{XC}\)/\(H_Q^X\) via `modular_hamiltonian`/`conditional_expectation`/`traceless_part` : `REFERENCE_EXTRACTION = FAIL` attendu ;
+- **F2** (\(\nu_X=0\), `TEST_ONLY_OFF_CONTRACT`) : construction directe de la réduction \(\rho_{XD} = \frac16[I_{XD}+\delta Z_D]\) (spécification §33, ne passe pas par le constructeur public de `model0e/states.py`), dérivation de \(K_{XD}\)/\(H_N^X\) via la même machinerie `core` : `REFERENCE_EXTRACTION = FAIL` attendu ;
 - **F3** (semence de module inégal, test-only) : `Z3_PVM_GATE = FAIL` attendu ;
 - **F6** (relabellisation affine \(\mathbb Z_3\)) : invariance des probabilités physiques après transformation d'étiquette correspondante ;
 - contrôle d'asymétrie d'amplitude A/B (spécification §31) : amplitudes différentes, PVM compatibles par corrélation ;
@@ -228,12 +239,12 @@ Sans fixer de valeur canonique définitive, les tests devront couvrir au minimum
 **`test_conditional.py`** :
 
 - \(p_B(k) = 1/3\) et \(\rho_{A|k}\) contre l'oracle analytique du §19 (valeurs propres, fidélité, distinction pour \(k\) différents sous \(\eta>0\)) ;
-- C3 : au moins un \(j\) avec \(p_A(j|k_1) \neq p_A(j|k_2)\) pour \(\eta \neq 0\) ; **F0** (\(\eta=0\)) : `C3 = FAIL` attendu ;
+- C3 : au moins un \(j\) avec \(p_A(j|k_1) \neq p_A(j|k_2)\) pour \(\eta \neq 0\) ; **F0** (\(\eta=0\), `TEST_ONLY_OFF_CONTRACT`) : construction directe de \(\rho_{AB}(\eta=0) = I_{AB}/9\) plus les contextes valides nécessaires (spécification §33, ne passe pas par le constructeur public de `model0e/states.py`) : `C3 = FAIL` attendu ;
 - \(M_{AB}\) unitaire à tolérance près pour la famille déclarée (spécification §21) ;
 - \(V_A^3 = I\) à phase globale près, et \(\rho_{A|(k+1)} = V_A \rho_{A|k} V_A^\dagger\) (spécification §22) ;
 - C4B : `NUMBER_OF_INDEPENDENT_TARGET_STATE_INPUTS = 0` (contrôle structurel de signature, pas de paramètre cible dans `Lambda`) ;
 - C4C : \(p_{\text{law}} = p_{\text{direct}}\) pour une sonde physique déclarée indépendamment de la cible (spécification §25) ;
-- C7 : matrice de recouvrement `Tr[E_j^A J_AB(E_k^B)]` égale à une permutation à valeurs `{0,1}`, extraction de \(\pi\) comme relabellisation affine \(\mathbb Z_3\) (spécification §29–§30) ;
+- C7 : matrice de recouvrement `Tr[E_j^A Jop_AB(E_k^B)]` (carte induite sur opérateurs, pas la carte vectorielle `J_AB`) égale à une permutation à valeurs `{0,1}`, extraction de \(\pi\) comme relabellisation affine \(\mathbb Z_3\) (spécification §29–§30) ;
 - **F4** (trois états conditionnels arbitraires, test-only) : `FIXED_LAW_OVERDETERMINATION = FAIL` attendu ;
 - **F5** (perturbation \(\rho_{AB}\) trace-nulle, test-only) : `FIXED_LAW = FAIL` ou `REFERENCE_CHANGE_COMPATIBILITY = FAIL` attendu, tout en pouvant laisser les états conditionnels directs distincts ;
 - absence d'import de `model0a`, `model0b`, `model0c`, `model0d` dans `src/cosmotgg/models/model0e/` (contrôle structurel, cohérent avec `MODEL0E_PRODUCTION_IMPORTS_PRIOR_MODELS = NO`, §4 ci-dessus).
@@ -290,7 +301,10 @@ Le récit scientifique de l'exécution appartiendra ensuite à `experiments/toy0
 ## 14. Statut et prochaine étape
 
 ```text
-MODEL0E_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL0E_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_CORRECTED_PENDING_CHATGPT_REVIEW
+MODEL0E_DESIGN_CORRECTION            = OPERATOR_TRANSFER_TYPING_AND_OFF_CONTRACT_CONTROLS
 ```
 
-La prochaine étape autorisée est la revue à distance de ce design par ChatGPT.
+Corrections apportées par le lot `MODEL0E-DESIGN-CORRECTION-1` : typage explicite `J_AB`/`Jop_AB` dans l'audit §3, la responsabilité de `reference.py`/`conditional.py` §7 et le test C7 de §9 ; clarification des contrôles F0/F1/F2 comme `TEST_ONLY_OFF_CONTRACT` (§8) avec construction directe hors-contrat (§9) ; ajout des tests explicites de rejet de frontière du constructeur de production (§9, `test_states.py`). Aucun changement scientifique supplémentaire.
+
+La prochaine étape autorisée est la revue à distance de ce design corrigé par ChatGPT.

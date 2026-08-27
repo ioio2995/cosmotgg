@@ -667,13 +667,38 @@ $$
 
 Pour un vecteur maximalement intriqué : \(M_{AB}\) est unitaire, à tolérance numérique près.
 
-Ceci définit le transfert de corrélation anti-linéaire :
+Ceci définit le transfert de corrélation anti-linéaire vectoriel :
 
 $$
-J_{AB}(b) = M_{AB}\, b^*.
+J_{AB}(b) = M_{AB}\, b^*,
+\qquad
+\text{statut : } \texttt{ANTI\_LINEAR\_VECTOR\_CORRELATION\_MAP}.
 $$
 
-Ne pas exposer \(J\) comme une opération de « renversement du temps ». C'est une carte de corrélation entre les deux facteurs qutrit.
+Ne pas exposer \(J_{AB}\) comme une opération de « renversement du temps ». C'est une carte de corrélation entre les deux facteurs qutrit.
+
+\(J_{AB}\) est une carte définie sur les **vecteurs** de \(\mathcal H_B\), pas sur les opérateurs. Ce document distingue strictement :
+
+```text
+vector   J_AB
+operator Jop_AB
+```
+
+La carte induite sur les **opérateurs**, nécessaire dès qu'un opérateur (par exemple un projecteur \(E_k^B\)) doit être transporté de \(B\) vers \(A\), est :
+
+$$
+\operatorname{Jop}_{AB}(X) = M_{AB}\, X^*\, M_{AB}^\dagger,
+$$
+
+nom de travail équivalent : `operator_correlation_transfer_AB`.
+
+Pour un projecteur de rang 1 \(E = |b\rangle\langle b|\) :
+
+$$
+\operatorname{Jop}_{AB}(E) = |J_{AB}(b)\rangle\langle J_{AB}(b)|.
+$$
+
+Tout opérateur transféré de \(B\) vers \(A\) dans ce document utilise \(\operatorname{Jop}_{AB}\), jamais \(J_{AB}\) directement.
 
 ---
 
@@ -841,10 +866,10 @@ $$
 p(j,k) = \frac{1-\eta}{9} + \frac{\eta}{3}\,\operatorname{Tr}\big[E_j^A\,(E_k^B)^{\mathsf T}\big].
 $$
 
-Lorsque les références dérivées indépendamment coïncident via la carte de corrélation AB, leur matrice de recouvrement doit être une permutation :
+Lorsque les références dérivées indépendamment coïncident via la carte de corrélation AB, leur matrice de recouvrement doit être une permutation, en utilisant la carte induite sur opérateurs \(\operatorname{Jop}_{AB}\) (§21), pas la carte vectorielle \(J_{AB}\) :
 
 $$
-\operatorname{Tr}\big[E_j^A\, J_{AB}(E_k^B)\big] \in \{0,1\},
+\operatorname{Tr}\big[E_j^A\, \operatorname{Jop}_{AB}(E_k^B)\big] \in \{0,1\},
 $$
 
 avec une entrée unité par ligne/colonne. Extraire la carte d'étiquette :
@@ -933,11 +958,31 @@ Aucune définition officielle alternative.
 
 ## 33. Contrôles de faux positifs
 
-**F0 — absence de contenu de changement physique** : \(\eta = 0\). Les contextes de référence peuvent toujours exister, mais \(\rho_{A|k} = I/3\) pour tout \(k\). Attendu : `C3 = FAIL`.
+Le domaine de production (§8) reste inchangé et n'est pas relâché par les contrôles ci-dessous :
 
-**F1 — absence de contexte de fixation de phase** : \(\mu_X = 0\) sur le côté testé. \(H_Q^X\) ne peut alors pas fournir la semence de référence unique de fixation de phase déclarée sous le contrat du modèle. Attendu : `REFERENCE_EXTRACTION = FAIL`. Aucun remplacement arbitraire de semence.
+```text
+PRODUCTION_STATE_CONSTRUCTOR = FAIL_CLOSED_ON_BRANCH_DOMAIN
+```
 
-**F2 — absence de contexte d'ordre** : \(\nu_X = 0\). \(H_N\) n'a alors pas de spectre de référence ordonné non dégénéré déclaré. Attendu : `REFERENCE_EXTRACTION = FAIL`.
+Les branches déclarées \(\eta>0\), \(\mu_A>0\), \(\mu_B>0\), \(0<\nu_A<\delta\), \(0<\nu_B<\delta\) (§8) restent obligatoires pour le constructeur public de production de la famille `model0e` : \(\eta=0\), \(\mu_X=0\) ou \(\nu_X=0\) sont rejetés par ce constructeur.
+
+**F0, F1 et F2 ci-dessous sont des contrôles négatifs `TEST_ONLY_OFF_CONTRACT_NEGATIVE_CONTROLS` : ils ne sont PAS construits avec le constructeur public de production de la famille `model0e`.** Ils construisent directement, dans le code de test uniquement, la réduction physique hors-contrat requise (matrice densité explicite), puis appliquent la machinerie `core` déjà établie (`modular_hamiltonian`, `conditional_expectation`, `traceless_part`) à cette réduction pour dériver les contextes modulaires nécessaires au diagnostic. Aucun contournement (« bypass ») du constructeur de production, aucun constructeur public non sûr, et aucun indicateur optionnel de type `validate=False` / `allow_invalid_branch=True` / `testing=True` en production ne sont introduits pour ces contrôles.
+
+**F0 — absence de contenu de changement physique** : \(\eta = 0\). Construction directe, test-only : \(\rho_{AB}(\eta=0) = I_{AB}/9\), plus les contextes valides nécessaires (§9–§10, inchangés). But : vérifier que les états conditionnels physiques deviennent \(I/3\) et que C3 échoue. Attendu : `C3 = FAIL`.
+
+**F1 — absence de contexte de fixation de phase** : \(\mu_X = 0\) sur le côté testé. Construction directe, test-only, de la réduction \(XC\) hors-contrat :
+$$
+\rho_{XC} = \frac16\big[I_{XC} + \gamma Z_C\big],
+$$
+puis dérivation de \(K_{XC}\)/\(H_Q^X\) via la machinerie `core` déjà établie (§10). \(H_Q^X\) ne peut alors pas fournir la semence de référence unique de fixation de phase déclarée sous le contrat du modèle. Attendu : `REFERENCE_EXTRACTION = FAIL`. Aucun remplacement arbitraire de semence.
+
+**F2 — absence de contexte d'ordre** : \(\nu_X = 0\). Construction directe, test-only, de la réduction \(XD\) hors-contrat :
+$$
+\rho_{XD} = \frac16\big[I_{XD} + \delta Z_D\big],
+$$
+puis dérivation de \(K_{XD}\)/\(H_N^X\) via la machinerie `core` déjà établie (§10). \(H_N\) n'a alors pas de spectre de référence ordonné non dégénéré déclaré. Attendu : `REFERENCE_EXTRACTION = FAIL`.
+
+**F0/F1/F2 ne testent pas l'acceptation du constructeur d'état de production.** Cette acceptation/ce rejet est testé séparément et obligatoirement (§38, `implementation-design.md` §9) : le constructeur public de production doit rejeter \(\eta=0\), \(\mu_A=0\), \(\mu_B=0\), \(\nu_A=0\) et \(\nu_B=0\) (`CONTRACT_REJECTION = PASS`), indépendamment de la validité du mécanisme de contrôle négatif hors-contrat F0/F1/F2 lui-même (`OFF_CONTRACT_FALSE_POSITIVE_MECHANISM = PASS`).
 
 **F3 — semence de module inégal** : perturbation test-only construisant un état extrémal unique de \(H_Q\) dont les amplitudes au carré dans la base de \(H_N\) ne sont pas \(1/3, 1/3, 1/3\). Attendu : `Z3_PVM_GATE = FAIL`. Aucun Gram-Schmidt ni réparation.
 
@@ -1103,7 +1148,10 @@ Guides de littérature applicables déjà enregistrés par `docs/model/t1-relati
 ## 40. Statut et prochaine étape
 
 ```text
-MODEL0E_SPECIFICATION_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL0E_SPECIFICATION_STATUS = PROPOSED_CORRECTED_PENDING_CHATGPT_REVIEW
+MODEL0E_DESIGN_CORRECTION    = OPERATOR_TRANSFER_TYPING_AND_OFF_CONTRACT_CONTROLS
 ```
 
-La prochaine étape autorisée est la revue à distance de ce design par ChatGPT.
+Corrections apportées par le lot `MODEL0E-DESIGN-CORRECTION-1` : distinction explicite entre la carte de corrélation vectorielle \(J_{AB}\) et sa carte induite sur opérateurs \(\operatorname{Jop}_{AB}\) (§21, §29) ; clarification des contrôles négatifs hors-contrat F0/F1/F2 comme `TEST_ONLY_OFF_CONTRACT_NEGATIVE_CONTROLS` (§33), sans relâchement du domaine de branche de production (§8). Aucun changement scientifique supplémentaire.
+
+La prochaine étape autorisée est la revue à distance de ce design corrigé par ChatGPT.

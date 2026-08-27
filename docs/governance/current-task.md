@@ -731,6 +731,20 @@ PHASE                      = MODEL0E_DESIGN_PENDING_CHATGPT_REVIEW
 PROCHAINE_ACTION_AUTORISEE = remote model0e design review by ChatGPT
 ```
 
+Le lot `MODEL0E-DESIGN-CORRECTION-1` (rôle `docs`) a corrigé exactement deux incohérences de contrat dans `docs/toy-models/toy0e/specification.md` et `docs/toy-models/toy0e/implementation-design.md`, avant gel : (1) distinction explicite entre la carte de corrélation vectorielle anti-linéaire \(J_{AB}(b)=M_{AB}b^*\) (`ANTI_LINEAR_VECTOR_CORRELATION_MAP`) et sa carte induite sur opérateurs \(\operatorname{Jop}_{AB}(X)=M_{AB}X^*M_{AB}^\dagger\) (`operator_correlation_transfer_AB`), remplaçant `J_AB(E_k^B)` par `Jop_AB(E_k^B)` partout où un opérateur est transféré (spécification §21, §29 ; design §3, §7, §9) ; (2) clarification des contrôles négatifs F0/F1/F2 (\(\eta=0\), \(\mu_X=0\), \(\nu_X=0\)) comme `TEST_ONLY_OFF_CONTRACT_NEGATIVE_CONTROLS`, construits directement en test à partir de la réduction physique hors-contrat puis de la machinerie `core` déjà établie, sans contournement/constructeur non sûr/indicateur optionnel en production, et ajout de tests explicites et distincts de rejet de frontière du constructeur public de production (`CONTRACT_REJECTION = PASS`, spécification §33 ; design §8–§9). Le domaine de branche de production (\(\eta>0\), \(\mu_A>0\), \(\mu_B>0\), \(0<\nu_A<\delta\), \(0<\nu_B<\delta\)) reste inchangé. Aucun changement scientifique supplémentaire.
+
+```text
+MODEL0E_SPECIFICATION_STATUS         = PROPOSED_CORRECTED_PENDING_CHATGPT_REVIEW
+MODEL0E_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_CORRECTED_PENDING_CHATGPT_REVIEW
+MODEL0E_DESIGN_CORRECTION            = OPERATOR_TRANSFER_TYPING_AND_OFF_CONTRACT_CONTROLS
+
+T1_STATUS = OPEN_NOT_EXECUTED
+
+CURRENT_LOT                = NONE
+PHASE                      = MODEL0E_CORRECTED_DESIGN_PENDING_CHATGPT_REVIEW
+PROCHAINE_ACTION_AUTORISEE = remote corrected model0e design review by ChatGPT
+```
+
 ---
 
 ## Mémoire de session
