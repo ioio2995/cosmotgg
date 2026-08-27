@@ -202,7 +202,7 @@ def state_derived_edge_link(
             f"edge_spectral_tolerance={edge_spec_tol}: max|difference|={consistency}"
         )
 
-    psi_matrix = top_state_vector.reshape((2, 2), order="C")
+    psi_matrix = bottom_modular_vector.reshape((2, 2), order="C")
     m_ij = np.sqrt(2.0) * psi_matrix
     m_ij = _validate_unitary_2x2(m_ij, tolerance=unitarity_tol, name="correlation_matrix")
 

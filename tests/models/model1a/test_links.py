@@ -245,6 +245,48 @@ def test_l10_centered_transfer_equals_strength_times_action():
 
 
 # ---------------------------------------------------------------------------
+# L11 — CORRELATION_MATRIX_SOURCE = MODULAR_GROUND_EIGENSPACE
+#
+# Independently diagonalizes `rho_ij` and `K_ij` (fresh `np.linalg.eigh`
+# calls, not reusing any internal state of `state_derived_edge_link`)
+# and verifies: (1) the two independently-obtained projectors coincide;
+# (2) the production `correlation_matrix` reconstructs the MODULAR
+# minimum projector `P_min(K)`; (3) it necessarily also reconstructs
+# `P_max(rho)`, confirming global-phase-gauge equivalence. All
+# comparisons are projector-level (quotiented by global phase); no raw
+# eigenvector or raw `M` comparison, no phase fixing/alignment/overlap
+# correction.
+# ---------------------------------------------------------------------------
+
+
+def test_l11_correlation_matrix_reconstructs_modular_minimum_projector():
+    reductions = _reductions(PRIMARY)
+    rho_bc = reductions["rho_bc"]
+    link = state_derived_edge_link(rho_bc, **_link_kwargs())
+    k_bc = link["modular_hamiltonian"]
+
+    w_rho, v_rho = np.linalg.eigh(rho_bc)
+    w_k, v_k = np.linalg.eigh(k_bc)
+
+    p_max_rho = np.outer(v_rho[:, -1], v_rho[:, -1].conj())
+    p_min_k = np.outer(v_k[:, 0], v_k[:, 0].conj())
+
+    # 1. independently-diagonalized projectors coincide.
+    assert np.allclose(p_max_rho, p_min_k, atol=1e-8)
+
+    m_matrix = link["correlation_matrix"]
+    phi_from_m = (m_matrix / np.sqrt(2.0)).reshape(4)
+    p_from_m = np.outer(phi_from_m, phi_from_m.conj())
+
+    # 2. production correlation_matrix reconstructs P_min(K).
+    assert np.allclose(p_from_m, p_min_k, atol=1e-8)
+
+    # 3. it necessarily also reconstructs P_max(rho) (phase-gauge
+    # equivalence for the declared family).
+    assert np.allclose(p_from_m, p_max_rho, atol=1e-8)
+
+
+# ---------------------------------------------------------------------------
 # F4 — arbitrary rephasing leaves projective/directional action unchanged
 # ---------------------------------------------------------------------------
 
