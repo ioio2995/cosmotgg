@@ -669,6 +669,37 @@ PROCHAINE_ACTION_AUTORISEE = conceptual and literature analysis of the requireme
 
 Ceci ne change aucun contenu scientifique de `docs/toy-models/toy0a/specification.md`, `docs/toy-models/toy0b/specification.md`, `docs/toy-models/toy0c/specification.md`, `docs/toy-models/toy0d/specification.md`, ni de leurs `implementation-design.md` respectifs.
 
+Le lot `T1-RELATIONAL-PHYSICAL-CHANGE-DEFINITION-1` (rôle `docs`) a créé `docs/model/t1-relational-physical-change-criteria.md` (`T1_OPERATIONAL_DEFINITION_NOTE`), formalisant l'étape définitionnelle bornée exigée par la revue `T1-RELATIONAL-PHYSICAL-CHANGE-CRITERIA-REVIEW-1`, sans concevoir `model0e` :
+
+```text
+T1_RELATIONAL_PHYSICAL_CHANGE_CRITERIA_REVIEW = ACCEPTED_WITH_REQUIRED_DEFINITION_STEP
+FROZEN_HYPOTHESIS_REOPEN                       = NO
+
+NO_EXTERNAL_TIME                          = REQUIRED
+INTERNALLY_DERIVED_RELATIONAL_LABEL       = ADMISSIBLE_UNDER_C1_TO_C7
+
+MODEL0D_PAIR_TRANSPORT_STATUS   = STRUCTURAL_PROGRESS_BUT_NOT_PHYSICAL_PROCESS
+MODEL0D_COMPOSITION_DEFECT      = ZERO_INDEPENDENT_PREDICTIVE_CONTENT
+
+SINGLE_K_CANONICAL_REFERENCE        = BLOCKED
+MODULAR_DERIVED_RELATIONAL_REFERENCE = PLAUSIBLE_OPEN_TARGET
+
+RELATIONAL_PHYSICAL_CHANGE_CRITERIA = C1_C2_C3_C4A_C4B_C4C_C5_C6_C7_DEFINED_PENDING_CHATGPT_REVIEW
+
+NEXT_TOY   = NOT_AUTHORIZED
+NEXT_MODEL = NOT_AUTHORIZED
+
+T1_STATUS = OPEN_NOT_EXECUTED
+```
+
+Ce lot ne modifie ni `docs/model/hypothesis.md`, ni `docs/model/hypothesis-annex-a.md`, ni aucun `docs/toy-models/**`, ni `src/`, ni `tests/`, ni `experiments/`. Aucun code, aucun notebook, aucun toy, aucun `model0e` ne sont produits.
+
+```text
+CURRENT_LOT                = NONE
+PHASE                      = T1_RELATIONAL_PHYSICAL_CHANGE_DEFINITION_PENDING_CHATGPT_REVIEW
+PROCHAINE_ACTION_AUTORISEE = remote review of T1 relational physical change operational definition by ChatGPT
+```
+
 ---
 
 ## Mémoire de session
