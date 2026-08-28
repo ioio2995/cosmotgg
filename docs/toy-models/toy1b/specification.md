@@ -1,15 +1,24 @@
 # toy1b — Spécification scientifique proposée
 
-**Statut : `PROPOSED_MODEL1B_T5_FLOW_DESIGN`.**
+**Statut : `FROZEN_MODEL1B_T5_FLOW_DESIGN`.**
 
 ```text
-STATUS                 = PROPOSED_MODEL1B_T5_FLOW_DESIGN
-NOT_FROZEN              = TRUE
-CHATGPT_REVIEW          = CONSISTENCY_FIX_INTEGRATED_PENDING_FINAL_CONFIRMATION
-IMPLEMENTATION          = NOT_AUTHORIZED
-CONFIRMATORY_EXECUTION  = NOT_AUTHORIZED
-VALIDATION_PLAN         = NOT_CREATED
-T5_FLOW_QUALIFICATION   = NOT_EXECUTED
+STATUS                        = FROZEN_MODEL1B_T5_FLOW_DESIGN
+NOT_FROZEN                     = FALSE
+
+CHATGPT_REVIEW                 = PASS
+MODEL1B_DESIGN_REVIEW          = PASS
+MODEL1B_DESIGN_FREEZE          = FROZEN
+LIONEL_ORCIL_FREEZE_APPROVAL   = GRANTED
+SCIENTIFIC_CONTENT_HEAD        = d1c765f62de9c28a90d75db47a585b80016ad236
+
+FROZEN_DOCUMENT_MODIFICATION   = FUNDAMENTAL_BLOCKING_ONLY
+
+IMPLEMENTATION                 = NOT_AUTHORIZED
+CONFIRMATORY_EXECUTION         = NOT_AUTHORIZED
+VALIDATION_PLAN                = NOT_CREATED
+T5_FLOW_QUALIFICATION          = NOT_EXECUTED
+T5                              = OPEN_NOT_EXECUTED
 ```
 
 Ce document définit `model1b`, construction candidate du toy `toy1b`.
@@ -17,6 +26,22 @@ Ce document définit `model1b`, construction candidate du toy `toy1b`.
 Il transforme en contrat explicite un mécanisme de qualification borné pour le contrat intermédiaire `T5-FLOW`, gelé par `docs/model/t5-modular-cross-scale-flow-criteria.md`. Il n'ouvre, ne clôt et n'arbitre aucune décision scientifique par lui-même, et ne redéfinit aucun critère `T5F1`–`T5F11` déjà gelé.
 
 Ce document n'est pas un plan de validation, n'inclut aucun code, aucun notebook, aucune fixture numérique canonique, aucune tolérance numérique, aucun critère d'acceptation.
+
+Les critères ci-dessous sont gelés après revue scientifique finale ChatGPT (`PASS`, contenu scientifique de référence au commit `d1c765f62de9c28a90d75db47a585b80016ad236`) et validation explicite de Lionel ORCIL. Toute modification ultérieure de sens exige une nouvelle décision explicite (`docs/governance/documentation-governance.md` §7).
+
+Obligatoire :
+
+```text
+DOCUMENT_FREEZE != MODEL1B_IMPLEMENTED
+DOCUMENT_FREEZE != T5_FLOW_PASS
+DOCUMENT_FREEZE != T5_PASS
+DOCUMENT_FREEZE != CONTINUUM
+DOCUMENT_FREEZE != GEOMETRY
+DOCUMENT_FREEZE != CURVATURE
+DOCUMENT_FREEZE != GRAVITY
+```
+
+Le gel documentaire valide ce document comme contrat normatif de référence pré-implémentation ; il ne valide `model1b` ni par exécution ni scientifiquement.
 
 ---
 
@@ -1014,8 +1039,12 @@ Exclu du contenu scientifique : `features/cosmotgg-early-universe-note.md` (`EXP
 ## 26. Statut et prochaine étape
 
 ```text
-MODEL1B_SPECIFICATION_STATUS = PROPOSED_MODEL1B_T5_FLOW_DESIGN
-MODEL1B_DESIGN                = AUTHORIZED
+MODEL1B_SPECIFICATION_STATUS = FROZEN_MODEL1B_T5_FLOW_DESIGN
+MODEL1B_DESIGN                = FROZEN
+MODEL1B_DESIGN_REVIEW         = PASS
+MODEL1B_DESIGN_FREEZE         = FROZEN
+LIONEL_ORCIL_FREEZE_APPROVAL  = GRANTED
+SCIENTIFIC_CONTENT_HEAD       = d1c765f62de9c28a90d75db47a585b80016ad236
 MODEL1B_DESIGN_CORRECTION     = Z2_DIRECTIONAL_TYPE_DOMAIN_AND_STABILITY_CLARIFICATIONS
 MODEL1B_CONSISTENCY_FIX       = SINGULAR_VS_Z2_TYPE_MISMATCH_DISTINCTION
 MODEL1B_IMPLEMENTATION         = NOT_AUTHORIZED
@@ -1027,4 +1056,8 @@ Corrections apportées par le lot `MODEL1B-T5-FLOW-DESIGN-CORRECTION-1` : typage
 
 Correction de cohérence apportée par le lot `MODEL1B-T5-FLOW-DESIGN-CONSISTENCY-1` : les deux échecs de domaine directionnel distincts sont désormais explicitement préservés — facteur singulier (`DIRECTIONAL_FACTOR=UNDEFINED`, raison `SINGULAR_DIRECTIONAL_FACTOR`, §12, §19) contre inadéquation de type \(\mathbb Z_2\) sur un facteur par ailleurs inversible (`DIRECTIONAL_RELATIONAL_TYPE=TYPE_MISMATCH_FAIL_CLOSED`, raison `Z2_DIRECTIONAL_TYPE_MISMATCH`, §12), sans jamais les confondre ; résultat générique de construction de boucle unifié `LOOP_DIAGNOSTIC=UNDEFINED_DIRECTIONAL_DOMAIN` avec `LOOP_UNDEFINED_REASON` explicite préservant laquelle des deux causes s'applique (§13–§14) ; contrôle de domaine à relation nulle réaffirmé `SINGULAR_DIRECTIONAL_FACTOR`, jamais `Z2_DIRECTIONAL_TYPE_MISMATCH` (§19) ; condition d'échec `T5F10` étendue pour couvrir la construction d'un diagnostic de boucle après l'un ou l'autre échec de domaine et toute inversion de signe cachée réparant \(\det(O)=+1\) (§21). Aucune formule scientifique modifiée, aucune tolérance ajoutée, aucun gel effectué.
 
-La prochaine étape autorisée est la confirmation finale à distance de ce design par ChatGPT.
+Gel documentaire (`PROPOSED_MODEL1B_T5_FLOW_DESIGN` → `FROZEN_MODEL1B_T5_FLOW_DESIGN`) effectué par le lot `MODEL1B-T5-FLOW-DESIGN-FREEZE-1`, suite à la revue scientifique finale ChatGPT (`PASS`, contenu scientifique de référence au commit `d1c765f62de9c28a90d75db47a585b80016ad236`) et à l'approbation explicite de Lionel ORCIL. Transition de statut uniquement : la hiérarchie \(8\to6\to4\), l'ordre de sites \((A,X,Y,B,C,P,Q,D)\), \(E_2/E_1/E_0\), la famille de Gibbs et son décalage spectral, la donnée canonique \(K_n=-\log(\rho_n)\), les définitions de support de Pauli, la normalisation de \(J\), la décomposition polaire, le typage de route \(\det(O)=-1\), la distinction facteur singulier/inadéquation de type \(\mathbb Z_2\), la construction de \(Q_n\), \(d_{\mathrm{flat}}\)/\(\chi_n\)/\(\Delta\chi\), les oracles de jauge pure et d'arbre, le contrôle de domaine à relation nulle, et la table de correspondance `T5F1`–`T5F11` restent inchangés dans leur contenu scientifique.
+
+Le gel de ce document n'implique ni implémentation, ni exécution confirmatoire, ni `T5-FLOW PASS`, ni `T5 PASS`. Aucun lot suivant n'est autorisé par ce gel : l'implémentation requiert un mandat distinct relevant du rôle `code`.
+
+La prochaine étape autorisée est la conception de l'implémentation par le rôle `code`, sur mandat distinct.

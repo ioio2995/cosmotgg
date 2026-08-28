@@ -1,20 +1,45 @@
 # toy1b — Conception d'implémentation (model1b)
 
-**Statut : `PROPOSED_MODEL1B_T5_FLOW_DESIGN`.**
+**Statut : `FROZEN_MODEL1B_T5_FLOW_DESIGN`.**
 
 ```text
-STATUS                 = PROPOSED_MODEL1B_T5_FLOW_DESIGN
-NOT_FROZEN              = TRUE
-CHATGPT_REVIEW          = CONSISTENCY_FIX_INTEGRATED_PENDING_FINAL_CONFIRMATION
-IMPLEMENTATION          = NOT_AUTHORIZED
-CONFIRMATORY_EXECUTION  = NOT_AUTHORIZED
-VALIDATION_PLAN         = NOT_CREATED
-T5_FLOW_QUALIFICATION   = NOT_EXECUTED
+STATUS                        = FROZEN_MODEL1B_T5_FLOW_DESIGN
+NOT_FROZEN                     = FALSE
+
+CHATGPT_REVIEW                 = PASS
+MODEL1B_DESIGN_REVIEW          = PASS
+MODEL1B_DESIGN_FREEZE          = FROZEN
+LIONEL_ORCIL_FREEZE_APPROVAL   = GRANTED
+SCIENTIFIC_CONTENT_HEAD        = d1c765f62de9c28a90d75db47a585b80016ad236
+
+FROZEN_DOCUMENT_MODIFICATION   = FUNDAMENTAL_BLOCKING_ONLY
+
+IMPLEMENTATION                 = NOT_AUTHORIZED
+CONFIRMATORY_EXECUTION         = NOT_AUTHORIZED
+VALIDATION_PLAN                = NOT_CREATED
+T5_FLOW_QUALIFICATION          = NOT_EXECUTED
+T5                              = OPEN_NOT_EXECUTED
 ```
 
 Ce document décrit l'architecture logicielle cible minimale de `model1b`, sur la base de `docs/toy-models/toy1b/specification.md` et de `docs/governance/software-architecture-governance.md`.
 
 Il ne contient aucun code, aucun notebook, aucun plan de validation, aucune fixture numérique canonique, aucune tolérance numérique, aucune norme ni seuil scalaire, et aucun verdict `T5-FLOW`/`T5`.
+
+Les critères ci-dessous sont gelés après revue scientifique finale ChatGPT (`PASS`, contenu scientifique de référence au commit `d1c765f62de9c28a90d75db47a585b80016ad236`) et validation explicite de Lionel ORCIL. Toute modification ultérieure de sens exige une nouvelle décision explicite (`docs/governance/documentation-governance.md` §7).
+
+Obligatoire :
+
+```text
+DOCUMENT_FREEZE != MODEL1B_IMPLEMENTED
+DOCUMENT_FREEZE != T5_FLOW_PASS
+DOCUMENT_FREEZE != T5_PASS
+DOCUMENT_FREEZE != CONTINUUM
+DOCUMENT_FREEZE != GEOMETRY
+DOCUMENT_FREEZE != CURVATURE
+DOCUMENT_FREEZE != GRAVITY
+```
+
+Le gel documentaire valide ce document comme contrat normatif d'architecture pré-implémentation ; il ne valide `model1b` ni par exécution ni scientifiquement.
 
 ---
 
@@ -321,7 +346,11 @@ T5_FLOW_QUALIFICATION                  = NOT_EXECUTED
 ## 14. Statut et prochaine étape
 
 ```text
-MODEL1B_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_MODEL1B_T5_FLOW_DESIGN
+MODEL1B_IMPLEMENTATION_DESIGN_STATUS = FROZEN_MODEL1B_T5_FLOW_DESIGN
+MODEL1B_DESIGN_REVIEW                 = PASS
+MODEL1B_DESIGN_FREEZE                 = FROZEN
+LIONEL_ORCIL_FREEZE_APPROVAL          = GRANTED
+SCIENTIFIC_CONTENT_HEAD               = d1c765f62de9c28a90d75db47a585b80016ad236
 MODEL1B_DESIGN_CORRECTION             = Z2_DIRECTIONAL_TYPE_DOMAIN_AND_STABILITY_CLARIFICATIONS
 MODEL1B_CONSISTENCY_FIX               = SINGULAR_VS_Z2_TYPE_MISMATCH_DISTINCTION
 MODEL1B_IMPLEMENTATION                = NOT_AUTHORIZED
@@ -332,4 +361,8 @@ Corrections apportées par le lot `MODEL1B-T5-FLOW-DESIGN-CORRECTION-1` : séman
 
 Correction de cohérence apportée par le lot `MODEL1B-T5-FLOW-DESIGN-CONSISTENCY-1` : distinction explicite, jamais confondue, entre les deux échecs de domaine directionnel — `DIRECTIONAL_FACTOR=UNDEFINED`/`SINGULAR_DIRECTIONAL_FACTOR` (facteur singulier) et `DIRECTIONAL_RELATIONAL_TYPE=TYPE_MISMATCH_FAIL_CLOSED`/`Z2_DIRECTIONAL_TYPE_MISMATCH` (facteur inversible de mauvais type) — dans `directional.py` (§9), le bloc de diagnostics (§10) et l'architecture de test (§11) ; résultat générique unifié `LOOP_DIAGNOSTIC=UNDEFINED_DIRECTIONAL_DOMAIN` avec `LOOP_UNDEFINED_REASON` explicite. Aucun changement de code, aucune promotion `core` exécutée, aucune fixture ni tolérance numérique introduite.
 
-La prochaine étape autorisée est la confirmation finale à distance de ce design par ChatGPT.
+Gel documentaire (`PROPOSED_MODEL1B_T5_FLOW_DESIGN` → `FROZEN_MODEL1B_T5_FLOW_DESIGN`) effectué par le lot `MODEL1B-T5-FLOW-DESIGN-FREEZE-1`, suite à la revue scientifique finale ChatGPT (`PASS`, contenu scientifique de référence au commit `d1c765f62de9c28a90d75db47a585b80016ad236`) et à l'approbation explicite de Lionel ORCIL. Transition de statut uniquement : l'audit `core` (`embed_operator`, `hermitian_exp`, promotions proposées non exécutées), l'arborescence cible (`states.py`/`hierarchy.py`/`modular_support.py`/`directional.py`), les responsabilités de module, le bloc de diagnostics et l'architecture de test restent inchangés dans leur contenu.
+
+Le gel de ce document n'implique ni implémentation, ni exécution confirmatoire, ni `T5-FLOW PASS`, ni `T5 PASS`. La règle `TOY_IMPLEMENTATION_DOCUMENT_FREEZE=ENABLED` (§12 ci-dessus) reste inchangée : au premier lot de code, ce document et `specification.md` deviennent `READ_ONLY_DURING_IMPLEMENTATION`, réouverts uniquement pour un blocage fondamental démontré.
+
+La prochaine étape autorisée est la conception de l'implémentation par le rôle `code`, sur mandat distinct.
