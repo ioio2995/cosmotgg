@@ -5,7 +5,7 @@
 ```text
 STATUS                 = PROPOSED_MODEL1B_T5_FLOW_DESIGN
 NOT_FROZEN              = TRUE
-CHATGPT_REVIEW          = CORRECTIONS_INTEGRATED_PENDING_FINAL_REVIEW
+CHATGPT_REVIEW          = CONSISTENCY_FIX_INTEGRATED_PENDING_FINAL_CONFIRMATION
 IMPLEMENTATION          = NOT_AUTHORIZED
 CONFIRMATORY_EXECUTION  = NOT_AUTHORIZED
 VALIDATION_PLAN         = NOT_CREATED
@@ -200,9 +200,9 @@ Ce module ne construit aucun facteur polaire directionnel, aucun objet de boucle
 
 Responsabilité scientifique strictement bornée à la spécification §12–§14, §18, §20 :
 
-- facteur polaire directionnel fail-closed \(\mathrm{DIRECTIONAL\_FACTOR}(J) = O\) pour \(J \in GL(3,\mathbb R)\), `UNDEFINED` si \(J\) singulier, sans pseudo-inverse ni réparation (§12) ;
-- vérification de typage \(\mathbb Z_2\) de route pour chaque facteur directionnel d'arête active, \(\det(O_{i\leftarrow j})=-1\) attendu ; `TYPE_MISMATCH_FAIL_CLOSED` si \(\det(O)=+1\), sans réparation ni inversion de signe insérée à la main (§12) ;
-- objet de boucle du cycle actif \(Q_n\), conséquence de domaine \(Q_n\in SO(3)\) pour tout cycle actif à nombre pair d'arêtes dont tous les facteurs sont typés/définis, `UNDEFINED_TYPE_MISMATCH` sinon (§13) ;
+- facteur polaire directionnel fail-closed \(\mathrm{DIRECTIONAL\_FACTOR}(J) = O\) pour \(J \in GL(3,\mathbb R)\), `UNDEFINED` (raison `SINGULAR_DIRECTIONAL_FACTOR`) si \(J\) singulier, sans pseudo-inverse ni réparation (§12) ;
+- vérification de typage \(\mathbb Z_2\) de route pour chaque facteur directionnel d'arête active, \(\det(O_{i\leftarrow j})=-1\) attendu ; `TYPE_MISMATCH_FAIL_CLOSED` (raison `Z2_DIRECTIONAL_TYPE_MISMATCH`) si \(\det(O)=+1\), sans réparation ni inversion de signe insérée à la main — cette raison n'est jamais confondue avec un facteur singulier (§12) ;
+- objet de boucle du cycle actif \(Q_n\), conséquence de domaine \(Q_n\in SO(3)\) pour tout cycle actif à nombre pair d'arêtes dont tous les facteurs sont typés/définis ; résultat générique `LOOP_DIAGNOSTIC=UNDEFINED_DIRECTIONAL_DOMAIN` sinon, avec `LOOP_UNDEFINED_REASON` préservant explicitement `SINGULAR_DIRECTIONAL_FACTOR` ou `Z2_DIRECTIONAL_TYPE_MISMATCH` (§13) ;
 - diagnostic de platitude \(d_{\mathrm{flat}}(Q_n)\) et scalaire de classe de conjugaison \(\chi_n\) (§14) ;
 - comparaison inter-échelles \(\Delta\chi(n,m)\) (§14) ;
 - diagnostic relatif d'arbre \(D_{\mathrm{tree}} = O_{\mathrm{path}}^{\mathsf T}\,O_{\mathrm{coarse}}\) (§18).
@@ -216,13 +216,17 @@ Ce module n'importe ni `model0a`–`model0e`, ni `model1a`.
 ```text
 CANONICAL_DATUM        = FULL_K_n
 LOOP_DIAGNOSTIC         = GAUGE_COVARIANT (Q_n) ; verdicts invariants (d_flat, chi_n) ;
-                          UNDEFINED_TYPE_MISMATCH si un facteur d'arête active est
-                          TYPE_MISMATCH_FAIL_CLOSED ou singulier (spécification §12-§13)
+                          UNDEFINED_DIRECTIONAL_DOMAIN si un facteur d'arête active
+                          requis est indisponible, avec LOOP_UNDEFINED_REASON distinct
+                          (SINGULAR_DIRECTIONAL_FACTOR | Z2_DIRECTIONAL_TYPE_MISMATCH,
+                          spécification §12-§13) ; les deux raisons ne sont jamais
+                          confondues
 TREE_ORACLE             = D_tree = O_path^T O_coarse, verdict D_tree = I
 PURE_GAUGE_ORACLE        = MANDATORY_NEGATIVE_ORACLE (spécification §16)
-FAIL_CLOSED_DOMAIN       = DIRECTIONAL_FACTOR UNDEFINED on singular J (spécification §12, §19) ;
-                          TYPE_MISMATCH_FAIL_CLOSED on det(O)=+1 for an active
-                          relational edge (spécification §12)
+FAIL_CLOSED_DOMAIN       = DIRECTIONAL_FACTOR UNDEFINED (SINGULAR_DIRECTIONAL_FACTOR) on
+                          singular J (spécification §12, §19) ; DIRECTIONAL_RELATIONAL_TYPE
+                          TYPE_MISMATCH_FAIL_CLOSED (Z2_DIRECTIONAL_TYPE_MISMATCH) on
+                          det(O)=+1 for an invertible active relational edge (spécification §12)
 ```
 
 Aucun seuil scientifique n'est fixé par ce document ; les tolérances numériques d'un futur protocole restent `OPEN` (spécification §24).
@@ -246,11 +250,13 @@ Aucun seuil scientifique n'est fixé par ce document ; les tolérances numériqu
 - bookkeeping des poids de support ;
 - covariance de \(J\) ;
 - comportement de domaine exact de la décomposition polaire ;
-- \(J\) singulier fail-closed ;
-- typage \(\mathbb Z_2\) fail-closed (\(\det(O)=-1\) attendu sur arête active ; \(\det(O)=+1\) rejeté `TYPE_MISMATCH_FAIL_CLOSED`, sans réparation) ;
+- \(J\) singulier fail-closed, raison `SINGULAR_DIRECTIONAL_FACTOR` ;
+- typage \(\mathbb Z_2\) fail-closed (\(\det(O)=-1\) attendu sur arête active ; \(\det(O)=+1\) rejeté `TYPE_MISMATCH_FAIL_CLOSED`, raison `Z2_DIRECTIONAL_TYPE_MISMATCH`, sans réparation ni inversion de signe cachée) ;
+- non-confusion des deux raisons de domaine directionnel : un facteur singulier n'est jamais étiqueté `Z2_DIRECTIONAL_TYPE_MISMATCH`, et réciproquement ;
+- résultat générique `LOOP_DIAGNOSTIC=UNDEFINED_DIRECTIONAL_DOMAIN` avec `LOOP_UNDEFINED_REASON` correct pour chacun des deux cas ;
 - covariance de \(Q_n\) ;
 - invariance par conjugaison de \(d_{\mathrm{flat}}\)/\(\chi_n\) ;
-- direction non définie à relation nulle.
+- direction non définie à relation nulle, raison `SINGULAR_DIRECTIONAL_FACTOR` (jamais `Z2_DIRECTIONAL_TYPE_MISMATCH`).
 
 **Contrôles de qualification, plus tard notebook/plan de validation :**
 
@@ -317,10 +323,13 @@ T5_FLOW_QUALIFICATION                  = NOT_EXECUTED
 ```text
 MODEL1B_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_MODEL1B_T5_FLOW_DESIGN
 MODEL1B_DESIGN_CORRECTION             = Z2_DIRECTIONAL_TYPE_DOMAIN_AND_STABILITY_CLARIFICATIONS
+MODEL1B_CONSISTENCY_FIX               = SINGULAR_VS_Z2_TYPE_MISMATCH_DISTINCTION
 MODEL1B_IMPLEMENTATION                = NOT_AUTHORIZED
 MODEL1B_CONFIRMATORY_QUALIFICATION    = NOT_AUTHORIZED
 ```
 
-Corrections apportées par le lot `MODEL1B-T5-FLOW-DESIGN-CORRECTION-1` : sémantique d'ordre explicite de `positions` pour `embed_operator` (ordre des facteurs tensoriels de l'opérande, permutation explicite obligatoire vers l'ordre global canonique, en particulier pour `DA`, §3.1, §6) ; `hermitian_exp` réaffirmé comme candidat `core` générique, décalage spectral de stabilité `H_shifted = H_rel - lambda_max I` explicitement propre à la construction de Gibbs `model1b` (§3.2, §6) ; contrôle de typage \(\mathbb Z_2\) fail-closed du facteur directionnel d'arête active et diagnostic `UNDEFINED_TYPE_MISMATCH` du cycle (§9–§10, tests §11). Aucun changement de code, aucune promotion `core` exécutée, aucune fixture ni tolérance numérique introduite.
+Corrections apportées par le lot `MODEL1B-T5-FLOW-DESIGN-CORRECTION-1` : sémantique d'ordre explicite de `positions` pour `embed_operator` (ordre des facteurs tensoriels de l'opérande, permutation explicite obligatoire vers l'ordre global canonique, en particulier pour `DA`, §3.1, §6) ; `hermitian_exp` réaffirmé comme candidat `core` générique, décalage spectral de stabilité `H_shifted = H_rel - lambda_max I` explicitement propre à la construction de Gibbs `model1b` (§3.2, §6) ; contrôle de typage \(\mathbb Z_2\) fail-closed du facteur directionnel d'arête active (§9–§10, tests §11).
 
-La prochaine étape autorisée est la revue finale à distance de ce design corrigé par ChatGPT.
+Correction de cohérence apportée par le lot `MODEL1B-T5-FLOW-DESIGN-CONSISTENCY-1` : distinction explicite, jamais confondue, entre les deux échecs de domaine directionnel — `DIRECTIONAL_FACTOR=UNDEFINED`/`SINGULAR_DIRECTIONAL_FACTOR` (facteur singulier) et `DIRECTIONAL_RELATIONAL_TYPE=TYPE_MISMATCH_FAIL_CLOSED`/`Z2_DIRECTIONAL_TYPE_MISMATCH` (facteur inversible de mauvais type) — dans `directional.py` (§9), le bloc de diagnostics (§10) et l'architecture de test (§11) ; résultat générique unifié `LOOP_DIAGNOSTIC=UNDEFINED_DIRECTIONAL_DOMAIN` avec `LOOP_UNDEFINED_REASON` explicite. Aucun changement de code, aucune promotion `core` exécutée, aucune fixture ni tolérance numérique introduite.
+
+La prochaine étape autorisée est la confirmation finale à distance de ce design par ChatGPT.

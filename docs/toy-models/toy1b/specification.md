@@ -5,7 +5,7 @@
 ```text
 STATUS                 = PROPOSED_MODEL1B_T5_FLOW_DESIGN
 NOT_FROZEN              = TRUE
-CHATGPT_REVIEW          = CORRECTIONS_INTEGRATED_PENDING_FINAL_REVIEW
+CHATGPT_REVIEW          = CONSISTENCY_FIX_INTEGRATED_PENDING_FINAL_CONFIRMATION
 IMPLEMENTATION          = NOT_AUTHORIZED
 CONFIRMATORY_EXECUTION  = NOT_AUTHORIZED
 VALIDATION_PLAN         = NOT_CREATED
@@ -488,7 +488,8 @@ Domaine : \(J \in GL(3,\mathbb R)\).
 Si \(J\) est singulier :
 
 ```text
-DIRECTIONAL_FACTOR = UNDEFINED
+DIRECTIONAL_FACTOR         = UNDEFINED
+DIRECTIONAL_UNDEFINED_REASON = SINGULAR_DIRECTIONAL_FACTOR
 ```
 
 Aucune pseudo-inverse. Aucune réparation epsilon. Aucun écrêtage silencieux. Aucun seuil de rang arbitraire.
@@ -512,12 +513,21 @@ ACTIVE_RELATIONAL_EDGE_DIRECTIONAL_TYPE = O_MINUS_3
 Si un \(J\) par ailleurs inversible produit \(\det(O) = +1\) :
 
 ```text
-DIRECTIONAL_RELATIONAL_TYPE = TYPE_MISMATCH_FAIL_CLOSED
+DIRECTIONAL_RELATIONAL_TYPE  = TYPE_MISMATCH_FAIL_CLOSED
+DIRECTIONAL_UNDEFINED_REASON = Z2_DIRECTIONAL_TYPE_MISMATCH
 ```
 
 et aucun diagnostic de boucle ne peut être construit depuis ce facteur.
 
 Aucune réparation. Aucune inversion de signe insérée à la main. Aucun ajustement d'orientation.
+
+Ces deux échecs de domaine directionnel restent distincts et ne doivent jamais être confondus l'un avec l'autre :
+
+```text
+SINGULAR_DIRECTIONAL_FACTOR    != Z2_DIRECTIONAL_TYPE_MISMATCH
+```
+
+Un facteur singulier n'est jamais étiqueté comme une inadéquation de type, et réciproquement.
 
 Ceci ne modifie pas la science \(\mathbb Z_2\) gelée de `docs/model/t5-relational-refinement-boundary.md` §3.
 
@@ -559,11 +569,22 @@ pour un cycle actif à \(m\) arêtes, \(m\) pair. \(Q_n\) étant de plus un prod
 Q_n IN SO(3) = EXPLICIT_DOMAIN_CONSEQUENCE
 ```
 
-Si un facteur \(O_{i\leftarrow j}\) requis pour \(Q_n\) est `TYPE_MISMATCH_FAIL_CLOSED` (§12) ou `UNDEFINED` (facteur singulier, §12) :
+Si un facteur \(O_{i\leftarrow j}\) requis pour \(Q_n\) est indisponible, quelle qu'en soit la cause (§12), le résultat générique est :
 
 ```text
-LOOP_DIAGNOSTIC = UNDEFINED_TYPE_MISMATCH
+LOOP_DIAGNOSTIC = UNDEFINED_DIRECTIONAL_DOMAIN
 ```
+
+avec la raison précise conservée explicitement et distinctement :
+
+```text
+LOOP_UNDEFINED_REASON =
+    SINGULAR_DIRECTIONAL_FACTOR
+    |
+    Z2_DIRECTIONAL_TYPE_MISMATCH
+```
+
+Aucun diagnostic de boucle, \(d_{\mathrm{flat}}\), \(\chi_n\) ni \(\Delta\chi\) n'est construit dans l'un ou l'autre cas.
 
 Sous changement de repère local :
 
@@ -583,7 +604,7 @@ et non gauge-invariant.
 
 ## 14. Diagnostics de boucle invariants de jauge
 
-Chaque cycle actif ayant une longueur paire et chaque facteur d'arête actif étant typé \(\det(O)=-1\) (§12), \(Q_n \in SO(3)\) est une conséquence de domaine explicite (§13) lorsque tous les facteurs d'arête requis sont définis. Si l'un d'eux est `TYPE_MISMATCH_FAIL_CLOSED` ou `UNDEFINED`, alors `LOOP_DIAGNOSTIC = UNDEFINED_TYPE_MISMATCH` (§13) et les diagnostics ci-dessous ne sont pas construits.
+Chaque cycle actif ayant une longueur paire et chaque facteur d'arête actif étant typé \(\det(O)=-1\) (§12), \(Q_n \in SO(3)\) est une conséquence de domaine explicite (§13) lorsque tous les facteurs d'arête requis sont définis. Si l'un d'eux est `TYPE_MISMATCH_FAIL_CLOSED` (`Z2_DIRECTIONAL_TYPE_MISMATCH`) ou `UNDEFINED` (`SINGULAR_DIRECTIONAL_FACTOR`), alors `LOOP_DIAGNOSTIC = UNDEFINED_DIRECTIONAL_DOMAIN` avec la raison correspondante (§13) et les diagnostics ci-dessous ne sont pas construits.
 
 Définir le diagnostic de platitude projective :
 
@@ -601,7 +622,7 @@ $$
 \chi_n = \frac{\mathrm{Tr}(Q_n) - 1}{2}.
 $$
 
-Pour \(Q_n \in SO(3)\) : \(\chi_n = \cos(\phi_n)\), invariant de jauge. Ce scalaire n'est utilisé que sur le domaine \(SO(3)\) déclaré (§13) ; si \(Q_n\) est `UNDEFINED_TYPE_MISMATCH`, \(\chi_n\) n'est pas défini.
+Pour \(Q_n \in SO(3)\) : \(\chi_n = \cos(\phi_n)\), invariant de jauge. Ce scalaire n'est utilisé que sur le domaine \(SO(3)\) déclaré (§13) ; si \(Q_n\) est `UNDEFINED_DIRECTIONAL_DOMAIN`, \(\chi_n\) n'est pas défini, quelle que soit la raison (§13).
 
 Définir la comparaison de variation inter-échelles finie :
 
@@ -802,14 +823,20 @@ $$
 et :
 
 ```text
-DIRECTIONAL_FACTOR = UNDEFINED
+DIRECTIONAL_FACTOR           = UNDEFINED
+DIRECTIONAL_UNDEFINED_REASON = SINGULAR_DIRECTIONAL_FACTOR
 ```
+
+\(J_{i\leftarrow j}=0\) est le facteur nul (\(3\times3\)), strictement singulier : cette indisponibilité relève du domaine de la décomposition polaire (§12), pas du typage \(\mathbb Z_2\) — aucun \(O\) inversible n'est produit dont le déterminant pourrait être évalué.
 
 Obligatoire :
 
 ```text
-ZERO_RELATION_LOOP_DIRECTION = UNDEFINED_FAIL_CLOSED
+ZERO_RELATION_LOOP_DIRECTION  = UNDEFINED_FAIL_CLOSED
+ZERO_RELATION_UNDEFINED_REASON = SINGULAR_DIRECTIONAL_FACTOR
 ```
+
+et non `Z2_DIRECTIONAL_TYPE_MISMATCH`.
 
 Aucune orientation arbitraire ne peut être retournée.
 
@@ -878,7 +905,7 @@ Pour chaque critère, mécanisme/statut avant exécution/condition d'échec :
 | T5F7 | Platitude de jauge pure, §16 | `NOT_EXECUTED` | \(Q_n \neq I_3\) pour une famille de jauge pure déclarée |
 | T5F8 | Variation non triviale, §17 | `NOT_EXECUTED` | \(\Delta\chi = 0\) pour toute paire de niveaux à force finie non nulle |
 | T5F9 | Préenregistrement avant mesure, §22 (renvoi) | `NOT_EXECUTED` | loi modifiée après observation d'un résidu |
-| T5F10 | Fermeture sur échec, §12, §19 | `NOT_EXECUTED` | pseudo-inverse, réparation epsilon, ou orientation arbitraire retournée |
+| T5F10 | Fermeture sur échec, §12, §19 | `NOT_EXECUTED` | pseudo-inverse utilisée ; réparation epsilon/rang insérée ; orientation arbitraire retournée ; diagnostic de boucle construit après un facteur directionnel singulier (`SINGULAR_DIRECTIONAL_FACTOR`) ; diagnostic de boucle construit après une inadéquation de type \(\mathbb Z_2\) (`Z2_DIRECTIONAL_TYPE_MISMATCH`) ; inversion de signe cachée utilisée pour réparer \(\det(O)=+1\) |
 | T5F11 | \(\rho_2\to\rho_1\to\rho_0\) plus contrôle direct, §6, §15 | `SATISFIED_BY_CONSTRUCTION` | contrôle direct non implémenté ou divergent |
 
 Pour `T5F5`, aucun secteur à \(N\) corps particulier n'est requis non nul par définition : la génération effectivement observée reste une preuve de qualification, pas un axiome imposé a priori.
@@ -990,11 +1017,14 @@ Exclu du contenu scientifique : `features/cosmotgg-early-universe-note.md` (`EXP
 MODEL1B_SPECIFICATION_STATUS = PROPOSED_MODEL1B_T5_FLOW_DESIGN
 MODEL1B_DESIGN                = AUTHORIZED
 MODEL1B_DESIGN_CORRECTION     = Z2_DIRECTIONAL_TYPE_DOMAIN_AND_STABILITY_CLARIFICATIONS
+MODEL1B_CONSISTENCY_FIX       = SINGULAR_VS_Z2_TYPE_MISMATCH_DISTINCTION
 MODEL1B_IMPLEMENTATION         = NOT_AUTHORIZED
 MODEL1B_CONFIRMATORY_QUALIFICATION = NOT_AUTHORIZED
 MODEL1A_REOPEN                 = NO
 ```
 
-Corrections apportées par le lot `MODEL1B-T5-FLOW-DESIGN-CORRECTION-1` : typage \(\mathbb Z_2\) directionnel de route pour toute arête relationnelle active (\(\det(O_{i\leftarrow j})=-1\), `TYPE_MISMATCH_FAIL_CLOSED` sur \(\det(O)=+1\), §12), avec conséquence de domaine explicite \(Q_n\in SO(3)\) pour tout cycle actif à nombre pair d'arêtes et diagnostic `UNDEFINED_TYPE_MISMATCH` en cas de facteur non typé/singulier (§13–§14) ; construction de Gibbs numériquement stable par décalage spectral commun, identité exacte sous normalisation, sans régularisation ni paramètre libre (§8) ; correction de renvoi `T5F9` vers §22 (§21) ; complétude de la condition d'échec `T5F5` (secteur écarté, reconstruction incomplète, troncature substituée, projection de poids ≤2 utilisée comme flux exact) sans exiger qu'un secteur à \(N\) corps particulier soit non nul par définition (§21). Aucun changement à `T5F1`–`T5F11` gelés, à la hiérarchie \(8\to6\to4\), ni au sens mathématique de la famille de Gibbs.
+Corrections apportées par le lot `MODEL1B-T5-FLOW-DESIGN-CORRECTION-1` : typage \(\mathbb Z_2\) directionnel de route pour toute arête relationnelle active (\(\det(O_{i\leftarrow j})=-1\), `TYPE_MISMATCH_FAIL_CLOSED` sur \(\det(O)=+1\), §12), avec conséquence de domaine explicite \(Q_n\in SO(3)\) pour tout cycle actif à nombre pair d'arêtes (§13–§14) ; construction de Gibbs numériquement stable par décalage spectral commun, identité exacte sous normalisation, sans régularisation ni paramètre libre (§8) ; correction de renvoi `T5F9` vers §22 (§21) ; complétude de la condition d'échec `T5F5` (secteur écarté, reconstruction incomplète, troncature substituée, projection de poids ≤2 utilisée comme flux exact) sans exiger qu'un secteur à \(N\) corps particulier soit non nul par définition (§21). Aucun changement à `T5F1`–`T5F11` gelés, à la hiérarchie \(8\to6\to4\), ni au sens mathématique de la famille de Gibbs.
 
-La prochaine étape autorisée est la revue finale à distance de ce design corrigé par ChatGPT.
+Correction de cohérence apportée par le lot `MODEL1B-T5-FLOW-DESIGN-CONSISTENCY-1` : les deux échecs de domaine directionnel distincts sont désormais explicitement préservés — facteur singulier (`DIRECTIONAL_FACTOR=UNDEFINED`, raison `SINGULAR_DIRECTIONAL_FACTOR`, §12, §19) contre inadéquation de type \(\mathbb Z_2\) sur un facteur par ailleurs inversible (`DIRECTIONAL_RELATIONAL_TYPE=TYPE_MISMATCH_FAIL_CLOSED`, raison `Z2_DIRECTIONAL_TYPE_MISMATCH`, §12), sans jamais les confondre ; résultat générique de construction de boucle unifié `LOOP_DIAGNOSTIC=UNDEFINED_DIRECTIONAL_DOMAIN` avec `LOOP_UNDEFINED_REASON` explicite préservant laquelle des deux causes s'applique (§13–§14) ; contrôle de domaine à relation nulle réaffirmé `SINGULAR_DIRECTIONAL_FACTOR`, jamais `Z2_DIRECTIONAL_TYPE_MISMATCH` (§19) ; condition d'échec `T5F10` étendue pour couvrir la construction d'un diagnostic de boucle après l'un ou l'autre échec de domaine et toute inversion de signe cachée réparant \(\det(O)=+1\) (§21). Aucune formule scientifique modifiée, aucune tolérance ajoutée, aucun gel effectué.
+
+La prochaine étape autorisée est la confirmation finale à distance de ce design par ChatGPT.
