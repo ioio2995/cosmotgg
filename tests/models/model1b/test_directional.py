@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from cosmotgg.models.model1b.directional import (
+    ACTIVE_CYCLE_EDGE_COUNTS,
     REASON_SINGULAR_DIRECTIONAL_FACTOR,
     REASON_Z2_DIRECTIONAL_TYPE_MISMATCH,
     DirectionalFactorUndefinedError,
@@ -118,6 +119,44 @@ def test_df8_nonreal_input_rejected():
 
 
 # ---------------------------------------------------------------------------
+# C1 — determinant-underflow regression: SVD singular values, never det(J),
+# decide the singular/full-rank domain.
+# ---------------------------------------------------------------------------
+
+
+def test_df9_determinant_underflow_full_rank_j_remains_defined():
+    """diag(1e-200, 2e-200, -3e-200): det(J) underflows to a signed 0.0 in
+    float64 (product of three ~1e-200 magnitudes ~1e-600, far below the
+    smallest representable double ~4.9e-324), yet every singular value is
+    individually nonzero and exactly representable: J must NOT be
+    classified singular."""
+    j_tiny = np.diag([1e-200, 2e-200, -3e-200])
+    assert np.linalg.det(j_tiny) == 0.0  # confirms the underflow this guards against
+
+    result = directional_factor(j_tiny)  # must not raise
+    assert np.linalg.det(result) == pytest.approx(-1.0, abs=1e-10)
+
+    singular_values = directional_conditioning(j_tiny)
+    assert np.all(singular_values > 0.0)
+
+
+def test_df10_common_positive_rescaling_leaves_directional_factor_unchanged():
+    j_tiny = np.diag([1e-200, 2e-200, -3e-200])
+    o_tiny = directional_factor(j_tiny)
+
+    for scale in (1e150, 1e-100, 3.7):
+        o_scaled = directional_factor(scale * j_tiny)
+        assert np.allclose(o_scaled, o_tiny, atol=1e-10)
+
+
+def test_df11_exact_zero_singular_value_remains_undefined():
+    j_matrix = np.diag([1.0, 1.0, 0.0])
+    with pytest.raises(DirectionalFactorUndefinedError) as excinfo:
+        directional_factor(j_matrix)
+    assert excinfo.value.reason == REASON_SINGULAR_DIRECTIONAL_FACTOR
+
+
+# ---------------------------------------------------------------------------
 # active_cycle_loop_object — ordered composition, flat/nontrivial loops
 # ---------------------------------------------------------------------------
 
@@ -156,6 +195,63 @@ def test_lo3_nontrivial_so3_loop():
 def test_lo4_empty_sequence_rejected():
     with pytest.raises(ValueError):
         active_cycle_loop_object([])
+
+
+# ---------------------------------------------------------------------------
+# C2 — active-cycle cardinality domain: exactly (4, 6, 8) accepted.
+# ---------------------------------------------------------------------------
+
+
+def test_lo_c2a_declared_active_cycle_edge_counts():
+    assert ACTIVE_CYCLE_EDGE_COUNTS == (4, 6, 8)
+
+
+@pytest.mark.parametrize("length", [4, 6, 8])
+def test_lo_c2b_active_cycle_loop_object_accepts_declared_lengths(length):
+    factor = np.diag([2.0, 3.0, -1.0])  # det(O) = -1, well-defined O_MINUS_3
+    q_matrix = active_cycle_loop_object([factor] * length)
+    assert q_matrix.shape == (3, 3)
+
+
+@pytest.mark.parametrize("length", [4, 6, 8])
+def test_lo_c2c_active_cycle_loop_object_from_blocks_accepts_declared_lengths(length):
+    j_block = np.diag([2.0, 3.0, -1.0])
+    q_matrix = active_cycle_loop_object_from_blocks([j_block] * length)
+    assert q_matrix.shape == (3, 3)
+
+
+@pytest.mark.parametrize("length", [0, 3, 5])
+def test_lo_c2d_active_cycle_loop_object_rejects_undeclared_lengths(length):
+    factor = np.diag([2.0, 3.0, -1.0])
+    with pytest.raises(ValueError):
+        active_cycle_loop_object([factor] * length)
+
+
+@pytest.mark.parametrize("length", [0, 3, 5])
+def test_lo_c2e_active_cycle_loop_object_from_blocks_rejects_undeclared_lengths(length):
+    j_block = np.diag([2.0, 3.0, -1.0])
+    with pytest.raises(ValueError):
+        active_cycle_loop_object_from_blocks([j_block] * length)
+
+
+# ---------------------------------------------------------------------------
+# C3 — direct-factor route must not bypass the frozen active-edge Z2 sector.
+# ---------------------------------------------------------------------------
+
+
+def test_lo_c3a_active_cycle_loop_object_rejects_det_plus_one_factor():
+    o_valid = np.diag([2.0, 3.0, -1.0])  # det(O) = -1
+    o_mismatch = np.diag([1.0, -1.0, -1.0])  # det(O) = +1
+    with pytest.raises(DirectionalTypeMismatchError) as excinfo:
+        active_cycle_loop_object([o_valid, o_mismatch, o_valid, o_valid])
+    assert excinfo.value.reason == REASON_Z2_DIRECTIONAL_TYPE_MISMATCH
+
+
+def test_lo_c3b_no_hidden_sign_repair_of_direct_factor():
+    o_mismatch = np.diag([1.0, -1.0, -1.0])
+    with pytest.raises(ValueError):
+        active_cycle_loop_object([o_mismatch] * 4)
+    # No repaired/sign-flipped Q is ever returned; the call above raises.
 
 
 # ---------------------------------------------------------------------------
