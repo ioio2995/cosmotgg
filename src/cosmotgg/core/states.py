@@ -306,6 +306,99 @@ def partial_trace(
     return result_tensor.reshape(kept_dim, kept_dim)
 
 
+def embed_operator(
+    operator, *, dimensions: Sequence[int], positions: Sequence[int]
+) -> np.ndarray:
+    """Embed a finite operator on declared, arbitrary tensor factors.
+
+    `operator` acts on a tensor product of `len(positions)` subsystems whose
+    local dimensions are given, in `operator`'s own tensor-factor order, by
+    `dimensions[p]` for `p` in `positions` (`product(dimensions[p] for p in
+    positions)` must equal the dimension of `operator`). `positions` lists the
+    target subsystem indices (0-based, into `dimensions`) of the larger tensor
+    product, IN THE SAME ORDER AS OPERATOR'S OWN TENSOR FACTORS: `positions[0]`
+    is the subsystem carrying `operator`'s first local factor, `positions[1]`
+    its second, and so on. This semantic order is preserved exactly and is
+    never silently sorted: `embed_operator(operator, dimensions=dimensions,
+    positions=(3, 0))` embeds `operator`'s first factor at subsystem `3` and
+    its second factor at subsystem `0`, and in general differs from
+    `embed_operator(operator, dimensions=dimensions, positions=(0, 3))` unless
+    `operator` is itself invariant under that factor swap. All other
+    subsystems (the `positions` complement) are embedded as identity.
+
+    Requirements (fail-closed, raise `ValueError` otherwise):
+
+    - `operator` is a square 2D array;
+    - `dimensions` is a non-empty sequence of already-integer, positive local
+      dimensions (delegated to the same validation as `partial_trace`);
+    - `positions` is non-empty, contains valid indices (`0 <= p <
+      len(dimensions)`), and contains no duplicate;
+    - `product(dimensions[p] for p in positions) == operator.shape[0]`.
+
+    The returned operator acts on the full tensor product declared by
+    `dimensions`, in that canonical global order (subsystem `0` first), with
+    dimension `product(dimensions)`: it is the explicit permutation of
+    `operator (x) I_rest` (built internally in `positions` order, exactly as
+    `operator`'s own factor order dictates) into that canonical global order.
+    No implicit reordering of `positions` is ever performed
+    (`POSITIONS_SORTING_WITHOUT_OPERATOR_PERMUTATION = FORBIDDEN`).
+
+    This primitive makes no assumption about the number of subsystems, their
+    dimensions, whether `positions` is contiguous, or any bipartite/qubit
+    structure: it is the companion, in the opposite direction, of
+    `partial_trace` (embedding into a larger finite tensor product rather than
+    reducing out of one), sharing the same `dimensions` convention.
+    """
+    dims = _validate_dimensions(dimensions, name="dimensions")
+    n = len(dims)
+
+    positions_list = list(positions)
+    if len(positions_list) == 0:
+        raise ValueError("positions must be a non-empty sequence of subsystem indices")
+    if len(set(positions_list)) != len(positions_list):
+        raise ValueError("positions must be unique")
+    if any(
+        (not isinstance(p, (int, np.integer))) or not (0 <= p < n) for p in positions_list
+    ):
+        raise ValueError("positions must be valid subsystem indices into dimensions")
+
+    arr = np.asarray(operator)
+    if arr.ndim != 2 or arr.shape[0] != arr.shape[1]:
+        raise ValueError("operator must be a square 2D array")
+
+    operand_dim = 1
+    for p in positions_list:
+        operand_dim *= dims[p]
+    if arr.shape[0] != operand_dim:
+        raise ValueError(
+            f"operator dimension {arr.shape[0]} does not match "
+            f"product(dimensions[p] for p in positions)={operand_dim}"
+        )
+    arr = arr.astype(complex, copy=False)
+
+    positions_set = set(positions_list)
+    other_positions = [i for i in range(n) if i not in positions_set]
+    full_order = positions_list + other_positions
+
+    other_dim = 1
+    for p in other_positions:
+        other_dim *= dims[p]
+    identity_rest = np.eye(other_dim, dtype=complex)
+
+    combined = np.kron(arr, identity_rest)
+    shape_full_order = [dims[p] for p in full_order]
+    combined_tensor = combined.reshape(shape_full_order + shape_full_order)
+
+    perm_row = [full_order.index(k) for k in range(n)]
+    perm = perm_row + [p + n for p in perm_row]
+    embedded_tensor = np.transpose(combined_tensor, perm)
+
+    total_dim = 1
+    for d in dims:
+        total_dim *= d
+    return embedded_tensor.reshape(total_dim, total_dim)
+
+
 def conditional_expectation(
     operator, *, dimensions: Sequence[int], keep: Sequence[int]
 ) -> np.ndarray:

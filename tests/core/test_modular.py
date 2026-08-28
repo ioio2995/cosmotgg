@@ -9,6 +9,7 @@ from cosmotgg.core.information import log_density_difference
 from cosmotgg.core.modular import (
     connes_cocycle_at_minus_i_half,
     finite_connes_cocycle,
+    hermitian_exp,
     hermitian_log,
     modular_flow,
     modular_hamiltonian,
@@ -91,6 +92,87 @@ def test_modular_flow_sign_convention():
     inverted_entry = np.exp(-1j * k1 * s) * np.exp(1j * k2 * s)
     inverted = np.array([[0.0, inverted_entry], [0.0, 0.0]], dtype=complex)
     assert not np.allclose(result, inverted)
+
+
+# ---------------------------------------------------------------------------
+# hermitian_exp — model-free, generic
+# ---------------------------------------------------------------------------
+
+
+def test_hermitian_exp_diagonal_oracle():
+    eigvals = np.array([0.2, -1.5])
+    matrix = np.diag(eigvals).astype(complex)
+
+    result = hermitian_exp(matrix, hermiticity_tolerance=1e-9)
+    expected = np.diag(np.exp(eigvals)).astype(complex)
+    assert np.allclose(result, expected)
+
+
+def _fixed_nondiagonal_hermitian_d3():
+    """A fixed, small, nondiagonal hermitian 3x3 matrix, no RNG."""
+    return np.array(
+        [
+            [1.0, 0.3 - 0.1j, 0.05],
+            [0.3 + 0.1j, -0.4, 0.2 + 0.05j],
+            [0.05, 0.2 - 0.05j, 0.7],
+        ],
+        dtype=complex,
+    )
+
+
+def test_hermitian_exp_matches_independent_eigendecomposition_oracle_generic_dimension_three():
+    h = _fixed_nondiagonal_hermitian_d3()
+
+    eigvals, eigvecs = np.linalg.eigh(h)
+    expected = (eigvecs * np.exp(eigvals)) @ eigvecs.conj().T
+
+    result = hermitian_exp(h, hermiticity_tolerance=1e-9)
+    assert result.shape == (3, 3)
+    assert np.allclose(result, expected, atol=1e-10)
+
+
+def test_hermitian_exp_unitary_covariance():
+    h = _fixed_nondiagonal_hermitian_d3()
+    theta = 0.53
+    generator = np.array(
+        [[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 0.0]], dtype=complex
+    )
+    u_matrix, _ = np.linalg.qr(np.eye(3, dtype=complex) + theta * generator)
+
+    h_prime = u_matrix @ h @ u_matrix.conj().T
+    result = hermitian_exp(h_prime, hermiticity_tolerance=1e-9)
+    expected = u_matrix @ hermitian_exp(h, hermiticity_tolerance=1e-9) @ u_matrix.conj().T
+    assert np.allclose(result, expected, atol=1e-9)
+
+
+def test_hermitian_exp_of_zero_is_identity():
+    zero = np.zeros((4, 4), dtype=complex)
+    result = hermitian_exp(zero, hermiticity_tolerance=1e-9)
+    assert np.allclose(result, np.eye(4, dtype=complex))
+
+
+def test_hermitian_exp_output_is_hermitian():
+    h = _fixed_nondiagonal_hermitian_d3()
+    result = hermitian_exp(h, hermiticity_tolerance=1e-9)
+    assert np.allclose(result, result.conj().T, atol=1e-10)
+
+
+def test_hermitian_exp_rejects_non_hermitian_input():
+    non_hermitian = np.array([[1.0, 0.5], [0.0, 1.0]], dtype=complex)
+    with pytest.raises(ValueError):
+        hermitian_exp(non_hermitian, hermiticity_tolerance=1e-9)
+
+
+def test_hermitian_exp_rejects_malformed_shape():
+    with pytest.raises(ValueError):
+        hermitian_exp(np.zeros((2, 3), dtype=complex), hermiticity_tolerance=1e-9)
+
+
+@pytest.mark.parametrize("bad_tolerance", [-1e-9, float("nan"), float("inf")], ids=["negative", "nan", "inf"])
+def test_hermitian_exp_rejects_bad_hermiticity_tolerance(bad_tolerance):
+    h = np.eye(2, dtype=complex)
+    with pytest.raises(ValueError):
+        hermitian_exp(h, hermiticity_tolerance=bad_tolerance)
 
 
 BAD_TOLERANCES = [-1e-9, float("nan"), float("inf")]

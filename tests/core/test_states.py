@@ -5,6 +5,7 @@ import pytest
 
 from cosmotgg.core.states import (
     conditional_expectation,
+    embed_operator,
     partial_trace,
     traceless_part,
     validate_density_matrix,
@@ -204,6 +205,132 @@ def test_partial_trace_rejects_non_integer_dimensions_without_coercion(dimension
     rho_ab = np.eye(4, dtype=complex) / 4.0
     with pytest.raises(ValueError):
         partial_trace(rho_ab, dimensions=dimensions, keep=[0])
+
+
+# ---------------------------------------------------------------------------
+# embed_operator (model-free)
+# ---------------------------------------------------------------------------
+
+_SIGMA_X = np.array([[0.0, 1.0], [1.0, 0.0]], dtype=complex)
+_SIGMA_Z = np.array([[1.0, 0.0], [0.0, -1.0]], dtype=complex)
+
+
+def _deterministic_hermitian(dim: int) -> np.ndarray:
+    """Deterministic Hermitian `dim x dim` operator, no RNG."""
+    base = _deterministic_operator(dim)
+    return base + base.conj().T
+
+
+def test_eo1_single_factor_embedding_matches_manual_kron_oracle():
+    op = _deterministic_hermitian(3)
+    result = embed_operator(op, dimensions=(2, 3, 2), positions=[1])
+    expected = np.kron(np.eye(2, dtype=complex), np.kron(op, np.eye(2, dtype=complex)))
+    assert np.allclose(result, expected)
+
+
+def test_eo2_contiguous_two_factor_embedding_matches_manual_kron_oracle():
+    op = np.kron(_SIGMA_X, _SIGMA_Z)
+    result = embed_operator(op, dimensions=(2, 2, 2, 2), positions=[1, 2])
+    expected = np.kron(np.eye(2, dtype=complex), np.kron(op, np.eye(2, dtype=complex)))
+    assert np.allclose(result, expected)
+
+
+def test_eo3_noncontiguous_embedding_matches_independent_explicit_oracle():
+    """Independent oracle: explicit matrix-element assignment (no kron reordering
+    trick), for a non-contiguous pair (positions 0 and 3 of a 4-factor space)."""
+    op = np.kron(_SIGMA_X, _SIGMA_Z)  # acts on (site_0, site_3) in that order
+    dims = (2, 2, 2, 2)
+    result = embed_operator(op, dimensions=dims, positions=[0, 3])
+
+    op_tensor = op.reshape(2, 2, 2, 2)  # (row_0, row_3, col_0, col_3)
+    full = np.zeros((2, 2, 2, 2, 2, 2, 2, 2), dtype=complex)
+    for a in range(2):
+        for a_prime in range(2):
+            for d in range(2):
+                for d_prime in range(2):
+                    value = op_tensor[a, d, a_prime, d_prime]
+                    if value == 0:
+                        continue
+                    for b in range(2):
+                        for c in range(2):
+                            full[a, b, c, d, a_prime, b, c, d_prime] = value
+    expected = full.reshape(16, 16)
+
+    assert np.allclose(result, expected)
+
+
+def test_eo4_reversed_semantic_position_order_differs_from_forward_order():
+    op = np.kron(_SIGMA_X, _SIGMA_Z)  # not symmetric under factor swap
+    dims = (2, 2, 2, 2)
+    forward = embed_operator(op, dimensions=dims, positions=[0, 3])
+    reversed_order = embed_operator(op, dimensions=dims, positions=[3, 0])
+    assert not np.allclose(forward, reversed_order)
+
+    # reversed_order must equal embedding kron(sigma_z, sigma_x) at positions [0, 3]
+    # (swapping the semantic order is equivalent to swapping the operand's own factors).
+    swapped_op = np.kron(_SIGMA_Z, _SIGMA_X)
+    expected_reversed = embed_operator(swapped_op, dimensions=dims, positions=[0, 3])
+    assert np.allclose(reversed_order, expected_reversed)
+
+
+def test_eo5_explicit_da_like_case_noncontiguous_reverse_orientation():
+    """A<->D-style edge: 4 sites A,B,C,D at positions 0,1,2,3; operand acts on
+    (D, A) i.e. positions=(3, 0), matching the toy1b DA-edge orientation
+    convention. Independent oracle: explicit matrix-element assignment."""
+    op_da = np.kron(_SIGMA_Z, _SIGMA_X)  # first factor = D, second factor = A
+    dims = (2, 2, 2, 2)
+    result = embed_operator(op_da, dimensions=dims, positions=(3, 0))
+
+    tensor = op_da.reshape(2, 2, 2, 2)  # (row_D, row_A, col_D, col_A)
+    full = np.zeros((2, 2, 2, 2, 2, 2, 2, 2), dtype=complex)
+    for a in range(2):
+        for a_prime in range(2):
+            for d in range(2):
+                for d_prime in range(2):
+                    value = tensor[d, a, d_prime, a_prime]
+                    if value == 0:
+                        continue
+                    for b in range(2):
+                        for c in range(2):
+                            full[a, b, c, d, a_prime, b, c, d_prime] = value
+    expected = full.reshape(16, 16)
+
+    assert np.allclose(result, expected)
+
+
+def test_eo6_identity_on_untouched_factors_via_partial_trace_roundtrip():
+    op = _deterministic_hermitian(2)
+    dims = (2, 3, 2)
+    embedded = embed_operator(op, dimensions=dims, positions=[0])
+    # Tracing out the untouched factors (dims 3*2=6) must recover 6*op exactly
+    # (partial_trace of an identity block over dimension d contributes a factor d).
+    reduced = partial_trace(embedded, dimensions=dims, keep=[0])
+    assert np.allclose(reduced, 6.0 * op)
+
+
+def test_eo7_malformed_operator_shape_rejected():
+    with pytest.raises(ValueError):
+        embed_operator(np.zeros((2, 3), dtype=complex), dimensions=(2, 2), positions=[0])
+
+
+def test_eo8_duplicate_positions_rejected():
+    op = np.eye(4, dtype=complex)
+    with pytest.raises(ValueError):
+        embed_operator(op, dimensions=(2, 2, 2), positions=[0, 0])
+
+
+def test_eo9_invalid_position_rejected():
+    op = np.eye(2, dtype=complex)
+    with pytest.raises(ValueError):
+        embed_operator(op, dimensions=(2, 2, 2), positions=[5])
+    with pytest.raises(ValueError):
+        embed_operator(op, dimensions=(2, 2, 2), positions=[-1])
+
+
+def test_eo10_operator_dimension_mismatch_rejected():
+    op = np.eye(4, dtype=complex)  # 4-dim, but positions=[0] implies dim 2
+    with pytest.raises(ValueError):
+        embed_operator(op, dimensions=(2, 2, 2), positions=[0])
 
 
 # ---------------------------------------------------------------------------

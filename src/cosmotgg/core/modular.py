@@ -80,6 +80,31 @@ def hermitian_log(
     return (eigvecs * log_eigvals) @ eigvecs.conj().T
 
 
+def hermitian_exp(matrix, *, hermiticity_tolerance: float) -> np.ndarray:
+    """Spectral exponential `exp(H)` of a finite Hermitian matrix.
+
+    `matrix` must be hermitian within `hermiticity_tolerance`; otherwise this
+    function fails closed with `ValueError`. Unlike `hermitian_log`, no
+    positivity is required of `matrix`: any finite hermitian matrix is
+    accepted (its eigenvalues, real by hermiticity, are exponentiated
+    directly; the result is always hermitian and strictly positive definite
+    by construction, since `exp` of any real eigenvalue is strictly
+    positive). Computed by diagonalizing `matrix` (`numpy.linalg.eigh`) and
+    exponentiating its real eigenvalues, then reconstructing the hermitian
+    result in the original eigenbasis. No `scipy` dependency is used; no
+    clipping, no pseudoinverse, no hidden spectral shift is applied by this
+    primitive itself: any numerical-stability shift belongs to the caller's
+    own construction, not to this generic mathematical primitive.
+
+    This primitive is generic: it makes no assumption that `Tr(matrix) == 1`
+    or that `matrix` is a density matrix.
+    """
+    _, eigvals, eigvecs = _hermitian_eigendecomposition(
+        matrix, hermiticity_tolerance=hermiticity_tolerance, name="matrix"
+    )
+    return (eigvecs * np.exp(eigvals)) @ eigvecs.conj().T
+
+
 def modular_hamiltonian(
     rho,
     *,
