@@ -2081,6 +2081,79 @@ PROCHAINE_ACTION_AUTORISEE = CHATGPT_REVIEW_OF_MODEL1B_CLOSURE_AND_T5_NEXT_BOUND
 
 Aucun lot suivant n'est autorisé par ce lot.
 
+Le lot `T5-FULL-PASS-BOUNDARY-FEASIBILITY-INTEGRATION-1` (rôle `docs`)
+a créé `docs/model/t5-full-pass-boundary-feasibility.md`
+(`PROPOSED_T5_FULL_PASS_BOUNDARY_FEASIBILITY_CORRECTED`), intégration
+documentaire mécanique — sans nouvelle analyse scientifique autonome —
+du rapport initial `T5-FULL-PASS-BOUNDARY-FEASIBILITY-1`, de la
+contre-expertise Opus `T5-FULL-PASS-BOUNDARY-OPUS-REVIEW-1` et de
+l'arbitrage scientifique ChatGPT qui les tranche : scission de travail
+non gelée `T5A=CONTROLLED_LIMIT_OF_STATE_DERIVED_CROSS_SCALE_FLOW` /
+`T5B=LOCAL_CONTINUUM_CORRESPONDENCE` (`T5A_PASS != T5_PASS`) ;
+correction B1 projection exacte à deux corps sur `K_n`
+(`EXACT_DERIVED_TWO_BODY_PROJECTION=TRUE`,
+`H_GE3_CONTRIBUTION_TO_J=EXACTLY_ZERO`, `R_PAIR_IS_ERROR_ON_J=FALSE`,
+`FULL_K_n_MUST_REMAIN_CANONICAL=TRUE`,
+`AUTONOMOUS_REDUCED_FLOW_ON_PAIR_OR_LOOP_DATA=NOT_ESTABLISHED`
+remplaçant l'énoncé rejeté `NO_AUTONOMOUS_EFFECTIVE_PAIR_FLOW_EXISTS`) ;
+correction B2 `SO(3)`/`log Q` (`Z2_OBSTRUCTION_TO_LOG_Q=FALSE`, vrai
+problème = non-unicité de branche de la correspondance d'objets
+cross-scale, `FAIL_CLOSED_AT_PI=ADMISSIBLE_CONSERVATIVE_ROUTE` non
+imposé) ; correction B3 indice vs coordonnée de raffinement
+(`NUMERICAL_REFINEMENT_COORDINATE_REQUIRED=NO` pour une simple limite
+`T5a`, `REFINEMENT_PARAMETER_ADDITIVITY` classée
+`CONVENIENT_GAUGE_CHOICE`/`ROUTE_SPECIFIC`) ; correction B4 retrait de
+`UPWARD_PROJECTIVE_STATE_TOWER=NECESSARY_FOR_ANY_T5_LIMIT` au profit de
+`DECLARED_REFINEMENT_INDEXED_FAMILY`/`DECLARED_CROSS_LEVEL_COMPARISON_LAW`
+(`NECESSARY_CANDIDATE`) et tour projective/famille inductive
+(`OPTIONAL_ROUTE`) ; correction B5 générateur
+(`GENERATOR_REQUIRED_FOR_T5A_LIMIT=NO`,
+`NO_SEMIGROUP_GENERATOR != NO_T5A_LIMIT`) ; correction B6 type I
+(retrait de `LIMIT_GENERICALLY_LEAVES_TYPE_I`,
+`GNS_VON_NEUMANN_CLOSURE_TYPE=STATE_DEPENDENT`,
+`LIMIT_MODULAR_DOMAIN_DECLARATION=CONDITIONAL_NECESSITY`) ; schéma de
+décimation (`WELL_DEFINED_WITHIN_DECLARED_REFINEMENT_SCHEME=NECESSARY`,
+universalité non requise pour `T5a` mais candidate nécessaire pour
+`T5b`) ; `G3_FOR_T5=CONDITIONALLY_NECESSARY`,
+`G4_FOR_T5A=NOT_REQUIRED`,
+`G4_FOR_RELATIONAL_TIDAL_RESPONSE_CLAIM=NECESSARY_IN_ITS_NATIVE_STAGE` ;
+richesse de contenu invariant corrigeant le faux positif `F5`
+(`CHI_VS_SO3_CONJUGACY_CLASS=SAME_INVARIANT_INFORMATION_FOR_SINGLE_Q`,
+nouveau `F5=CONVERGENCE_OF_ONE_SCALAR_INVARIANT
+!=TENSORIAL_OR_GEOMETRIC_CONTENT`,
+`T5C17=OPTIONAL_FOR_T5A_LIMIT|NECESSARY_CANDIDATE_FOR_G6`) ; dix-sept
+portes candidates corrigées `T5C1`–`T5C17` (`PROPOSED`/`NON_FROZEN`),
+frontière minimale non gelée `T5A_MINIMAL_CANDIDATE_GATES=
+{T5C1,T5C3,T5C4,T5C6,T5C7,T5C8,T5C11}` plus conditionnelles
+`{T5C2,T5C9,T5C10,T5C12,T5C15}` ; ensemble faux-positifs/no-go `F1`–
+`F10` avec `F5`/`F6` corrigés. Conclusion :
+`T5_FULL_PASS_BOUNDARY=SUFFICIENTLY_CHARACTERIZED_FOR_NEXT_BOUNDED_PHASE`,
+`NEXT_BOUNDED_PHASE=T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA_DESIGN`,
+`FUNDAMENTAL_BLOCKING=NONE_DEMONSTRATED`, mais
+`T5A_CRITERIA=NOT_YET_FROZEN`, `T5A_PASS=NOT_ESTABLISHED`,
+`T5_PASS=NOT_ESTABLISHED`. Sans modifier `docs/model/hypothesis.md`,
+`docs/model/t5-relational-refinement-boundary.md`,
+`docs/model/t5-modular-cross-scale-flow-criteria.md`,
+`docs/model/tidal-relational-curvature-criteria.md`,
+`docs/toy-models/toy1b/**`, `experiments/`, `src/` ni `tests/`, sans
+déclarer `T5 PASS`, sans geler la note, sans créer de nouveau toy.
+
+```text
+MODEL1B                = CLOSED_AT_T5_FLOW_QUALIFICATION_LEVEL
+T5_FLOW_QUALIFICATION  = PASS
+T5                     = OPEN_NOT_EXECUTED
+T5_FULL_PASS_BOUNDARY  = SUFFICIENTLY_CHARACTERIZED_FOR_NEXT_BOUNDED_PHASE
+
+CURRENT_LOT                = NONE
+PHASE                      = T5_FULL_PASS_BOUNDARY_CORRECTED_PENDING_CHATGPT_FINAL_REVIEW
+PROCHAINE_ACTION_AUTORISEE = CHATGPT_FINAL_REVIEW_OF_CORRECTED_T5_FULL_PASS_BOUNDARY
+
+NEXT_MODEL = NOT_AUTHORIZED
+NEXT_TOY   = NOT_AUTHORIZED
+```
+
+Aucun lot suivant n'est autorisé par ce lot.
+
 ---
 
 ## Mémoire de session
