@@ -1,12 +1,19 @@
 # T5 — Frontière corrigée de faisabilité vers `T5_FULL_PASS`
 
-Statut : **note corrigée, non gelée**
+Statut : **gelée**
 
 ```text
-STATUS = PROPOSED_T5_FULL_PASS_BOUNDARY_FEASIBILITY_CORRECTED
+STATUS = FROZEN_T5_FULL_PASS_BOUNDARY_FEASIBILITY
 
-NOT_FROZEN     = TRUE
-CHATGPT_REVIEW = PENDING_FINAL_REVIEW
+NOT_FROZEN     = FALSE
+CHATGPT_REVIEW = PASS
+
+T5_FULL_PASS_BOUNDARY_REVIEW = PASS
+T5_FULL_PASS_BOUNDARY_FREEZE = FROZEN
+LIONEL_ORCIL_FREEZE_APPROVAL = GRANTED
+SCIENTIFIC_CONTENT_HEAD      = 1b81a2c991ca3ca4d1981aab6dbedfa21344c5fc
+
+FROZEN_DOCUMENT_MODIFICATION = NEW_EXPLICIT_DECISION_REQUIRED_FOR_SEMANTIC_CHANGE
 
 T5_FLOW_QUALIFICATION = PASS
 T5                     = OPEN_NOT_EXECUTED
@@ -19,6 +26,28 @@ T5_FULL_PASS_BOUNDARY = SUFFICIENTLY_CHARACTERIZED_FOR_NEXT_BOUNDED_PHASE
 NEXT_MODEL = NOT_AUTHORIZED
 NEXT_TOY   = NOT_AUTHORIZED
 ```
+
+Obligatoire :
+
+```text
+DOCUMENT_FREEZE != T5A_PASS
+DOCUMENT_FREEZE != T5_PASS
+
+DOCUMENT_FREEZE != CONTINUUM
+DOCUMENT_FREEZE != LOCALITY
+DOCUMENT_FREEZE != GEOMETRY
+DOCUMENT_FREEZE != CURVATURE
+DOCUMENT_FREEZE != GRAVITY
+
+BOUNDARY_CHARACTERIZED != T5A_CRITERIA_FROZEN
+
+T5A_CRITERIA_DESIGN_AUTHORIZED != T5A_CRITERIA_PASS
+```
+
+Le gel documentaire valide ce document comme frontière de conception
+des futurs critères `T5a` ; il ne valide pas ces futurs critères
+eux-mêmes, et ne transforme la scission `T5a`/`T5b` en aucun résultat
+physique.
 
 ---
 
@@ -667,12 +696,20 @@ NEXT_TOY   = NOT_AUTHORIZED
 
 ```text
 T5_FULL_PASS_BOUNDARY_DOCUMENT = docs/model/t5-full-pass-boundary-feasibility.md
-T5_FULL_PASS_BOUNDARY_STATUS   = PROPOSED_T5_FULL_PASS_BOUNDARY_FEASIBILITY_CORRECTED
-NOT_FROZEN                     = TRUE
-CHATGPT_REVIEW                 = PENDING_FINAL_REVIEW
+T5_FULL_PASS_BOUNDARY_STATUS   = FROZEN_T5_FULL_PASS_BOUNDARY_FEASIBILITY
+T5_FULL_PASS_BOUNDARY_FREEZE   = FROZEN
+NOT_FROZEN                     = FALSE
+CHATGPT_REVIEW                 = PASS
+LIONEL_ORCIL_FREEZE_APPROVAL   = GRANTED
+SCIENTIFIC_CONTENT_HEAD        = 1b81a2c991ca3ca4d1981aab6dbedfa21344c5fc
 
-NEXT_MODEL = NOT_AUTHORIZED
-NEXT_TOY   = NOT_AUTHORIZED
+T5A_CRITERIA = NOT_YET_CREATED_OR_FROZEN
+T5A_PASS     = NOT_ESTABLISHED
+T5_PASS      = NOT_ESTABLISHED
+
+NEXT_BOUNDED_PHASE = T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA_DESIGN
+NEXT_MODEL          = NOT_AUTHORIZED
+NEXT_TOY            = NOT_AUTHORIZED
 ```
 
 Ce document ne modifie pas `docs/model/hypothesis.md`, ne modifie pas
@@ -681,3 +718,10 @@ Ce document ne modifie pas `docs/model/hypothesis.md`, ne modifie pas
 modifie pas `docs/model/tidal-relational-curvature-criteria.md`, ne
 modifie aucun fichier de `docs/toy-models/toy1b/**`, ne définit aucun
 `T5 PASS`, et n'autorise la conception d'aucun nouveau toy.
+
+Le gel valide la frontière de conception des futurs critères `T5a`
+(`NEXT_BOUNDED_PHASE = T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA_DESIGN`).
+Il ne conçoit pas ces critères et n'autorise leur conception que par un
+mandat scientifique distinct explicite. Toute modification ultérieure
+de sens de ce document exige une nouvelle décision explicite
+(`docs/governance/documentation-governance.md` §7).

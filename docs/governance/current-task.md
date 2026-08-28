@@ -2154,6 +2154,61 @@ NEXT_TOY   = NOT_AUTHORIZED
 
 Aucun lot suivant n'est autorisé par ce lot.
 
+Le lot `T5-FULL-PASS-BOUNDARY-FREEZE-1` (rôle `docs`) a effectué le gel
+documentaire (`PROPOSED_T5_FULL_PASS_BOUNDARY_FEASIBILITY_CORRECTED` →
+`FROZEN_T5_FULL_PASS_BOUNDARY_FEASIBILITY`) de
+`docs/model/t5-full-pass-boundary-feasibility.md`, suite à la revue
+finale ChatGPT (`PASS`) et à l'approbation explicite de Lionel ORCIL
+(`GRANTED`) : bloc de métadonnées d'en-tête et section « Statut
+suivant » uniquement modifiés (transition de statut, empreinte
+`SCIENTIFIC_CONTENT_HEAD=1b81a2c991ca3ca4d1981aab6dbedfa21344c5fc`,
+pare-feu `DOCUMENT_FREEZE != T5A_PASS/T5_PASS/CONTINUUM/LOCALITY/
+GEOMETRY/CURVATURE/GRAVITY`, `BOUNDARY_CHARACTERIZED !=
+T5A_CRITERIA_FROZEN`, `T5A_CRITERIA_DESIGN_AUTHORIZED !=
+T5A_CRITERIA_PASS`) ; corps scientifique (§0–§14 : scission `T5a`/
+`T5b`, corrections B1–B6, `G3`/`G4`, richesse de contenu invariant,
+dix-sept portes candidates `T5C1`–`T5C17` et leurs classifications,
+ensemble faux-positifs `F1`–`F10`, frontière minimale
+`T5A_MINIMAL_CANDIDATE_GATES` et son statut
+`NOT_YET_DECLARED_SUFFICIENT`) laissé byte-for-byte inchangé. Sans
+modifier `docs/model/hypothesis.md`,
+`docs/model/t5-relational-refinement-boundary.md`,
+`docs/model/t5-modular-cross-scale-flow-criteria.md`,
+`docs/model/tidal-relational-curvature-criteria.md`,
+`docs/toy-models/**`, `experiments/`, `src/`, `tests/` ni
+`docs/governance/agents/**`, sans déclarer `T5A_PASS` ni `T5_PASS`, sans
+concevoir les futurs critères `T5a`, sans créer de nouveau toy.
+
+```text
+CHATGPT_FINAL_REVIEW         = PASS
+LIONEL_ORCIL_FREEZE_APPROVAL = GRANTED
+
+T5_FULL_PASS_BOUNDARY_FREEZE                  = FROZEN
+T5_FULL_PASS_BOUNDARY_STATUS                  = FROZEN_T5_FULL_PASS_BOUNDARY_FEASIBILITY
+T5_FULL_PASS_BOUNDARY_SCIENTIFIC_CONTENT_HEAD = 1b81a2c991ca3ca4d1981aab6dbedfa21344c5fc
+
+MODEL1B                = CLOSED_AT_T5_FLOW_QUALIFICATION_LEVEL
+T5_FLOW_QUALIFICATION  = PASS
+T5                      = OPEN_NOT_EXECUTED
+
+T5_FULL_PASS_BOUNDARY = SUFFICIENTLY_CHARACTERIZED_FOR_NEXT_BOUNDED_PHASE
+FUNDAMENTAL_BLOCKING   = NONE_DEMONSTRATED
+
+T5A_CRITERIA = NOT_YET_CREATED_OR_FROZEN
+T5A_PASS     = NOT_ESTABLISHED
+T5_PASS      = NOT_ESTABLISHED
+
+CURRENT_LOT                = NONE
+PHASE                      = T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA_DESIGN_PENDING_EXPLICIT_AUTHORIZATION
+PROCHAINE_ACTION_AUTORISEE = NONE — la conception des critères T5a requiert un mandat scientifique distinct
+
+NEXT_BOUNDED_PHASE = T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA_DESIGN
+NEXT_MODEL          = NOT_AUTHORIZED
+NEXT_TOY            = NOT_AUTHORIZED
+```
+
+Aucun lot suivant n'est autorisé par ce lot.
+
 ---
 
 ## Mémoire de session
