@@ -1,18 +1,19 @@
 # toy1b — Plan de validation proposé (qualification confirmatoire `T5-FLOW`)
 
-**Statut : `PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN`.**
+**Statut : `PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED`.**
 
 ```text
-STATUS                 = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN
+STATUS                 = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED
 NOT_FROZEN              = TRUE
-CHATGPT_REVIEW          = PENDING
+CHATGPT_REVIEW          = PENDING_FINAL_REVIEW
 CONFIRMATORY_EXECUTION  = NOT_AUTHORIZED
 
 MODEL1B_IMPLEMENTATION            = ACCEPTED
 MODEL1B_IMPLEMENTATION_ACCEPTED_HEAD = 788337f4d383962947586084c342edcf395af234
 
-T5_FLOW_QUALIFICATION   = NOT_EXECUTED
-T5                       = OPEN_NOT_EXECUTED
+T5_FLOW_EXECUTION_STATUS = NOT_EXECUTED
+T5_FLOW_QUALIFICATION    = NOT_EXECUTED
+T5                        = OPEN_NOT_EXECUTED
 ```
 
 Ce document définit le protocole confirmatoire préenregistré de qualification `T5-FLOW` de `model1b`, conformément à `docs/governance/documentation-governance.md` §11.4 (`CONFIRMATORY_PROTOCOL_FREEZE_BEFORE_EXECUTION = REQUIRED`) et au pare-feu confirmatoire de `docs/toy-models/toy1b/specification.md` §22.
@@ -35,7 +36,7 @@ Ce document n'exécute rien. Il ne contient aucun résultat, aucune sortie numé
 TOY_ID   = toy1b
 MODEL_ID = model1b
 
-VALIDATION_PLAN_STATUS = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN
+VALIDATION_PLAN_STATUS = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED
 ```
 
 Une fois gelé, ce document devient `READ_ONLY_DURING_CONFIRMATORY_EXECUTION` (`docs/governance/documentation-governance.md` §11.4) : il ne peut plus être modifié en fonction des résultats observés.
@@ -397,6 +398,27 @@ $$
 \text{niveau 0 :}\quad F_A\otimes F_B\otimes F_C\otimes F_D.
 $$
 
+### Convention de repère \(SU(2) \to SO(3)\)
+
+Pour tout \(F \in SU(2)\), le repère orthogonal réel \(R(F) \in SO(3)\) utilisé pour les contrôles de covariance ci-dessous est fixé, avant exécution, comme :
+
+$$
+R(F)_{ab} = \frac12\,\mathrm{Tr}\big[\sigma_a\,F\,\sigma_b\,F^\dagger\big],
+\qquad a,b \in \{x,y,z\}.
+$$
+
+C'est cette convention, et uniquement celle-ci, qui définit \(R_i\), \(R_j\), \(R_A\) dans :
+
+$$
+J' = R_i\,J\,R_j^{\mathsf T},
+\qquad
+O' = R_i\,O\,R_j^{\mathsf T},
+\qquad
+Q' = R_A\,Q\,R_A^{\mathsf T}.
+$$
+
+Aucun choix de transposée ni de convention alternative ne peut être modifié après observation.
+
 Contrôles requis :
 
 $$
@@ -450,6 +472,29 @@ CONDITIONING_ADMISSIBILITY_THRESHOLD = NONE
 ```
 
 Toutes les valeurs singulières et tous les nombres de conditionnement utilisés dans l'extraction directionnelle doivent néanmoins être rapportés. Un bloc non nul mais mal conditionné n'est jamais exclu silencieusement.
+
+### Câblage déterministe des tolérances vers les appels de production
+
+Table fixée avant exécution, reliant chaque tolérance ci-dessus au paramètre nommé exact de l'appel de production correspondant :
+
+```text
+fine_relational_hamiltonian:
+    max_entanglement_unitarity_tolerance = UNITARY_INPUT_TOLERANCE
+
+fine_relational_gibbs_state:
+    hermiticity_tolerance = HERMITICITY_TOLERANCE
+    trace_tolerance       = TRACE_TOLERANCE
+    positivity_tolerance  = POSITIVITY_TOLERANCE
+
+modular_datum (à tous les niveaux n = 2, 1, 0) :
+    hermiticity_tolerance = HERMITICITY_TOLERANCE
+    trace_tolerance       = TRACE_TOLERANCE
+    positivity_tolerance  = POSITIVITY_TOLERANCE
+```
+
+Les autres tolérances (`STATE_COMPOSITION_TOLERANCE`, `MODULAR_PATH_TOLERANCE`, `PAULI_RECONSTRUCTION_TOLERANCE`, `COVARIANCE_TOLERANCE`, `PURE_GAUGE_FLATNESS_TOLERANCE`, `TREE_AGREEMENT_TOLERANCE`, `ZERO_RELATION_J_TOLERANCE`, `SIGNAL_FLOOR`, `ORTHOGONALITY_REGRESSION_TOLERANCE`) restent affectées exactement aux résidus déjà déclarés dans les sections `V11`–`V21` où elles apparaissent.
+
+Aucune tolérance implicite, aucune valeur par défaut de production, pendant l'exécution confirmatoire.
 
 ---
 
@@ -531,6 +576,19 @@ $$
 
 Aucun flot autonome de \(K\). Aucun \(K\) cible.
 
+### Convention scalaire additive du datum modulaire
+
+Déclarée explicitement et fixée avant exécution :
+
+```text
+MODULAR_ADDITIVE_SCALAR_CONVENTION = ABSOLUTE_FROM_NORMALIZED_RHO
+K_ADDITIVE_SHIFT                    = NONE
+IDENTITY_COMPONENT_RETAINED         = TRUE
+TRACE_CENTERING_OF_K                = FORBIDDEN
+```
+
+\(K_n\) est exactement \(-\log(\rho_n)\) pour le \(\rho_n\) normalisé réel (`modular_datum`, spec §9) : aucune comparaison modulo l'identité, aucun retrait de trace, aucun décalage scalaire post-hoc. \(K_{0,\mathrm{seq}}\) et \(K_{0,\mathrm{direct}}\) sont comparés comme matrices complètes (résidu \(R\) ci-dessus), pas via une quantité réduite ou centrée.
+
 ---
 
 ## V13. `T5F5` — Support modulaire complet
@@ -559,13 +617,11 @@ $$
 
 car \(K_2\) dérive du \(H_{\mathrm{rel}}\) explicitement à deux corps plus l'identité (identité exacte, spécification §8).
 
-Preuve de support généré requise : au moins l'un de
+Rapporter, à titre d'observation (jamais comme condition de `PASS`/`FAIL`) :
 
 $$
-H_{\ge3}(K_1),\qquad H_{\ge3}(K_0)
+H_{\ge3}(K_1),\qquad H_{\ge3}(K_0).
 $$
-
-doit satisfaire \(> \mathrm{SIGNAL\_FLOOR}\).
 
 Définir la troncature par paire exacte :
 
@@ -579,13 +635,38 @@ $$
 R_{\mathrm{pair}}(n) = \frac{\|K_n - K_n^{(\le2)}\|_F}{\max(1,\ \|K_n\|_F)}.
 $$
 
-`T5F5` `PASS` requiert : au moins un niveau grossier \(n\in\{1,0\}\) avec
+Rapporter également, à titre d'observation, \(R_{\mathrm{pair}}(1)\) et \(R_{\mathrm{pair}}(0)\).
 
-$$
-R_{\mathrm{pair}}(n) > \mathrm{SIGNAL\_FLOOR}.
-$$
+### Classification informative — fermeture par paire
 
-Aucun support généré ne peut être écarté de la donnée canonique.
+Le design gelé de `model1b` (`docs/toy-models/toy1b/specification.md` §21) est explicite : « aucun secteur à \(N\) corps particulier n'est requis non nul par définition ; la génération effectivement observée reste une preuve de qualification, pas un axiome imposé a priori ». La fermeture ou non-fermeture par paire doit donc être MESURÉE et RAPPORTÉE, jamais imposée a priori comme condition de `PASS`.
+
+Définir, à titre purement informatif :
+
+```text
+PAIR_TRUNCATION_FLOW_OBSERVATION =
+    CLOSED_WITHIN_SIGNAL_FLOOR
+    |
+    NONCLOSED_ABOVE_SIGNAL_FLOOR
+```
+
+`CLOSED_WITHIN_SIGNAL_FLOOR` si \(R_{\mathrm{pair}}(1) \le \mathrm{SIGNAL\_FLOOR}\) ET \(R_{\mathrm{pair}}(0) \le \mathrm{SIGNAL\_FLOOR}\) ; `NONCLOSED_ABOVE_SIGNAL_FLOOR` sinon. Cette classification ne modifie à elle seule ni `T5F5 = PASS` ni `T5F5 = FAIL`.
+
+### `T5F5` `PASS`/`FAIL`
+
+`T5F5` `PASS` requiert UNIQUEMENT :
+
+- la complétude du support canonique (reconstruction ci-dessus, à tous les niveaux, dans `PAULI_RECONSTRUCTION_TOLERANCE`) ;
+- l'absence de substitution d'une troncature par paire à la donnée canonique \(K_n\) complète (`CANONICAL_SCALE_DATUM = FULL_K_n` effectivement utilisée par la route de production, jamais \(K_n^{(\le2)}\)).
+
+`T5F5` `FAIL` si :
+
+- un secteur de support effectivement présent est silencieusement écarté ;
+- la reconstruction de Pauli ne reconstruit pas le \(K_n\) complet ;
+- une troncature par paire est substituée à la donnée canonique ;
+- une projection de poids \(\le2\) est utilisée comme flux exact.
+
+Aucun support généré ne peut être écarté de la donnée canonique. Aucune exigence de non-nullité d'un secteur \(H_{\ge3}\) ou d'un résidu \(R_{\mathrm{pair}}\) particulier n'est imposée par ce critère : ces quantités restent des observations rapportées, jamais des conditions de verdict.
 
 ---
 
@@ -695,6 +776,10 @@ Après gel : tout changement sémantique ou réajustement de paramètre invalide
 
 ## V18. `T5F10` — Domaine fail-closed
 
+`T5F10` couvre les DEUX échecs de domaine directionnel distincts, préservés séparément et jamais confondus (spec §12).
+
+### V18.a — Facteur singulier (fixture V6)
+
 En utilisant V6, exiger :
 
 tous les blocs \(J\) actifs satisfont
@@ -706,14 +791,63 @@ $$
 et la route directionnelle de production réelle produit :
 
 ```text
-SINGULAR_DIRECTIONAL_FACTOR
+DIRECTIONAL_FACTOR            = UNDEFINED
+DIRECTIONAL_UNDEFINED_REASON  = SINGULAR_DIRECTIONAL_FACTOR
 ```
 
-Aucune pseudo-inverse. Aucune réparation epsilon. Aucune réparation de signe. Aucune orientation arbitraire.
+et jamais `Z2_DIRECTIONAL_TYPE_MISMATCH`.
 
-Enregistrer également les valeurs singulières (`directional_conditioning`) pour tous les blocs directionnels de V3/V4/V5/V7.
+### V18.b — Inadéquation de type \(\mathbb Z_2\) (`TYPE_MISMATCH_DOMAIN_FIXTURE`)
+
+Fixture négative déterministe, distincte de V6 et préenregistrée avant exécution :
+
+$$
+J_{\mathrm{TYPE\_MISMATCH}} = I_3,
+\qquad
+J_{\mathrm{VALID\_MINUS}} = \mathrm{diag}(-1,\ 1,\ 1).
+$$
+
+**Oracle direct obligatoire.** \(J_{\mathrm{TYPE\_MISMATCH}}=I_3\) est inversible (toutes ses valeurs singulières valent \(1\)) ; son facteur polaire est \(O=I_3\), \(\det(O)=+1\). `directional_factor(J_TYPE_MISMATCH)` doit donc échouer fail-closed avec exactement :
+
+```text
+DIRECTIONAL_RELATIONAL_TYPE  = TYPE_MISMATCH_FAIL_CLOSED
+DIRECTIONAL_UNDEFINED_REASON = Z2_DIRECTIONAL_TYPE_MISMATCH
+```
+
+et jamais `SINGULAR_DIRECTIONAL_FACTOR`.
+
+\(J_{\mathrm{VALID\_MINUS}}=\mathrm{diag}(-1,1,1)\) est déjà orthogonal, \(\det(J_{\mathrm{VALID\_MINUS}})=-1\) : son facteur polaire est lui-même, typé correctement (\(\det(O)=-1\)), et sert de comparaison valide.
+
+**Contrôle de propagation obligatoire**, via la route de production réelle `active_cycle_loop_object_from_blocks`, sur un cycle actif de niveau 0 (longueur 4, `ACTIVE_CYCLE_EDGE_COUNTS`), avec exactement un \(J_{\mathrm{TYPE\_MISMATCH}}\) et trois \(J_{\mathrm{VALID\_MINUS}}\), dans cet ordre préenregistré :
+
+$$
+(J_{\mathrm{TYPE\_MISMATCH}},\ J_{\mathrm{VALID\_MINUS}},\ J_{\mathrm{VALID\_MINUS}},\ J_{\mathrm{VALID\_MINUS}}).
+$$
+
+Résultat obligatoire :
+
+```text
+LOOP_DIAGNOSTIC       = UNDEFINED_DIRECTIONAL_DOMAIN
+LOOP_UNDEFINED_REASON = Z2_DIRECTIONAL_TYPE_MISMATCH
+```
+
+Aucun \(Q\), \(d_{\mathrm{flat}}\) ou \(\chi\) ne doit être construit dans ce cas.
+
+### Fermeture sur échec — commune aux deux fixtures
+
+Aucune pseudo-inverse. Aucune réparation epsilon. Aucune réparation de signe. Aucune inversion d'axe. Aucun ajustement d'orientation (`orientation fitting`). Aucune orientation arbitraire.
+
+```text
+SINGULAR_DIRECTIONAL_FACTOR   != Z2_DIRECTIONAL_TYPE_MISMATCH
+```
+
+Les deux raisons restent explicitement non confondues dans les deux sens.
+
+Enregistrer également les valeurs singulières (`directional_conditioning`) pour tous les blocs directionnels de V3/V4/V5/V7 (y compris \(J_{\mathrm{TYPE\_MISMATCH}}\)/\(J_{\mathrm{VALID\_MINUS}}\) ci-dessus).
 
 Aucun rejet d'échantillon fondé sur le conditionnement.
+
+`T5F10` `PASS` requiert V18.a ET V18.b, chacune avec la raison exacte préservée. `T5F10` `FAIL` si une pseudo-inverse/réparation/orientation arbitraire est utilisée, ou si la raison retournée pour l'une des deux fixtures est incorrecte ou confondue avec l'autre.
 
 ---
 
@@ -801,35 +935,60 @@ Aucune revendication physique. Ces contrôles ne redéfinissent pas le domaine d
 
 ## V22. Agrégation des résultats
 
+### Algèbre de statut
+
+Le contrat `T5-FLOW` gelé (`docs/model/t5-modular-cross-scale-flow-criteria.md` §18) n'autorise que :
+
+```text
+T5_FLOW_QUALIFICATION = PASS | FAIL | NOT_EXECUTED
+```
+
+`BLOCKED` n'est jamais un quatrième verdict de qualification. Le statut d'exécution du protocole et le verdict de qualification sont donc séparés explicitement :
+
+```text
+T5_FLOW_EXECUTION_STATUS = NOT_EXECUTED | COMPLETED | BLOCKED
+T5_FLOW_QUALIFICATION    = NOT_EXECUTED | PASS | FAIL
+```
+
+Si `T5_FLOW_EXECUTION_STATUS = BLOCKED` (impossibilité réelle d'exécuter le protocole gelé — panne, dépendance manquante, incohérence bloquante), alors `T5_FLOW_QUALIFICATION` reste `NOT_EXECUTED`.
+
+### Rapport par critère
+
 Rapporter `T5F1`…`T5F11` individuellement comme :
 
 ```text
 PASS
 FAIL
-ou
-BLOCKED_DOMAIN
 ```
 
-sauf `T5F3`, qui peut en outre indiquer `SATISFIED_BY_CONSTRUCTION_CONFIRMED`.
+avec, le cas échéant, le sous-type explicite `FAIL_DOMAIN / <raison exacte>` lorsqu'un échec de domaine d'une fixture obligatoire, survenu pendant une exécution confirmatoire achevée (`T5_FLOW_EXECUTION_STATUS = COMPLETED`), empêche l'évaluation normale du critère — par exemple :
+
+```text
+FAIL_DOMAIN / SINGULAR_DIRECTIONAL_FACTOR
+FAIL_DOMAIN / Z2_DIRECTIONAL_TYPE_MISMATCH
+```
+
+`FAIL_DOMAIN` est un sous-type de `FAIL`, jamais un troisième statut de critère ni une valeur de `T5_FLOW_QUALIFICATION`. `T5F3` peut en outre indiquer `SATISFIED_BY_CONSTRUCTION_CONFIRMED` (`PASS` par construction, confirmé par régression).
 
 Aucun critère ne peut être silencieusement omis.
 
-Définir :
+### Verdict global
+
+Si `T5_FLOW_EXECUTION_STATUS = COMPLETED`, définir :
 
 ```text
 T5_FLOW_QUALIFICATION = PASS
 ```
 
-UNIQUEMENT SI chaque exigence gelée `T5F1`–`T5F11` passe sous ce protocole gelé et qu'aucun oracle négatif obligatoire n'échoue.
+UNIQUEMENT SI chaque exigence gelée `T5F1`–`T5F11` obtient `PASS` (ou `SATISFIED_BY_CONSTRUCTION_CONFIRMED` pour `T5F3`) sous ce protocole gelé et qu'aucun oracle négatif obligatoire n'échoue.
 
 Sinon :
 
 ```text
 T5_FLOW_QUALIFICATION = FAIL
-ou BLOCKED
 ```
 
-avec le ou les critères en échec exacts.
+avec le ou les critères en échec exacts (y compris tout `FAIL_DOMAIN / <raison>`).
 
 Pare-feu obligatoire :
 
@@ -880,8 +1039,9 @@ Pare-feu confirmatoire transverse : `docs/governance/software-architecture-gover
 ## Paramètres qui restent `OPEN`/non exécutés par ce document
 
 ```text
-T5_FLOW_QUALIFICATION = NOT_EXECUTED
-T5                      = OPEN_NOT_EXECUTED
+T5_FLOW_EXECUTION_STATUS = NOT_EXECUTED
+T5_FLOW_QUALIFICATION     = NOT_EXECUTED
+T5                         = OPEN_NOT_EXECUTED
 
 CONFIRMATORY_EXECUTION = NOT_AUTHORIZED
 NOTEBOOK_CREATION       = NOT_AUTHORIZED
@@ -894,9 +1054,14 @@ Aucune valeur numérique de ce document n'est encore validée par exécution : e
 ## Statut et prochaine étape
 
 ```text
-MODEL1B_VALIDATION_PLAN_STATUS = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN
+MODEL1B_VALIDATION_PLAN_STATUS = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED
 MODEL1B_VALIDATION_PLAN_FREEZE = NOT_FROZEN
+CHATGPT_REVIEW                  = PENDING_FINAL_REVIEW
 CONFIRMATORY_EXECUTION          = NOT_AUTHORIZED
+T5_FLOW_QUALIFICATION           = NOT_EXECUTED
+T5                               = OPEN_NOT_EXECUTED
 ```
 
-La prochaine étape autorisée est la revue à distance de ce plan de validation par ChatGPT.
+Corrections apportées par le lot `MODEL1B-T5-FLOW-VALIDATION-PLAN-CORRECTION-1`, à la suite de la revue ChatGPT `REVISION_REQUIRED` : (C1) `T5F5` recentré sur la seule complétude du support canonique et l'absence de substitution d'une troncature par paire, `H_{\ge3}(K_1)`/`H_{\ge3}(K_0)`/`R_pair(1)`/`R_pair(0)` rapportés à titre d'observation via la classification informative `PAIR_TRUNCATION_FLOW_OBSERVATION`, sans exiger leur non-nullité (§V13) ; (C2) ajout de la fixture négative déterministe `TYPE_MISMATCH_DOMAIN_FIXTURE` (\(J_{\mathrm{TYPE\_MISMATCH}}=I_3\), \(J_{\mathrm{VALID\_MINUS}}=\mathrm{diag}(-1,1,1)\)) et de son contrôle de propagation par `active_cycle_loop_object_from_blocks` sur un cycle actif de niveau 0, `T5F10` couvrant désormais explicitement les deux échecs de domaine distincts (§V18) ; (C3) séparation de `T5_FLOW_EXECUTION_STATUS` (`NOT_EXECUTED`/`COMPLETED`/`BLOCKED`) et de `T5_FLOW_QUALIFICATION` (`NOT_EXECUTED`/`PASS`/`FAIL`, sans `BLOCKED`), `FAIL_DOMAIN` reclassé sous-type de `FAIL` (§V22) ; (C4) convention scalaire additive du datum modulaire déclarée explicitement (`K_ADDITIVE_SHIFT=NONE`, `TRACE_CENTERING_OF_K=FORBIDDEN`, §V12) ; (C5) convention de repère \(SU(2)\to SO(3)\) explicitée, \(R(F)_{ab}=\tfrac12\mathrm{Tr}[\sigma_aF\sigma_bF^\dagger]\) (§V7) ; (C6) table de câblage déterministe des tolérances vers les paramètres nommés de production (`fine_relational_hamiltonian`, `fine_relational_gibbs_state`, `modular_datum`, §V8). Les fixtures V3/V4/V5/V6/V7 numériques, les treize tolérances déjà préenregistrées, `CONDITIONING_ADMISSIBILITY_THRESHOLD=NONE`, le critère `T5F8`, les oracles négatifs d'arbre et de jauge pure, le pare-feu `T5_FLOW_PASS != T5_PASS`, et `MODEL1B_IMPLEMENTATION_ACCEPTED_HEAD=788337f4d383962947586084c342edcf395af234` restent inchangés. Aucune exécution confirmatoire, aucun gel de ce document dans ce lot.
+
+La prochaine étape autorisée est la revue finale à distance de ce plan de validation corrigé par ChatGPT.
