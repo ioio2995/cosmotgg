@@ -1,31 +1,54 @@
-# T5-FLOW — Critères proposés du flux relationnel inter-échelles modulaire
+# T5-FLOW — Critères du flux relationnel inter-échelles modulaire
 
-Statut : **PROPOSED_T5_MODULAR_CROSS_SCALE_FLOW_CRITERIA**
+Statut : **FROZEN_T5_MODULAR_CROSS_SCALE_FLOW_CRITERIA**
 
 ```text
-STATUS                         = PROPOSED_T5_MODULAR_CROSS_SCALE_FLOW_CRITERIA
-NOT_FROZEN                     = TRUE
+STATUS                         = FROZEN_T5_MODULAR_CROSS_SCALE_FLOW_CRITERIA
+NOT_FROZEN                     = FALSE
 
-T5_FLOW_CRITERIA_REVIEW        = CHATGPT_REVIEW_CORRECTIONS_INTEGRATED_PENDING_FINAL_REVIEW
+T5_FLOW_CRITERIA_REVIEW        = PASS
+T5_FLOW_CRITERIA_FREEZE        = FROZEN
+LIONEL_ORCIL_FREEZE_APPROVAL   = GRANTED
+SCIENTIFIC_CONTENT_HEAD        = 7d923bcfeb4cb2e9345a79ed9aec6f6433f08f01
+
 T5_FLOW_CONFIRMATORY_EXECUTION = NOT_AUTHORIZED
 T5_FLOW_QUALIFICATION          = NOT_EXECUTED
 T5_FULL_PASS_CRITERIA          = PREMATURE
 NEXT_TOY                       = NOT_AUTHORIZED
 MODEL1A_REOPEN                 = NOT_REQUIRED
 OPUS_ESCALATION                = NOT_REQUIRED
+
+FROZEN_DOCUMENT_MODIFICATION   = NEW_EXPLICIT_DECISION_REQUIRED_FOR_SEMANTIC_CHANGE
 ```
 
-Ce document définit le premier contrat normatif **PROPOSED** de la
-qualification intermédiaire `T5-FLOW` : un flux relationnel inter-échelles
-dérivé de l'état, déterministe. Il ne définit ni `T5 PASS`, ni géométrie
-continue, ni courbure, ni gravitation, ni nouveau toy, ni échelle physique.
+Ce document définit le contrat normatif **gelé** de la qualification
+intermédiaire `T5-FLOW` : un flux relationnel inter-échelles dérivé de
+l'état, déterministe. Il ne définit ni `T5 PASS`, ni géométrie continue,
+ni courbure, ni gravitation, ni nouveau toy, ni échelle physique.
 
 Il s'appuie sur `docs/model/hypothesis.md` (gelé, v0.2),
 `docs/model/tidal-relational-curvature-criteria.md` et
 `docs/model/t5-relational-refinement-boundary.md`, sans les modifier.
 
-Les critères ci-dessous ne sont gelés qu'après revue scientifique ChatGPT
-puis validation finale de Lionel ORCIL.
+Les critères ci-dessous sont gelés après revue scientifique finale
+ChatGPT (`PASS`, contenu scientifique de référence au commit
+`7d923bcfeb4cb2e9345a79ed9aec6f6433f08f01`) et validation explicite de
+Lionel ORCIL. Toute modification ultérieure de sens exige une nouvelle
+décision explicite (`docs/governance/documentation-governance.md` §7).
+
+Obligatoire :
+
+```text
+DOCUMENT_FREEZE != T5_FLOW_PASS
+DOCUMENT_FREEZE != T5_PASS
+DOCUMENT_FREEZE != CONTINUUM
+DOCUMENT_FREEZE != GEOMETRY
+DOCUMENT_FREEZE != CURVATURE
+DOCUMENT_FREEZE != GRAVITY
+```
+
+Le gel documentaire valide ce document comme contrat normatif de
+référence ; il ne valide pas `T5-FLOW` scientifiquement par exécution.
 
 ---
 
@@ -698,7 +721,7 @@ Restent `OPEN` après T5-FLOW :
 
 ## 20. Pare-feu confirmatoire
 
-Ce document est un contrat de critères uniquement.
+Ce document est un contrat de critères uniquement, désormais gelé.
 
 Obligatoire :
 
@@ -708,17 +731,21 @@ T5_FLOW_TOY_DESIGN              = NOT_AUTHORIZED
 T5_FLOW_VALIDATION_PLAN         = NOT_CREATED
 ```
 
-Après revue/gel de ce document, la séquence suivante s'applique :
+La séquence de gel est complète :
 
-1. revue des critères par ChatGPT ;
-2. acceptation par Lionel ORCIL ;
-3. gel documentaire ;
-4. seulement alors, conception du mécanisme minimal de qualification ;
+1. revue des critères par ChatGPT — `PASS` ;
+2. acceptation par Lionel ORCIL — accordée ;
+3. gel documentaire — effectué par ce lot.
+
+Restent à venir, sur mandat séparé :
+
+4. conception du mécanisme minimal de qualification ;
 5. plan de validation gelé avant exécution confirmatoire.
 
 Aucun résultat de qualification ne peut être importé des audits de
 faisabilité exploratoires précédents. Ces audits ont motivé les critères
-mais ne comptent pas comme preuve confirmatoire.
+mais ne comptent pas comme preuve confirmatoire ; le gel du présent
+document ne les requalifie pas.
 
 ---
 
@@ -726,7 +753,10 @@ mais ne comptent pas comme preuve confirmatoire.
 
 ```text
 T5_FLOW_CRITERIA_DOCUMENT      = docs/model/t5-modular-cross-scale-flow-criteria.md
-T5_FLOW_CRITERIA_STATUS        = PROPOSED_CORRECTED_PENDING_CHATGPT_REVIEW
+T5_FLOW_CRITERIA_STATUS        = FROZEN
+T5_FLOW_CRITERIA_FREEZE        = FROZEN
+T5_FLOW_CRITERIA_FINAL_REVIEW  = PASS
+SCIENTIFIC_CONTENT_HEAD        = 7d923bcfeb4cb2e9345a79ed9aec6f6433f08f01
 T5_FLOW_CONFIRMATORY_EXECUTION = NOT_AUTHORIZED
 T5_FLOW_QUALIFICATION          = NOT_EXECUTED
 
