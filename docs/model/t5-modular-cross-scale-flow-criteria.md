@@ -6,11 +6,13 @@ Statut : **PROPOSED_T5_MODULAR_CROSS_SCALE_FLOW_CRITERIA**
 STATUS                         = PROPOSED_T5_MODULAR_CROSS_SCALE_FLOW_CRITERIA
 NOT_FROZEN                     = TRUE
 
-T5_FLOW_CRITERIA_REVIEW        = PENDING_CHATGPT_REVIEW
+T5_FLOW_CRITERIA_REVIEW        = CHATGPT_REVIEW_CORRECTIONS_INTEGRATED_PENDING_FINAL_REVIEW
 T5_FLOW_CONFIRMATORY_EXECUTION = NOT_AUTHORIZED
+T5_FLOW_QUALIFICATION          = NOT_EXECUTED
 T5_FULL_PASS_CRITERIA          = PREMATURE
 NEXT_TOY                       = NOT_AUTHORIZED
 MODEL1A_REOPEN                 = NOT_REQUIRED
+OPUS_ESCALATION                = NOT_REQUIRED
 ```
 
 Ce document définit le premier contrat normatif **PROPOSED** de la
@@ -86,18 +88,54 @@ REFINEMENT_CATEGORY_SUBSTITUTION = EXPLICIT
 
 Aucune identification silencieuse des deux catégories n'est autorisée.
 
-La donnée d'échelle testée est définie comme :
+Typage des sites éliminés cumulés (utilisé par T5F3, §6) : relativement à
+un étiquetage de sites fins fixé une fois pour toutes, pour chaque niveau
+\(n\) on note \(E_n\) l'ensemble cumulé des sites déjà éliminés pour
+produire \(\rho_n\). Si \(n_1 \le n_2\) (niveau \(n_1\) plus grossier ou
+égal), alors \(E_{n_1} \supseteq E_{n_2}\). L'ensemble éliminé à une étape
+unique est :
+
+$$
+I_n = E_n \setminus E_{n+1},
+$$
+
+de sorte que \(\rho_n = \mathrm{Tr}_{I_n}[\rho_{n+1}]\) ci-dessus s'écrit de
+façon équivalente et bien typée :
+
+$$
+\rho_n = \mathrm{Tr}_{E_n \setminus E_{n+1}}[\rho_{n+1}].
+$$
+
+La donnée d'échelle canonique testée est définie comme :
 
 ```text
-FULL_MODULAR_SCALE_DATUM_n = complete support-resolved K_n.
+CANONICAL_SCALE_DATUM_n = K_n = -log(rho_n)
+```
+
+sur l'algèbre factorisée tensoriellement déclarée au niveau \(n\) (cf.
+T5F4, §7). Sa décomposition résolue en support complet constitue une
+représentation de bookkeeping et d'analyse du flux, notée :
+
+```text
+COMPLETE_REPRESENTATION_OF_K_n
+```
+
+Cette décomposition n'est pas une seconde donnée physique indépendante de
+\(K_n\). Aucun coefficient local particulier de cette décomposition (par
+exemple un unique coefficient de Pauli) n'est déclaré invariant de repère :
+chaque bloc se transforme selon sa représentation tensorielle sous
+unitaire local (T5F6, §9).
+
+```text
+FULL_MODULAR_STRUCTURE_AS_SCALE_DATUM = CURRENT_ROUTE_CANDIDATE
 ```
 
 Obligatoire :
 
 ```text
-FULL_MODULAR_SCALE_DATUM_IS_GEOMETRY   = NO
-FULL_MODULAR_SCALE_DATUM_IS_CONNECTION = NO
-FULL_MODULAR_SCALE_DATUM_IS_CURVATURE  = NO
+CANONICAL_SCALE_DATUM_IS_GEOMETRY   = NO
+CANONICAL_SCALE_DATUM_IS_CONNECTION = NO
+CANONICAL_SCALE_DATUM_IS_CURVATURE  = NO
 ```
 
 ---
@@ -175,11 +213,30 @@ sites ou de la profondeur de décimation.
 
 Critère : `T5F3_STATE_COMPOSITION`.
 
-Pour des éliminations emboîtées \(I_1,I_2\), requis :
+En utilisant les ensembles de sites cumulés \(E_n\) déclarés au §2,
+relatifs à un unique étiquetage de sites fins fixé, pour trois niveaux
+emboîtés \(n_0 \le n_1 \le n_2\) (donc \(E_{n_0} \supseteq E_{n_1}
+\supseteq E_{n_2}\)), requis :
 
 $$
-\mathrm{Tr}_{I_1}\big[\mathrm{Tr}_{I_2}(\rho)\big] = \mathrm{Tr}_{I_1\cup I_2}(\rho).
+\mathrm{Tr}_{E_{n_0}\setminus E_{n_1}}\Big[\mathrm{Tr}_{E_{n_1}\setminus E_{n_2}}(\rho_{n_2})\Big]
+=
+\mathrm{Tr}_{E_{n_0}\setminus E_{n_2}}(\rho_{n_2}).
 $$
+
+Cas particulier utile pour l'exigence multi-étapes (T5F11, §14), avec
+\(E_2=\varnothing\) au niveau fin de référence :
+
+$$
+\mathrm{Tr}_{E_0\setminus E_1}\big[\mathrm{Tr}_{E_1}(\rho_2)\big]
+=
+\mathrm{Tr}_{E_0}(\rho_2).
+$$
+
+Une notation équivalente par pas disjoints (\(I_{n_1}=E_{n_1}\setminus
+E_{n_2}\), \(I_{n_0}=E_{n_0}\setminus E_{n_1}\)) n'est admissible que si la
+condition de disjonction \(I_{n_0}\cap I_{n_1}=\varnothing\) est rendue
+explicite.
 
 Opérationnellement :
 
@@ -229,7 +286,8 @@ $$
 
 Critère : `T5F5_MODULAR_SUPPORT_COMPLETENESS`.
 
-La décomposition complète du support de \(K_n\) doit rester admissible.
+La décomposition complète du support de \(K_n\)
+(`COMPLETE_REPRESENTATION_OF_K_n`, cf. §2) doit rester admissible.
 
 Si la réduction engendre des termes à 3 corps, 4 corps, ..., N corps, ils
 sont conservés comme données effectives génuinement dérivées de l'état.
@@ -251,24 +309,72 @@ indépendamment. Elle ne doit jamais redéfinir le flux exact.
 
 Critère : `T5F6_LOCAL_FRAME_COVARIANCE`.
 
-Sous unitaire local :
+Au niveau fin, avant décimation, un unitaire local se factorise selon les
+facteurs survivants et éliminés :
 
 $$
-U = \bigotimes_i U_i,
+U_{\mathrm{fine}} = U_{\mathrm{surviving}} \otimes U_{\mathrm{eliminated}}.
 $$
 
-requis :
+Alors :
 
 $$
-\rho_n' = U \rho_n U^\dagger, \qquad K_n' = U K_n U^\dagger.
+\mathrm{Tr}_{I}\big[U_{\mathrm{fine}}\,\rho\,U_{\mathrm{fine}}^{\dagger}\big]
+=
+U_{\mathrm{surviving}}\,\mathrm{Tr}_{I}[\rho]\,U_{\mathrm{surviving}}^{\dagger}.
 $$
 
-Chaque bloc de support dérivé doit se transformer selon sa représentation
-tensorielle. Tout diagnostic directionnel de boucle fermée ne doit se
-transformer que par conjugaison au point de base.
+Les unitaires locaux agissant uniquement sur les facteurs tracés
+s'annulent sous la trace partielle.
 
-`PASS` requiert une vérification explicite de la covariance pour la
-construction de qualification déclarée.
+À chaque échelle \(n\), on définit :
+
+$$
+U_n = \bigotimes_i U_i^{(n)},
+$$
+
+produit tensoriel de changements de base locaux sur les facteurs
+survivants à l'échelle \(n\). Requis :
+
+$$
+\rho_n' = U_n \rho_n U_n^{\dagger}, \qquad K_n' = U_n K_n U_n^{\dagger}.
+$$
+
+Chaque bloc de support dérivé de \(K_n\) doit se transformer selon sa
+représentation tensorielle sous \(U_n\).
+
+Un objet de boucle fermée \(Q_{\mathrm{loop}}\) (holonomie, action
+projective, ou diagnostic directionnel analogue) se transforme par
+conjugaison au point de base :
+
+$$
+Q_{\mathrm{loop}}' = R_{\mathrm{base}}\, Q_{\mathrm{loop}}\, R_{\mathrm{base}}^{\mathsf T}.
+$$
+
+Il est donc :
+
+```text
+LOOP_OBJECT = GAUGE_COVARIANT_LOOP_OBJECT
+```
+
+et non une matrice invariante de jauge. Sont invariants de jauge :
+
+- ses données de classe de conjugaison ;
+- un diagnostic scalaire explicitement déclaré invariant par conjugaison ;
+- le verdict de platitude projective (T5F7, §10) ;
+- toute comparaison explicitement démontrée invariante sous conjugaison au
+  point de base (T5F8, §11).
+
+```text
+FLATNESS_VERDICT = GAUGE_INVARIANT
+```
+
+`PASS` requiert une vérification explicite de la covariance (annulation
+des unitaires purement éliminés sous trace partielle, transformation
+\(U_n\) de \(\rho_n\)/\(K_n\), transformation par conjugaison au point de
+base de tout objet de boucle) pour la construction de qualification
+déclarée. Aucune revendication de symétrie physique au-delà de cette
+covariance de repère local n'est faite.
 
 ---
 
@@ -284,9 +390,18 @@ FINE_PROJECTIVELY_FLAT -> COARSE_PROJECTIVELY_FLAT
 
 à chaque niveau de réduction défini.
 
-Utiliser exclusivement un diagnostic directionnel de boucle fermée
-invariant de jauge. Le `skew(J_ij)` brut d'une paire isolée n'est pas un
-verdict de platitude admissible.
+L'objet de boucle fermée lui-même est `GAUGE_COVARIANT`, pas invariant
+(T5F6, §9). Utiliser exclusivement un verdict de platitude dérivé de cet
+objet gauge-covariant par une donnée invariante par conjugaison au point
+de base (classe de conjugaison, ou diagnostic scalaire explicitement
+déclaré invariant) :
+
+```text
+FLATNESS_VERDICT = GAUGE_INVARIANT
+```
+
+Le `skew(J_ij)` brut d'une paire isolée n'est pas un verdict de platitude
+admissible.
 
 Aucune réciproque requise :
 
@@ -308,8 +423,16 @@ Critère : `T5F8_NONTRIVIAL_STATE_DERIVED_RUNNING`.
 - la même loi grossière d'état est utilisée ;
 - la même loi d'extraction est utilisée ;
 - aucune géométrie grossière cible n'est fournie ;
-- un diagnostic structurel relationnel invariant de jauge change entre au
-  moins deux niveaux finis.
+- un diagnostic structurel relationnel change entre au moins deux niveaux
+  finis, cette comparaison utilisant exclusivement des données invariantes
+  de jauge (classe de conjugaison, diagnostic scalaire explicitement
+  déclaré invariant) ou un alignement de covariance explicitement déclaré
+  (même conjugaison de base appliquée aux deux niveaux comparés) :
+
+```text
+RUNNING_COMPARISON = MUST_USE_GAUGE_INVARIANT_DATA
+                      OR_EXPLICIT_COVARIANT_ALIGNMENT
+```
 
 L'égalité exacte à échelle finie n'est pas requise. La variation doit être
 observée à force relationnelle finie non nulle. Un accord obtenu
@@ -403,16 +526,27 @@ Ceci établit une loi inter-échelles, pas un continuum.
 Ces oracles sont propres à la route courante. Ce ne sont pas des axiomes
 T5 universels.
 
+Oracles négatifs obligatoires de la route Gibbs courante :
+
 ```text
-GIBBS_ORACLE_1:
+GIBBS_NEGATIVE_ORACLE_1:
 TREE_DIRECTIONAL_RUNNING = ABSENT_FOR_DECLARED_GIBBS_TREE_FAMILY
 
-GIBBS_ORACLE_2:
+GIBBS_NEGATIVE_ORACLE_2:
 PURE_GAUGE_MULTISCALE_FLATNESS = REQUIRED
+```
 
-GIBBS_ORACLE_3:
+Le résultat sur cycle n'est pas un oracle négatif. Il est classé
+séparément comme candidat contextuel :
+
+```text
+GIBBS_CONTEXTUAL_CANDIDATE_1:
 CYCLE_CONTEXT_CAN_SUPPORT_DIRECTIONAL_RUNNING = YES_CANDIDATE
 ```
+
+`GIBBS_CONTEXTUAL_CANDIDATE_1` n'est pas une porte négative obligatoire
+indépendante. La variation non triviale dérivée de l'état requise pour
+T5-FLOW reste couverte par `T5F8` (§11).
 
 Pare-feu obligatoire :
 
@@ -519,8 +653,11 @@ T5F10
 T5F11
 ```
 
-Pour la route Gibbs courante, les oracles négatifs déclarés de la famille
-Gibbs doivent également passer.
+Pour la route Gibbs courante, `GIBBS_NEGATIVE_ORACLE_1` et
+`GIBBS_NEGATIVE_ORACLE_2` (§15) doivent également passer.
+`GIBBS_CONTEXTUAL_CANDIDATE_1` n'est pas une porte négative obligatoire ;
+la variation non triviale dérivée de l'état qu'il peut soutenir reste
+couverte par `T5F8`.
 
 La non-classicalité peut rester `OPEN` pour la qualification mathématique
 T5-FLOW. Mais tant qu'elle est `OPEN` :
@@ -589,8 +726,9 @@ mais ne comptent pas comme preuve confirmatoire.
 
 ```text
 T5_FLOW_CRITERIA_DOCUMENT      = docs/model/t5-modular-cross-scale-flow-criteria.md
-T5_FLOW_CRITERIA_STATUS        = PROPOSED_PENDING_CHATGPT_REVIEW
+T5_FLOW_CRITERIA_STATUS        = PROPOSED_CORRECTED_PENDING_CHATGPT_REVIEW
 T5_FLOW_CONFIRMATORY_EXECUTION = NOT_AUTHORIZED
+T5_FLOW_QUALIFICATION          = NOT_EXECUTED
 
 NEXT_TOY         = NOT_AUTHORIZED
 OPUS_ESCALATION  = NOT_REQUIRED
