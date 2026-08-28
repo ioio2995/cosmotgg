@@ -1,12 +1,22 @@
 # toy1b — Plan de validation proposé (qualification confirmatoire `T5-FLOW`)
 
-**Statut : `PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED`.**
+**Statut : `FROZEN_MODEL1B_T5_FLOW_VALIDATION_PLAN`.**
 
 ```text
-STATUS                 = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED
-NOT_FROZEN              = TRUE
-CHATGPT_REVIEW          = PENDING_FINAL_REVIEW
+STATUS                        = FROZEN_MODEL1B_T5_FLOW_VALIDATION_PLAN
+NOT_FROZEN                     = FALSE
+
+CHATGPT_REVIEW                 = PASS
+MODEL1B_VALIDATION_PLAN_REVIEW = PASS
+MODEL1B_VALIDATION_PLAN_FREEZE = FROZEN
+LIONEL_ORCIL_FREEZE_APPROVAL   = GRANTED
+SCIENTIFIC_CONTENT_HEAD        = d9c7474de8a747d0ada0685a06549dcdccfcb977
+
+FROZEN_DOCUMENT_MODIFICATION   = NEW_EXPLICIT_DECISION_REQUIRED_FOR_SEMANTIC_CHANGE
+READ_ONLY_DURING_CONFIRMATORY_EXECUTION = TRUE
+
 CONFIRMATORY_EXECUTION  = NOT_AUTHORIZED
+NOTEBOOK_CREATION        = NOT_AUTHORIZED
 
 MODEL1B_IMPLEMENTATION            = ACCEPTED
 MODEL1B_IMPLEMENTATION_ACCEPTED_HEAD = 788337f4d383962947586084c342edcf395af234
@@ -28,6 +38,21 @@ docs/toy-models/toy1b/implementation-design.md        (FROZEN_MODEL1B_T5_FLOW_DE
 
 Ce document n'exécute rien. Il ne contient aucun résultat, aucune sortie numérique, aucun verdict.
 
+Les critères ci-dessous sont gelés après revue scientifique finale ChatGPT (`PASS`, contenu scientifique de référence au commit `d9c7474de8a747d0ada0685a06549dcdccfcb977`) et validation explicite de Lionel ORCIL. Toute modification ultérieure de sens exige une nouvelle décision explicite (`docs/governance/documentation-governance.md` §7).
+
+Obligatoire :
+
+```text
+DOCUMENT_FREEZE != T5_FLOW_PASS
+DOCUMENT_FREEZE != T5_PASS
+DOCUMENT_FREEZE != CONTINUUM
+DOCUMENT_FREEZE != GEOMETRY
+DOCUMENT_FREEZE != CURVATURE
+DOCUMENT_FREEZE != GRAVITY
+```
+
+Le gel documentaire valide ce document comme contrat confirmatoire préenregistré de référence ; il ne valide ni `T5_FLOW_QUALIFICATION = PASS`, ni `T5 PASS`, ni par exécution, ni scientifiquement.
+
 ---
 
 ## 1. Identification
@@ -36,7 +61,7 @@ Ce document n'exécute rien. Il ne contient aucun résultat, aucune sortie numé
 TOY_ID   = toy1b
 MODEL_ID = model1b
 
-VALIDATION_PLAN_STATUS = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED
+VALIDATION_PLAN_STATUS = FROZEN_MODEL1B_T5_FLOW_VALIDATION_PLAN
 ```
 
 Une fois gelé, ce document devient `READ_ONLY_DURING_CONFIRMATORY_EXECUTION` (`docs/governance/documentation-governance.md` §11.4) : il ne peut plus être modifié en fonction des résultats observés.
@@ -1054,14 +1079,22 @@ Aucune valeur numérique de ce document n'est encore validée par exécution : e
 ## Statut et prochaine étape
 
 ```text
-MODEL1B_VALIDATION_PLAN_STATUS = PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED
-MODEL1B_VALIDATION_PLAN_FREEZE = NOT_FROZEN
-CHATGPT_REVIEW                  = PENDING_FINAL_REVIEW
+MODEL1B_VALIDATION_PLAN_STATUS = FROZEN_MODEL1B_T5_FLOW_VALIDATION_PLAN
+MODEL1B_VALIDATION_PLAN_REVIEW = PASS
+MODEL1B_VALIDATION_PLAN_FREEZE = FROZEN
+LIONEL_ORCIL_FREEZE_APPROVAL   = GRANTED
+SCIENTIFIC_CONTENT_HEAD        = d9c7474de8a747d0ada0685a06549dcdccfcb977
 CONFIRMATORY_EXECUTION          = NOT_AUTHORIZED
-T5_FLOW_QUALIFICATION           = NOT_EXECUTED
-T5                               = OPEN_NOT_EXECUTED
+NOTEBOOK_CREATION                = NOT_AUTHORIZED
+T5_FLOW_EXECUTION_STATUS         = NOT_EXECUTED
+T5_FLOW_QUALIFICATION            = NOT_EXECUTED
+T5                                = OPEN_NOT_EXECUTED
 ```
 
-Corrections apportées par le lot `MODEL1B-T5-FLOW-VALIDATION-PLAN-CORRECTION-1`, à la suite de la revue ChatGPT `REVISION_REQUIRED` : (C1) `T5F5` recentré sur la seule complétude du support canonique et l'absence de substitution d'une troncature par paire, `H_{\ge3}(K_1)`/`H_{\ge3}(K_0)`/`R_pair(1)`/`R_pair(0)` rapportés à titre d'observation via la classification informative `PAIR_TRUNCATION_FLOW_OBSERVATION`, sans exiger leur non-nullité (§V13) ; (C2) ajout de la fixture négative déterministe `TYPE_MISMATCH_DOMAIN_FIXTURE` (\(J_{\mathrm{TYPE\_MISMATCH}}=I_3\), \(J_{\mathrm{VALID\_MINUS}}=\mathrm{diag}(-1,1,1)\)) et de son contrôle de propagation par `active_cycle_loop_object_from_blocks` sur un cycle actif de niveau 0, `T5F10` couvrant désormais explicitement les deux échecs de domaine distincts (§V18) ; (C3) séparation de `T5_FLOW_EXECUTION_STATUS` (`NOT_EXECUTED`/`COMPLETED`/`BLOCKED`) et de `T5_FLOW_QUALIFICATION` (`NOT_EXECUTED`/`PASS`/`FAIL`, sans `BLOCKED`), `FAIL_DOMAIN` reclassé sous-type de `FAIL` (§V22) ; (C4) convention scalaire additive du datum modulaire déclarée explicitement (`K_ADDITIVE_SHIFT=NONE`, `TRACE_CENTERING_OF_K=FORBIDDEN`, §V12) ; (C5) convention de repère \(SU(2)\to SO(3)\) explicitée, \(R(F)_{ab}=\tfrac12\mathrm{Tr}[\sigma_aF\sigma_bF^\dagger]\) (§V7) ; (C6) table de câblage déterministe des tolérances vers les paramètres nommés de production (`fine_relational_hamiltonian`, `fine_relational_gibbs_state`, `modular_datum`, §V8). Les fixtures V3/V4/V5/V6/V7 numériques, les treize tolérances déjà préenregistrées, `CONDITIONING_ADMISSIBILITY_THRESHOLD=NONE`, le critère `T5F8`, les oracles négatifs d'arbre et de jauge pure, le pare-feu `T5_FLOW_PASS != T5_PASS`, et `MODEL1B_IMPLEMENTATION_ACCEPTED_HEAD=788337f4d383962947586084c342edcf395af234` restent inchangés. Aucune exécution confirmatoire, aucun gel de ce document dans ce lot.
+Corrections apportées par le lot `MODEL1B-T5-FLOW-VALIDATION-PLAN-CORRECTION-1`, à la suite de la revue ChatGPT `REVISION_REQUIRED` : (C1) `T5F5` recentré sur la seule complétude du support canonique et l'absence de substitution d'une troncature par paire, `H_{\ge3}(K_1)`/`H_{\ge3}(K_0)`/`R_pair(1)`/`R_pair(0)` rapportés à titre d'observation via la classification informative `PAIR_TRUNCATION_FLOW_OBSERVATION`, sans exiger leur non-nullité (§V13) ; (C2) ajout de la fixture négative déterministe `TYPE_MISMATCH_DOMAIN_FIXTURE` (\(J_{\mathrm{TYPE\_MISMATCH}}=I_3\), \(J_{\mathrm{VALID\_MINUS}}=\mathrm{diag}(-1,1,1)\)) et de son contrôle de propagation par `active_cycle_loop_object_from_blocks` sur un cycle actif de niveau 0, `T5F10` couvrant désormais explicitement les deux échecs de domaine distincts (§V18) ; (C3) séparation de `T5_FLOW_EXECUTION_STATUS` (`NOT_EXECUTED`/`COMPLETED`/`BLOCKED`) et de `T5_FLOW_QUALIFICATION` (`NOT_EXECUTED`/`PASS`/`FAIL`, sans `BLOCKED`), `FAIL_DOMAIN` reclassé sous-type de `FAIL` (§V22) ; (C4) convention scalaire additive du datum modulaire déclarée explicitement (`K_ADDITIVE_SHIFT=NONE`, `TRACE_CENTERING_OF_K=FORBIDDEN`, §V12) ; (C5) convention de repère \(SU(2)\to SO(3)\) explicitée, \(R(F)_{ab}=\tfrac12\mathrm{Tr}[\sigma_aF\sigma_bF^\dagger]\) (§V7) ; (C6) table de câblage déterministe des tolérances vers les paramètres nommés de production (`fine_relational_hamiltonian`, `fine_relational_gibbs_state`, `modular_datum`, §V8). Les fixtures V3/V4/V5/V6/V7 numériques, `TYPE_MISMATCH_DOMAIN_FIXTURE`, les treize tolérances déjà préenregistrées, `CONDITIONING_ADMISSIBILITY_THRESHOLD=NONE`, le critère `T5F8`, les oracles négatifs d'arbre et de jauge pure, le pare-feu `T5_FLOW_PASS != T5_PASS`, et `MODEL1B_IMPLEMENTATION_ACCEPTED_HEAD=788337f4d383962947586084c342edcf395af234` restent inchangés.
 
-La prochaine étape autorisée est la revue finale à distance de ce plan de validation corrigé par ChatGPT.
+Gel documentaire (`PROPOSED_MODEL1B_T5_FLOW_VALIDATION_PLAN_CORRECTED` → `FROZEN_MODEL1B_T5_FLOW_VALIDATION_PLAN`) effectué par le lot `MODEL1B-T5-FLOW-VALIDATION-PLAN-FREEZE-1`, suite à la revue scientifique finale ChatGPT (`PASS`, contenu scientifique de référence au commit `d9c7474de8a747d0ada0685a06549dcdccfcb977`) et à l'approbation explicite de Lionel ORCIL. Transition de statut et de métadonnées uniquement : toutes les fixtures (V3–V7, `TYPE_MISMATCH_DOMAIN_FIXTURE`), les treize tolérances, le câblage des tolérances, la convention scalaire additive de \(K\), la convention de repère \(SU(2)\to SO(3)\), `T5F1`–`T5F11`, `T5F5` recentré, `T5F10` à deux branches, les oracles négatifs, `T5F8`, et l'algèbre de statut (`T5_FLOW_EXECUTION_STATUS`/`T5_FLOW_QUALIFICATION`) restent inchangés dans leur contenu. Ce document devient `READ_ONLY_DURING_CONFIRMATORY_EXECUTION` (`docs/governance/documentation-governance.md` §11.4).
+
+Le gel valide le protocole confirmatoire comme contrat préenregistré ; il ne valide ni `T5_FLOW_QUALIFICATION = PASS`, ni `T5 PASS`, ni continuum, ni géométrie, ni courbure, ni gravité. Aucun lot suivant n'est autorisé par ce gel : la création et l'exécution confirmatoire de `experiments/toy1b/toy1b.ipynb` requièrent un mandat distinct.
+
+La prochaine étape autorisée est l'autorisation explicite, sur mandat distinct, de la création et de l'exécution confirmatoire du notebook `toy1b`.
