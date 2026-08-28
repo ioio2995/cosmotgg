@@ -5,10 +5,11 @@
 ```text
 STATUS                 = PROPOSED_MODEL1B_T5_FLOW_DESIGN
 NOT_FROZEN              = TRUE
-CHATGPT_REVIEW          = PENDING
+CHATGPT_REVIEW          = CORRECTIONS_INTEGRATED_PENDING_FINAL_REVIEW
 IMPLEMENTATION          = NOT_AUTHORIZED
 CONFIRMATORY_EXECUTION  = NOT_AUTHORIZED
 VALIDATION_PLAN         = NOT_CREATED
+T5_FLOW_QUALIFICATION   = NOT_EXECUTED
 ```
 
 Ce document décrit l'architecture logicielle cible minimale de `model1b`, sur la base de `docs/toy-models/toy1b/specification.md` et de `docs/governance/software-architecture-governance.md`.
@@ -61,11 +62,23 @@ Incorpore un opérateur fini sur des facteurs tensoriels déclarés arbitraires,
 
 Justification `core` : cette opération ne code aucune identité de modèle, aucune constante nommée, aucune topologie particulière ; elle généralise le motif déjà répété indépendamment dans `model0e/states.py` (`_embed`) et `model1a/states.py` (`_embed_ab`/`_embed_bc`/`_embed_cd`/`_embed_da`), et est requise ici pour incorporer \(S_e(M_e)\) sur chacune des huit arêtes fines de \(\Gamma_2\) (spécification §5, §8), avec en particulier une arête (\(DA\)) dont l'ordre tensoriel naturel diffère de l'ordre global, comme déjà rencontré pour `model1a` (`docs/toy-models/toy1a/specification.md` §6–§7).
 
+**Sémantique d'ordre de `positions`.** Pour `embed_operator(operator, dimensions, positions)`, l'ordre de `positions` est l'ordre des facteurs tensoriels de `operator` lui-même. Exemple : `operator_DA` agit sur \(\mathcal H_D \otimes \mathcal H_A\), donc `positions=(D, A)` signifie que le premier facteur local de `operator_DA` appartient à \(D\) et le second à \(A\). L'implémentation doit ensuite permuter explicitement le résultat vers l'ordre tensoriel global canonique.
+
+```text
+POSITIONS_ORDER                                = OPERATOR_TENSOR_FACTOR_ORDER
+GLOBAL_PLACEMENT                               = EXPLICIT_PERMUTATION_TO_CANONICAL_GLOBAL_ORDER
+POSITIONS_SORTING_WITHOUT_OPERATOR_PERMUTATION = FORBIDDEN
+```
+
+Aucun tri implicite de l'ordre sémantique des sous-systèmes. Ceci est en particulier obligatoire pour l'arête \(DA\).
+
 ### 3.2 `cosmotgg.core.modular.hermitian_exp`
 
 Exponentielle spectrale d'une matrice hermitienne finie, sans dépendance `scipy`, préservant l'hermiticité.
 
 Justification `core` : requise pour \(\rho_2 = \exp(H_{\mathrm{rel}})/\mathrm{Tr}[\exp(H_{\mathrm{rel}})]\) (spécification §8), avec \(H_{\mathrm{rel}}\) hermitien et fini. Distincte de `hermitian_log`/`_hermitian_power` déjà présents dans `cosmotgg.core.modular` (exposant réel spectral, pas d'exponentielle) et de `_modular_unitary` (exponentielle du produit \(i \times \text{hermitien} \times s\), pas de l'hermitien lui-même) : aucune primitive existante ne couvre `exp(H)` pour \(H\) hermitien fini. Générique, indépendante de toute construction `model1b`.
+
+`hermitian_exp` reste un candidat `core` générique et n'implémente aucun décalage spectral par elle-même : le décalage \(H_{\mathrm{shifted}} = H_{\mathrm{rel}} - \lambda_{\max} I\) de stabilité numérique (spécification §8, identité exacte sous normalisation) appartient à la construction de l'état de Gibbs propre à `model1b` (`states.py`, §6 ci-dessous), pas à la primitive `core` elle-même.
 
 Aucune infrastructure générique supplémentaire n'est introduite au seul motif de l'abstraction.
 
@@ -149,9 +162,9 @@ MODEL1B_PRODUCTION_IMPORTS_PRIOR_MODELS = NO
 
 Responsabilité scientifique strictement bornée à la spécification §5, §8 :
 
-- \(S_e(M_e) = 4\,P_e(M_e) - I_e\) sur les huit arêtes fines déclarées de \(\Gamma_2\), en utilisant `embed_operator` (§3.1) pour l'incorporation sur les facteurs tensoriels déclarés ;
+- \(S_e(M_e) = 4\,P_e(M_e) - I_e\) sur les huit arêtes fines déclarées de \(\Gamma_2\), en utilisant `embed_operator` (§3.1) pour l'incorporation sur les facteurs tensoriels déclarés ; pour l'arête \(DA\), `positions=(D, A)` (ordre tensoriel de \(S_{DA}(M_{DA})\)) puis permutation explicite du résultat vers l'ordre tensoriel global canonique (§3.1) — aucun tri implicite ;
 - construction déterministe du graphe fin (huit sites \((A,X,Y,B,C,P,Q,D)\), huit arêtes `AX,XY,YB,BC,CP,PQ,QD,DA`) ;
-- état de Gibbs relationnel fin \(\rho_2 = \exp(H_{\mathrm{rel}})/\mathrm{Tr}[\exp(H_{\mathrm{rel}})]\), \(H_{\mathrm{rel}} = \sum_e \theta_e S_e(M_e)\), via `hermitian_exp` (§3.2).
+- état de Gibbs relationnel fin \(\rho_2 = \exp(H_{\mathrm{rel}})/\mathrm{Tr}[\exp(H_{\mathrm{rel}})]\), \(H_{\mathrm{rel}} = \sum_e \theta_e S_e(M_e)\), calculé via la construction numériquement stable \(H_{\mathrm{shifted}} = H_{\mathrm{rel}} - \lambda_{\max} I\) puis `hermitian_exp` (§3.2, spécification §8, identité exacte sous normalisation).
 
 Ce module ne construit aucune réduction, aucune donnée modulaire, aucun diagnostic directionnel.
 
@@ -188,7 +201,8 @@ Ce module ne construit aucun facteur polaire directionnel, aucun objet de boucle
 Responsabilité scientifique strictement bornée à la spécification §12–§14, §18, §20 :
 
 - facteur polaire directionnel fail-closed \(\mathrm{DIRECTIONAL\_FACTOR}(J) = O\) pour \(J \in GL(3,\mathbb R)\), `UNDEFINED` si \(J\) singulier, sans pseudo-inverse ni réparation (§12) ;
-- objet de boucle du cycle actif \(Q_n\) (§13) ;
+- vérification de typage \(\mathbb Z_2\) de route pour chaque facteur directionnel d'arête active, \(\det(O_{i\leftarrow j})=-1\) attendu ; `TYPE_MISMATCH_FAIL_CLOSED` si \(\det(O)=+1\), sans réparation ni inversion de signe insérée à la main (§12) ;
+- objet de boucle du cycle actif \(Q_n\), conséquence de domaine \(Q_n\in SO(3)\) pour tout cycle actif à nombre pair d'arêtes dont tous les facteurs sont typés/définis, `UNDEFINED_TYPE_MISMATCH` sinon (§13) ;
 - diagnostic de platitude \(d_{\mathrm{flat}}(Q_n)\) et scalaire de classe de conjugaison \(\chi_n\) (§14) ;
 - comparaison inter-échelles \(\Delta\chi(n,m)\) (§14) ;
 - diagnostic relatif d'arbre \(D_{\mathrm{tree}} = O_{\mathrm{path}}^{\mathsf T}\,O_{\mathrm{coarse}}\) (§18).
@@ -201,10 +215,14 @@ Ce module n'importe ni `model0a`–`model0e`, ni `model1a`.
 
 ```text
 CANONICAL_DATUM        = FULL_K_n
-LOOP_DIAGNOSTIC         = GAUGE_COVARIANT (Q_n) ; verdicts invariants (d_flat, chi_n)
+LOOP_DIAGNOSTIC         = GAUGE_COVARIANT (Q_n) ; verdicts invariants (d_flat, chi_n) ;
+                          UNDEFINED_TYPE_MISMATCH si un facteur d'arête active est
+                          TYPE_MISMATCH_FAIL_CLOSED ou singulier (spécification §12-§13)
 TREE_ORACLE             = D_tree = O_path^T O_coarse, verdict D_tree = I
 PURE_GAUGE_ORACLE        = MANDATORY_NEGATIVE_ORACLE (spécification §16)
-FAIL_CLOSED_DOMAIN       = DIRECTIONAL_FACTOR UNDEFINED on singular J (spécification §12, §19)
+FAIL_CLOSED_DOMAIN       = DIRECTIONAL_FACTOR UNDEFINED on singular J (spécification §12, §19) ;
+                          TYPE_MISMATCH_FAIL_CLOSED on det(O)=+1 for an active
+                          relational edge (spécification §12)
 ```
 
 Aucun seuil scientifique n'est fixé par ce document ; les tolérances numériques d'un futur protocole restent `OPEN` (spécification §24).
@@ -229,6 +247,7 @@ Aucun seuil scientifique n'est fixé par ce document ; les tolérances numériqu
 - covariance de \(J\) ;
 - comportement de domaine exact de la décomposition polaire ;
 - \(J\) singulier fail-closed ;
+- typage \(\mathbb Z_2\) fail-closed (\(\det(O)=-1\) attendu sur arête active ; \(\det(O)=+1\) rejeté `TYPE_MISMATCH_FAIL_CLOSED`, sans réparation) ;
 - covariance de \(Q_n\) ;
 - invariance par conjugaison de \(d_{\mathrm{flat}}\)/\(\chi_n\) ;
 - direction non définie à relation nulle.
@@ -297,8 +316,11 @@ T5_FLOW_QUALIFICATION                  = NOT_EXECUTED
 
 ```text
 MODEL1B_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_MODEL1B_T5_FLOW_DESIGN
+MODEL1B_DESIGN_CORRECTION             = Z2_DIRECTIONAL_TYPE_DOMAIN_AND_STABILITY_CLARIFICATIONS
 MODEL1B_IMPLEMENTATION                = NOT_AUTHORIZED
 MODEL1B_CONFIRMATORY_QUALIFICATION    = NOT_AUTHORIZED
 ```
 
-La prochaine étape autorisée est la revue à distance de ce design par ChatGPT.
+Corrections apportées par le lot `MODEL1B-T5-FLOW-DESIGN-CORRECTION-1` : sémantique d'ordre explicite de `positions` pour `embed_operator` (ordre des facteurs tensoriels de l'opérande, permutation explicite obligatoire vers l'ordre global canonique, en particulier pour `DA`, §3.1, §6) ; `hermitian_exp` réaffirmé comme candidat `core` générique, décalage spectral de stabilité `H_shifted = H_rel - lambda_max I` explicitement propre à la construction de Gibbs `model1b` (§3.2, §6) ; contrôle de typage \(\mathbb Z_2\) fail-closed du facteur directionnel d'arête active et diagnostic `UNDEFINED_TYPE_MISMATCH` du cycle (§9–§10, tests §11). Aucun changement de code, aucune promotion `core` exécutée, aucune fixture ni tolérance numérique introduite.
+
+La prochaine étape autorisée est la revue finale à distance de ce design corrigé par ChatGPT.

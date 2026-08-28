@@ -5,10 +5,11 @@
 ```text
 STATUS                 = PROPOSED_MODEL1B_T5_FLOW_DESIGN
 NOT_FROZEN              = TRUE
-CHATGPT_REVIEW          = PENDING
+CHATGPT_REVIEW          = CORRECTIONS_INTEGRATED_PENDING_FINAL_REVIEW
 IMPLEMENTATION          = NOT_AUTHORIZED
 CONFIRMATORY_EXECUTION  = NOT_AUTHORIZED
 VALIDATION_PLAN         = NOT_CREATED
+T5_FLOW_QUALIFICATION   = NOT_EXECUTED
 ```
 
 Ce document définit `model1b`, construction candidate du toy `toy1b`.
@@ -310,6 +311,33 @@ $$
 
 par construction.
 
+### Construction numériquement stable
+
+La construction suivante est, sous normalisation, mathématiquement identique à la définition ci-dessus :
+
+$$
+\lambda_{\max} = \text{plus grande valeur propre de } H_{\mathrm{rel}},
+$$
+
+$$
+H_{\mathrm{shifted}} = H_{\mathrm{rel}} - \lambda_{\max}\, I,
+$$
+
+$$
+\rho_2 = \frac{\exp(H_{\mathrm{shifted}})}{\mathrm{Tr}[\exp(H_{\mathrm{shifted}})]}.
+$$
+
+```text
+COMMON_SPECTRAL_SHIFT_UNDER_NORMALIZATION = EXACT_IDENTITY
+
+GIBBS_SPECTRAL_SHIFT                             = NUMERICAL_STABILITY_ONLY
+GIBBS_SPECTRAL_SHIFT_IS_REGULARIZATION           = NO
+GIBBS_SPECTRAL_SHIFT_IS_PHYSICAL_RENORMALIZATION = NO
+GIBBS_SPECTRAL_SHIFT_IS_FREE_PARAMETER           = NO
+```
+
+Aucun écrêtage. Aucune pseudo-inverse. Aucun décalage arbitraire.
+
 Les états grossiers \(\rho_1\) et \(\rho_0\) sont UNIQUEMENT des traces partielles de \(\rho_2\).
 
 Interdit :
@@ -469,6 +497,30 @@ Le conditionnement numérique doit être rapporté séparément de l'existence m
 
 Un futur plan de validation pourra préenregistrer un seuil d'admissibilité de conditionnement si nécessaire.
 
+### Typage \(\mathbb Z_2\) directionnel de route
+
+Toute arête relationnelle active utilisée par `toy1b` appartient au secteur \(\mathbb Z_2\) impair/transposition de la route déclarée (`docs/model/t5-relational-refinement-boundary.md` §3). Ceci impose, en sus de la décomposition polaire ci-dessus, l'exigence de typage suivante pour \(O_{i\leftarrow j}\) :
+
+$$
+\det(O_{i\leftarrow j}) = -1.
+$$
+
+```text
+ACTIVE_RELATIONAL_EDGE_DIRECTIONAL_TYPE = O_MINUS_3
+```
+
+Si un \(J\) par ailleurs inversible produit \(\det(O) = +1\) :
+
+```text
+DIRECTIONAL_RELATIONAL_TYPE = TYPE_MISMATCH_FAIL_CLOSED
+```
+
+et aucun diagnostic de boucle ne peut être construit depuis ce facteur.
+
+Aucune réparation. Aucune inversion de signe insérée à la main. Aucun ajustement d'orientation.
+
+Ceci ne modifie pas la science \(\mathbb Z_2\) gelée de `docs/model/t5-relational-refinement-boundary.md` §3.
+
 ---
 
 ## 13. Objet de boucle du cycle actif
@@ -495,6 +547,24 @@ Le point de base est toujours \(A\).
 
 Le nombre de facteurs varie selon le cycle actif, mais la loi d'extraction ne varie pas.
 
+Chaque cycle actif déclaré compte un nombre pair d'arêtes (huit à l'échelle fine, six ou quatre après décimation, §6), et chaque facteur \(O_{v_k\leftarrow v_{k+1}}\) satisfait \(\det(O)=-1\) sur le domaine typé (§12). Il s'ensuit :
+
+$$
+\det(Q_n) = (-1)^{m} = +1,
+$$
+
+pour un cycle actif à \(m\) arêtes, \(m\) pair. \(Q_n\) étant de plus un produit d'éléments de \(O(3)\), ceci est une conséquence de domaine explicite, pas un contrôle numérique séparé :
+
+```text
+Q_n IN SO(3) = EXPLICIT_DOMAIN_CONSEQUENCE
+```
+
+Si un facteur \(O_{i\leftarrow j}\) requis pour \(Q_n\) est `TYPE_MISMATCH_FAIL_CLOSED` (§12) ou `UNDEFINED` (facteur singulier, §12) :
+
+```text
+LOOP_DIAGNOSTIC = UNDEFINED_TYPE_MISMATCH
+```
+
 Sous changement de repère local :
 
 $$
@@ -513,7 +583,7 @@ et non gauge-invariant.
 
 ## 14. Diagnostics de boucle invariants de jauge
 
-Chaque cycle actif ayant une longueur paire, la route admissible déclarée attend \(Q_n \in SO(3)\) lorsque tous les facteurs d'arête sont définis avec l'orientation voulue.
+Chaque cycle actif ayant une longueur paire et chaque facteur d'arête actif étant typé \(\det(O)=-1\) (§12), \(Q_n \in SO(3)\) est une conséquence de domaine explicite (§13) lorsque tous les facteurs d'arête requis sont définis. Si l'un d'eux est `TYPE_MISMATCH_FAIL_CLOSED` ou `UNDEFINED`, alors `LOOP_DIAGNOSTIC = UNDEFINED_TYPE_MISMATCH` (§13) et les diagnostics ci-dessous ne sont pas construits.
 
 Définir le diagnostic de platitude projective :
 
@@ -531,7 +601,7 @@ $$
 \chi_n = \frac{\mathrm{Tr}(Q_n) - 1}{2}.
 $$
 
-Pour \(Q_n \in SO(3)\) : \(\chi_n = \cos(\phi_n)\), invariant de jauge.
+Pour \(Q_n \in SO(3)\) : \(\chi_n = \cos(\phi_n)\), invariant de jauge. Ce scalaire n'est utilisé que sur le domaine \(SO(3)\) déclaré (§13) ; si \(Q_n\) est `UNDEFINED_TYPE_MISMATCH`, \(\chi_n\) n'est pas défini.
 
 Définir la comparaison de variation inter-échelles finie :
 
@@ -803,13 +873,15 @@ Pour chaque critère, mécanisme/statut avant exécution/condition d'échec :
 | T5F2 | \(E_2/E_1/E_0\) fixés (§6), sélection déterministe | `NOT_EXECUTED` | sélection non déclarée avant exécution |
 | T5F3 | Composition de traces partielles, §15 | `SATISFIED_BY_CONSTRUCTION` | violation numérique de l'identité algébrique (bug) |
 | T5F4 | \(K_n = -\log(\rho_n)\), §9 | `NOT_EXECUTED` | \(\rho_n\) non fidèle ; \(K_n\) cible indépendant |
-| T5F5 | Support de Pauli complet conservé, §10 | `NOT_EXECUTED` | troncature de poids ≤2 utilisée comme flux exact |
+| T5F5 | Support de Pauli complet conservé, §10 | `NOT_EXECUTED` | tout secteur de support généré silencieusement écarté ; décomposition de support ne reconstruisant pas le \(K_n\) complet ; troncature par paire substituée à la donnée canonique ; projection de poids ≤2 utilisée comme flux exact |
 | T5F6 | Covariance de repère local, §20 | `NOT_EXECUTED` | échec de covariance de \(\rho_n\)/\(K_n\)/\(J\)/\(O\)/\(Q_n\) |
 | T5F7 | Platitude de jauge pure, §16 | `NOT_EXECUTED` | \(Q_n \neq I_3\) pour une famille de jauge pure déclarée |
 | T5F8 | Variation non triviale, §17 | `NOT_EXECUTED` | \(\Delta\chi = 0\) pour toute paire de niveaux à force finie non nulle |
-| T5F9 | Préenregistrement avant mesure, §18–19 (renvoi) | `NOT_EXECUTED` | loi modifiée après observation d'un résidu |
+| T5F9 | Préenregistrement avant mesure, §22 (renvoi) | `NOT_EXECUTED` | loi modifiée après observation d'un résidu |
 | T5F10 | Fermeture sur échec, §12, §19 | `NOT_EXECUTED` | pseudo-inverse, réparation epsilon, ou orientation arbitraire retournée |
 | T5F11 | \(\rho_2\to\rho_1\to\rho_0\) plus contrôle direct, §6, §15 | `SATISFIED_BY_CONSTRUCTION` | contrôle direct non implémenté ou divergent |
+
+Pour `T5F5`, aucun secteur à \(N\) corps particulier n'est requis non nul par définition : la génération effectivement observée reste une preuve de qualification, pas un axiome imposé a priori.
 
 ---
 
@@ -917,9 +989,12 @@ Exclu du contenu scientifique : `features/cosmotgg-early-universe-note.md` (`EXP
 ```text
 MODEL1B_SPECIFICATION_STATUS = PROPOSED_MODEL1B_T5_FLOW_DESIGN
 MODEL1B_DESIGN                = AUTHORIZED
+MODEL1B_DESIGN_CORRECTION     = Z2_DIRECTIONAL_TYPE_DOMAIN_AND_STABILITY_CLARIFICATIONS
 MODEL1B_IMPLEMENTATION         = NOT_AUTHORIZED
 MODEL1B_CONFIRMATORY_QUALIFICATION = NOT_AUTHORIZED
 MODEL1A_REOPEN                 = NO
 ```
 
-La prochaine étape autorisée est la revue à distance de ce design par ChatGPT.
+Corrections apportées par le lot `MODEL1B-T5-FLOW-DESIGN-CORRECTION-1` : typage \(\mathbb Z_2\) directionnel de route pour toute arête relationnelle active (\(\det(O_{i\leftarrow j})=-1\), `TYPE_MISMATCH_FAIL_CLOSED` sur \(\det(O)=+1\), §12), avec conséquence de domaine explicite \(Q_n\in SO(3)\) pour tout cycle actif à nombre pair d'arêtes et diagnostic `UNDEFINED_TYPE_MISMATCH` en cas de facteur non typé/singulier (§13–§14) ; construction de Gibbs numériquement stable par décalage spectral commun, identité exacte sous normalisation, sans régularisation ni paramètre libre (§8) ; correction de renvoi `T5F9` vers §22 (§21) ; complétude de la condition d'échec `T5F5` (secteur écarté, reconstruction incomplète, troncature substituée, projection de poids ≤2 utilisée comme flux exact) sans exiger qu'un secteur à \(N\) corps particulier soit non nul par définition (§21). Aucun changement à `T5F1`–`T5F11` gelés, à la hiérarchie \(8\to6\to4\), ni au sens mathématique de la famille de Gibbs.
+
+La prochaine étape autorisée est la revue finale à distance de ce design corrigé par ChatGPT.
