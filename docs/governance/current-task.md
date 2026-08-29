@@ -2209,6 +2209,51 @@ NEXT_TOY            = NOT_AUTHORIZED
 
 Aucun lot suivant n'est autorisé par ce lot.
 
+Le lot `T5A-CONTROLLED-CROSS-SCALE-LIMIT-CRITERIA-DRAFT-1` (rôle
+`docs`) a créé le premier document versionné des critères candidats
+`T5a`, `docs/model/t5a-controlled-cross-scale-limit-criteria.md`
+(`PROPOSED_T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA`, `NOT_FROZEN`),
+à partir de la frontière `T5` gelée, de
+`T5A-CONTROLLED-CROSS-SCALE-LIMIT-CRITERIA-DESIGN-1`, de
+`T5A-CRITERIA-TARGETED-CORRECTION-1` et de l'arbitrage scientifique
+final de ChatGPT : définition de `T5A` et de son pare-feu de sens ;
+critères `T5A1`–`T5A8` (indice de raffinement et direction de limite ;
+architecture de comparaison cross-level à deux routes
+`COMMON_TARGET_ROUTE`/`TRANSITION_MAP_ROUTE` ; famille générative
+contrôlée avec route conditionnelle `E4*`/`E7*` ; classe d'objet
+limite/espace/convergence à classe primaire unique ; classe de preuve
+d'établissement de la limite `A`/`B`/`B'` avec exclusion de la pure
+régression numérique finie ; non-trivialité et séparation des nulls
+sans marge numérique universelle ; invariance du verdict sous
+indexation/normalisation ; préenregistrement cross-scale et
+fail-closed avec `P_CORE` universel et `P_NUM` conditionnel) ; critères
+conditionnels `T5A-C1`–`T5A-C6` ; algèbre de qualification
+`PASS`/`FAIL`/`NOT_EXECUTED` ; neuf classes d'oracles négatifs
+`N1`–`N9` ; pare-feu faux-positifs `F1`–`F10` explicitement associé aux
+critères ; frontière `T5a`/`T5b` ; statut du toy
+(`T5A_CRITERIA_BOUNDARY = SUFFICIENTLY_CHARACTERIZED_FOR_DOCUMENTARY_DRAFT`,
+`NEXT_TOY_SCIENTIFICALLY_DESIGNABLE = PREMATURE`,
+`UNBLOCKING_CONDITION` explicite). Sans modifier
+`docs/model/t5-full-pass-boundary-feasibility.md` (gelé) ni aucun
+autre document scientifique existant, sans déclarer `T5A_PASS` ni
+`T5_PASS`, sans autoriser de nouveau toy ni de nouveau modèle.
+
+```text
+T5_FULL_PASS_BOUNDARY = FROZEN
+
+T5A_CRITERIA_DOCUMENT = docs/model/t5a-controlled-cross-scale-limit-criteria.md
+T5A_CRITERIA_STATUS   = PROPOSED_NOT_FROZEN
+
+CURRENT_LOT                = NONE
+PHASE                      = T5A_CRITERIA_DRAFT_PENDING_CHATGPT_FINAL_REVIEW
+PROCHAINE_ACTION_AUTORISEE = CHATGPT_FINAL_REVIEW_OF_T5A_CRITERIA_DRAFT
+
+NEXT_MODEL = NOT_AUTHORIZED
+NEXT_TOY   = NOT_AUTHORIZED
+```
+
+Aucun lot suivant n'est autorisé par ce lot.
+
 ---
 
 ## Mémoire de session
