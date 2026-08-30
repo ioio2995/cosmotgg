@@ -2385,6 +2385,45 @@ NEXT_TOY   = NOT_AUTHORIZED
 
 Aucun lot suivant n'est autorisé par ce lot.
 
+Le lot `MODEL1C-T5A-BELL-REFINEMENT-DESIGN-1` (rôle `docs`) a créé, en un seul lot pré-implémentation, la spécification scientifique proposée et la conception d'implémentation de `model1c` (`docs/toy-models/toy1c/specification.md`, `docs/toy-models/toy1c/implementation-design.md`), transformant en contrat explicite la famille analytique de raffinement Bell retenue comme premier candidat concret débloquant `NEXT_TOY_SCIENTIFICALLY_DESIGNABLE = PREMATURE` (`docs/model/t5a-controlled-cross-scale-limit-criteria.md` §15) :
+
+```text
+MODEL1C_CLASS = T5A_CONTROLLED_CROSS_SCALE_LIMIT_CANDIDATE
+
+MODEL1C_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+
+T5_FLOW_QUALIFICATION = PASS
+T5A_PASS              = NOT_ESTABLISHED
+T5_PASS               = NOT_ESTABLISHED
+
+IMPLEMENTATION   = NOT_AUTHORIZED
+VALIDATION_PLAN  = NOT_AUTHORIZED
+NEXT_MODEL       = NOT_AUTHORIZED
+```
+
+`model1c` déclare une famille de raffinement binaire `Lambda=N`, `N_n=2^n` cellules de dimension locale 4 (`H_c = C^2 tensor C^2`), une règle locale unique `R_cell(rho) = U(rho tensor alpha)U^dagger` (ancilla fixe `alpha=diag(5/8,1/8,1/8,1/8)`, unitaire contrôlé de Pauli `U = sum_g g tensor |g><g|` sur `G_BELL={II,XX,ZZ,YY}`), dérive analytiquement sa carte réduite `Phi = Tr_new[R_cell(.)]` sous forme fermée `Phi = 1/2 Id + 1/2 P_BELL` (`P_BELL` idempotent), une route `COMMON_TARGET_ROUTE` avec extraction canonique `I_n` le long de la branche `c_n=0^n` dans `X_*=D(H_c)`, et démontre analytiquement (preuve incluse dans `specification.md` §10, sans test numérique) le lemme de fermeture `I_{n+1} o G_n = Phi o I_n` (`T5A-C3 = REDUCED_PARAMETRIZATION_CLOSURE`, activé). Preuve de limite `EVIDENCE_CLASS = A_ANALYTIC_LIMIT_PROOF` / `NUMERICAL_ROLE = NONE` : `sigma_n -> sigma_infinity = 1/4[I + 1/4 XX]` pour le seed canonique `sigma_0 = 1/4[I + 1/4 XX + 1/4 XI]` (spectre `{1/8,1/4,1/4,3/8}`), séparation de la classe triviale par le séparateur `C_XX(sigma) = <XX> - <XI><IX>` (`C_XX(sigma_infinity)=1/4`), seed nul `sigma_0_null -> I/4` (classe triviale), et contrôle anti-comparison-collapse analytique via une famille admissible à un paramètre `sigma_0(kappa)` englobant les deux seeds déjà fermés (`kappa=1/4` vif, `kappa=0` nul). `PRIMARY_CLAIM_CLASS = L2_STATE_OBSERVABLE_LIMIT` uniquement ; aucune revendication L3/L4/continuum/localité/métrique/courbure/gravité/non-classicalité/temps relationnel/générateur continu. `implementation-design.md` borne l'extraction canonique à une itération de `Phi` sur une seule cellule (licite par le lemme de fermeture démontré, sans jamais construire l'espace global `H_n`), réserve une construction multi-cellules explicite à des contrôles corroboratifs de fermeture structurelle strictement bornés (`n=0->1`, éventuellement `1->2`), et confine la forme fermée de `Phi`/`Phi^n` à un rôle d'oracle analytique indépendant, jamais appelé en production. Sans modifier `docs/model/t5a-controlled-cross-scale-limit-criteria.md` (gelé), `docs/model/t5-full-pass-boundary-feasibility.md` (gelé), `docs/model/t5-modular-cross-scale-flow-criteria.md`, `docs/model/hypothesis.md`, `docs/toy-models/toy1a/**`, `docs/toy-models/toy1b/**`, `experiments/`, `src/`, `tests/` ni `docs/governance/agents/**`, sans déclarer `T5A_PASS` ni `T5_PASS`, sans autoriser d'implémentation, de plan de validation ni de modèle suivant.
+
+```text
+MODEL1C_SPECIFICATION_STATUS         = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL1C_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+
+T5A_PASS = NOT_ESTABLISHED
+T5_PASS  = NOT_ESTABLISHED
+
+IMPLEMENTATION   = NOT_AUTHORIZED
+VALIDATION_PLAN  = NOT_AUTHORIZED
+NEXT_MODEL       = NOT_AUTHORIZED
+
+CURRENT_LOT                = NONE
+PHASE                      = MODEL1C_DESIGN_PENDING_CHATGPT_REVIEW
+PROCHAINE_ACTION_AUTORISEE = CHATGPT_REVIEW_OF_MODEL1C_T5A_BELL_REFINEMENT_DESIGN
+
+NEXT_MODEL = NOT_AUTHORIZED
+NEXT_TOY   = NOT_AUTHORIZED
+```
+
+Aucun lot suivant n'est autorisé par ce lot.
+
 ---
 
 ## Mémoire de session
