@@ -1,14 +1,21 @@
 # T5a — Critères candidats de limite cross-scale contrôlée
 
-Statut : **proposé, non gelé**
+Statut : **gelé**
 
 ```text
-STATUS = PROPOSED_T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA
+STATUS = FROZEN_T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA
 
-NOT_FROZEN       = TRUE
+NOT_FROZEN       = FALSE
 
-CHATGPT_T5A_TARGETED_CORRECTION_REVIEW = PASS
-CHATGPT_DRAFT_FINAL_REVIEW             = PENDING
+CHATGPT_T5A_TARGETED_CORRECTION_REVIEW  = PASS
+CHATGPT_DRAFT_FINAL_REVIEW              = PASS
+CHATGPT_T5A_CRITERIA_DRAFT_FINAL_REVIEW = PASS
+
+T5A_CRITERIA_FREEZE              = FROZEN
+LIONEL_ORCIL_T5A_FREEZE_APPROVAL = GRANTED
+SCIENTIFIC_CONTENT_HEAD          = 7eb2622d9b9ef7ac9bd57751016f09e840e00acf
+
+FROZEN_DOCUMENT_MODIFICATION = NEW_EXPLICIT_DECISION_REQUIRED_FOR_SEMANTIC_CHANGE
 
 T5_FLOW_QUALIFICATION = PASS
 
@@ -19,6 +26,40 @@ T5_PASS                = NOT_ESTABLISHED
 NEXT_TOY   = NOT_AUTHORIZED
 NEXT_MODEL = NOT_AUTHORIZED
 ```
+
+Obligatoire :
+
+```text
+DOCUMENT_FREEZE != T5A_PASS
+DOCUMENT_FREEZE != T5_PASS
+
+T5A_CRITERIA_FROZEN != T5A_EXECUTED
+T5A_CRITERIA_FROZEN != T5A_PASS
+
+T5A_CRITERIA_FROZEN != CONTINUUM
+T5A_CRITERIA_FROZEN != LOCALITY
+T5A_CRITERIA_FROZEN != GEOMETRY
+T5A_CRITERIA_FROZEN != CURVATURE
+T5A_CRITERIA_FROZEN != GRAVITY
+
+T5A_PASS != T5_PASS
+T5A_PASS != T5B_PASS
+
+T5A_PASS != CONTINUUM
+T5A_PASS != LOCALITY
+T5A_PASS != GEOMETRY
+T5A_PASS != CURVATURE
+T5A_PASS != GRAVITY
+
+T5A_PASS != PHYSICAL_SCALE
+T5A_PASS != LOCAL_GENERATOR
+T5A_PASS != AUTONOMOUS_REDUCED_FLOW
+```
+
+Le gel documentaire valide ce document comme référence `FROZEN` des
+critères candidats `T5a` ; il ne valide pas leur exécution sur un
+candidat concret et ne transforme aucun résultat en continuum,
+localité, géométrie, courbure ni gravité.
 
 ---
 
@@ -967,7 +1008,18 @@ UNBLOCKING_CONDITION =
 ## 16. Statut final
 
 ```text
-T5A_CRITERIA = PROPOSED_NOT_FROZEN
+T5A_CRITERIA_DOCUMENT = docs/model/t5a-controlled-cross-scale-limit-criteria.md
+T5A_CRITERIA_STATUS   = FROZEN_T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA
+T5A_CRITERIA_FREEZE   = FROZEN
+NOT_FROZEN            = FALSE
+
+CHATGPT_T5A_TARGETED_CORRECTION_REVIEW  = PASS
+CHATGPT_DRAFT_FINAL_REVIEW              = PASS
+CHATGPT_T5A_CRITERIA_DRAFT_FINAL_REVIEW = PASS
+LIONEL_ORCIL_T5A_FREEZE_APPROVAL        = GRANTED
+SCIENTIFIC_CONTENT_HEAD                 = 7eb2622d9b9ef7ac9bd57751016f09e840e00acf
+
+FROZEN_DOCUMENT_MODIFICATION = NEW_EXPLICIT_DECISION_REQUIRED_FOR_SEMANTIC_CHANGE
 
 T5A_PASS = NOT_ESTABLISHED
 T5_PASS  = NOT_ESTABLISHED
@@ -986,8 +1038,15 @@ Ce document ne modifie pas `docs/model/hypothesis.md`, ne modifie pas
 aucun fichier de `docs/toy-models/**`, `experiments/`, `src/` ni
 `tests/`.
 
-Les critères présentés restent `PROPOSED` / `NOT_FROZEN`. Toute
-fermeture ultérieure de statut (`VALIDATED_FOR_FREEZE`, `FROZEN`)
-exige une revue finale ChatGPT explicite suivie de l'approbation de
-Lionel ORCIL, conformément à
+Le gel documentaire valide les critères candidats `T5a` tels que
+rédigés (`T5A1`–`T5A8`, `T5A-C1`–`T5A-C6`) comme document de référence
+`FROZEN` ; il ne déclare aucun `T5A_PASS` ni `T5_PASS`, n'exécute ces
+critères sur aucun candidat, et ne rend pas le prochain toy
+scientifiquement concevable
+(`NEXT_TOY_SCIENTIFICALLY_DESIGNABLE = PREMATURE`, §15). Le prochain
+travail scientifique autorisable après ce gel est
+`T5A_CANDIDATE_LIMIT_FAMILY_FEASIBILITY`, non `NEW_TOY_DESIGN`, et
+requiert un mandat scientifique distinct explicite. Toute modification
+ultérieure de sens de ce document exige une nouvelle décision
+explicite, conformément à
 `docs/governance/documentation-governance.md` §7.

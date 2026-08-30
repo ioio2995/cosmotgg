@@ -2327,6 +2327,64 @@ NEXT_TOY   = NOT_AUTHORIZED
 
 Aucun lot suivant n'est autorisé par ce lot.
 
+Le lot `T5A-CONTROLLED-CROSS-SCALE-LIMIT-CRITERIA-FREEZE-1` (rôle
+`docs`) a effectué le gel documentaire
+(`PROPOSED_T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA` →
+`FROZEN_T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA`) de
+`docs/model/t5a-controlled-cross-scale-limit-criteria.md`, suite à la
+revue finale ChatGPT (`CHATGPT_T5A_CRITERIA_DRAFT_FINAL_REVIEW = PASS`)
+et à l'approbation explicite de Lionel ORCIL
+(`LIONEL_ORCIL_T5A_FREEZE_APPROVAL = GRANTED`) : bloc de métadonnées
+d'en-tête et pare-feu de gel (`DOCUMENT_FREEZE != T5A_PASS/T5_PASS`,
+`T5A_CRITERIA_FROZEN != T5A_EXECUTED/T5A_PASS/CONTINUUM/LOCALITY/
+GEOMETRY/CURVATURE/GRAVITY`) ajoutés, et §16 « Statut final »
+réécrit en section de statut de gel (transition de statut,
+empreinte `SCIENTIFIC_CONTENT_HEAD = 7eb2622d9b9ef7ac9bd57751016f09e840e00acf`)
+uniquement modifiés ; corps scientifique (§0–§15 : définition de
+`T5a`, critères `T5A1`–`T5A8`, critères conditionnels `T5A-C1`–
+`T5A-C6`, algèbre de qualification, neuf oracles négatifs `N1`–`N9`
+avec clarification `D3` de `N9`, dix pare-feux faux-positifs `F1`–
+`F10`, frontière `T5a`/`T5b`, corrections `D1`–`D4`, et statut de
+faisabilité de conception du toy
+`T5A_CRITERIA_BOUNDARY = SUFFICIENTLY_CHARACTERIZED_FOR_DOCUMENTARY_DRAFT`
+/ `NEXT_TOY_SCIENTIFICALLY_DESIGNABLE = PREMATURE`) laissé
+byte-for-byte inchangé. Sans modifier
+`docs/model/t5-full-pass-boundary-feasibility.md` (gelé),
+`docs/model/t5-modular-cross-scale-flow-criteria.md`,
+`docs/model/t5-relational-refinement-boundary.md`,
+`docs/model/hypothesis.md`,
+`docs/model/tidal-relational-curvature-criteria.md`,
+`docs/toy-models/**`, `experiments/`, `src/`, `tests/` ni
+`docs/governance/agents/**`, sans déclarer `T5A_PASS` ni `T5_PASS`,
+sans autoriser de nouveau toy ni de nouveau modèle.
+
+```text
+CHATGPT_T5A_TARGETED_CORRECTION_REVIEW  = PASS
+CHATGPT_T5A_CRITERIA_DRAFT_FINAL_REVIEW = PASS
+LIONEL_ORCIL_T5A_FREEZE_APPROVAL        = GRANTED
+
+T5A_CRITERIA_FREEZE                  = FROZEN
+T5A_CRITERIA_STATUS                  = FROZEN_T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA
+T5A_CRITERIA_SCIENTIFIC_CONTENT_HEAD = 7eb2622d9b9ef7ac9bd57751016f09e840e00acf
+
+T5_FULL_PASS_BOUNDARY = FROZEN
+T5_FLOW_QUALIFICATION = PASS
+
+T5A_PASS = NOT_ESTABLISHED
+T5_PASS  = NOT_ESTABLISHED
+
+NEXT_TOY_SCIENTIFICALLY_DESIGNABLE = PREMATURE
+
+CURRENT_LOT                = NONE
+PHASE                      = T5A_CANDIDATE_LIMIT_FAMILY_FEASIBILITY_PENDING_EXPLICIT_AUTHORIZATION
+PROCHAINE_ACTION_AUTORISEE = NONE — toute recherche d'une famille limite candidate requiert un mandat scientifique distinct
+
+NEXT_MODEL = NOT_AUTHORIZED
+NEXT_TOY   = NOT_AUTHORIZED
+```
+
+Aucun lot suivant n'est autorisé par ce lot.
+
 ---
 
 ## Mémoire de session
