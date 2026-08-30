@@ -2254,6 +2254,79 @@ NEXT_TOY   = NOT_AUTHORIZED
 
 Aucun lot suivant n'est autorisé par ce lot.
 
+Le lot `T5A-CRITERIA-DRAFT-CORRECTION-1` (rôle `docs`) a appliqué à
+`docs/model/t5a-controlled-cross-scale-limit-criteria.md` les quatre
+corrections documentaires ciblées arbitrées par ChatGPT
+(`T5A-CRITERIA-TARGETED-CORRECTION-1`, contre-expertise `physic`
+`READ_ONLY` bornée) : `D1` (bien-définition de la classe triviale `T`
+sous route `HAUSDORFF_SPACE`/`EQUIVALENCE_OR_QUOTIENT`,
+`TRIVIAL_CLASS_WELL_DEFINEDNESS`, saturation exigée sous équivalence
+déclarée dans `T5A4`/`T5A6`, interdiction du verdict
+`REPRESENTATIVE_DEPENDENT_T5A6_VERDICT`) ; `D2` (non-héritage
+automatique de la non-trivialité par un résultat dérivé dans `T5A4`,
+`DERIVED_RESULT_NONTRIVIALITY = NOT_AUTOMATICALLY_INHERITED`, exigence
+d'une classe triviale dérivée propre ou d'une preuve de préservation de
+la non-trivialité) ; `D3` (clarification de `N9 COMPARISON_COLLAPSE` en
+trois situations discriminées, rejet conjoint `T5A2`+`T5A6` du cas de
+valeur forcée indépendante de l'état présentée comme non triviale,
+sans exigence globale d'injectivité de l'application de comparaison,
+sans nouvelle porte `T5A`, `L5_DIAGNOSTIC_ROUTE` préservée admissible)
+; `D4` (suppression de la formulation ambiguë « load-bearing »,
+vocabulaire `NUMERICAL_ROLE = NONE | CORROBORATIVE |
+SUPPORTING_SUBCLAIM` dans `T5A5`/`T5A8`, `P_NUM` activé dès que le
+numérique fait partie du dossier de qualification quel que soit son
+rôle, champs `FIT_WINDOW`/`SIGNAL_FLOOR`/`D_MIN` rendus explicitement
+conditionnels, `EVIDENCE_CLASS = A | B | B'` et
+`PURE_FINITE_NUMERICAL_REGRESSION => T5A_PASS = FORBIDDEN` préservés).
+Les cinq corrections déjà validées (`T5F3_ESTABLISHES`/
+`T5F3_DOES_NOT_ESTABLISH`, `PROJECTIVE_STATE_FAMILY`,
+`HELD_OUT_LEVEL_PREDICTIVITY` conditionnel,
+`RELATIONAL_STRENGTH_BOUNDED_AWAY_FROM_ZERO` retirée du noyau
+universel, `P_CORE`/`P_NUM` + `PRIMARY_CLAIM_CLASS`/
+`CLASS_PROMOTION_WITHOUT_REQUALIFICATION`) sont restées inchangées.
+`T5A1`–`T5A8` et `T5A-C1`–`T5A-C6` sont intégralement préservés. Sans
+modifier `docs/model/t5-full-pass-boundary-feasibility.md` (gelé),
+`docs/model/t5-modular-cross-scale-flow-criteria.md`,
+`docs/model/t5-relational-refinement-boundary.md`,
+`docs/model/hypothesis.md`,
+`docs/model/tidal-relational-curvature-criteria.md`,
+`docs/toy-models/**`, `experiments/`, `src/`, `tests/` ni
+`docs/governance/agents/**`, sans geler les critères `T5a`, sans
+déclarer `T5A_PASS` ni `T5_PASS`, sans créer de toy ni de modèle.
+
+Note de séquence (audit de provenance, pas un rejet scientifique du
+brouillon) : le brouillon existait déjà au commit
+`a5f56d63914e1e6b3ca3566ef015c0326c37ea61`, antérieur au commit
+initialement visé par le mandat `physic` ciblé
+(`b6fc1ca239a54c41b8005287e4d062ba36d308bb`, mandat `STRICT_READ_ONLY`
+sur lequel le rôle `physic` n'a écrit, commité ni poussé aucun
+fichier). La régularisation documentaire ci-dessus intervient donc
+après la revue scientifique ciblée effective, et non avant.
+
+```text
+DRAFT_CREATION_HEAD     = a5f56d63914e1e6b3ca3566ef015c0326c37ea61
+DRAFT_CREATION_SEQUENCE = EXISTED_BEFORE_TARGETED_PHYSIC_REVIEW_COMPLETION
+
+PHYSIC_TARGETED_REVIEW      = READ_ONLY_PASS
+SCIENTIFIC_REGULARIZATION   = ACCEPTED_WITH_TARGETED_DOCUMENTARY_CORRECTIONS
+
+T5_FULL_PASS_BOUNDARY = FROZEN
+
+T5A_CRITERIA_DOCUMENT = docs/model/t5a-controlled-cross-scale-limit-criteria.md
+T5A_CRITERIA_STATUS   = PROPOSED_NOT_FROZEN
+
+T5A_TARGETED_CORRECTION_REVIEW = PASS
+
+CURRENT_LOT                = NONE
+PHASE                      = T5A_CRITERIA_CORRECTED_DRAFT_PENDING_CHATGPT_FINAL_REVIEW
+PROCHAINE_ACTION_AUTORISEE = CHATGPT_FINAL_REVIEW_OF_CORRECTED_T5A_CRITERIA_DRAFT
+
+NEXT_MODEL = NOT_AUTHORIZED
+NEXT_TOY   = NOT_AUTHORIZED
+```
+
+Aucun lot suivant n'est autorisé par ce lot.
+
 ---
 
 ## Mémoire de session

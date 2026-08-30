@@ -6,7 +6,9 @@ Statut : **proposé, non gelé**
 STATUS = PROPOSED_T5A_CONTROLLED_CROSS_SCALE_LIMIT_CRITERIA
 
 NOT_FROZEN       = TRUE
-CHATGPT_REVIEW   = PENDING_FINAL_REVIEW
+
+CHATGPT_T5A_TARGETED_CORRECTION_REVIEW = PASS
+CHATGPT_DRAFT_FINAL_REVIEW             = PENDING
 
 T5_FLOW_QUALIFICATION = PASS
 
@@ -313,6 +315,27 @@ Espace :
 * convergence notion explicitly declared.
 ```
 
+Route de l'espace limite et définissabilité de la classe triviale `T`
+(voir aussi `T5A6`) :
+
+```text
+LIMIT_SPACE_ROUTE = HAUSDORFF_SPACE
+    -> T est définie comme classe triviale dans X.
+
+LIMIT_SPACE_ROUTE = EQUIVALENCE_OR_QUOTIENT
+    -> T doit être :
+       - soit définie directement comme sous-ensemble/classe du
+         quotient ;
+       - soit saturée relativement à la relation d'équivalence
+         déclarée.
+```
+
+```text
+TRIVIAL_CLASS_WELL_DEFINEDNESS =
+    if quotient/equivalence is used,
+    triviality must be representative-independent.
+```
+
 La convergence set-valued / omega-limit peut être utilisée lorsque
 explicitement revendiquée.
 
@@ -324,6 +347,31 @@ Des résultats dérivés plus faibles peuvent être rapportés **ssi** :
 * the result inherits the evidence class ;
 * it is labelled DERIVED.
 ```
+
+```text
+DERIVED_RESULT_CONVERGENCE    = MAY_BE_INHERITED_WITH_LIMIT_PRESERVING_MAP
+DERIVED_RESULT_EVIDENCE_CLASS = MAY_BE_INHERITED
+DERIVED_RESULT_NONTRIVIALITY  = NOT_AUTOMATICALLY_INHERITED
+```
+
+Pour déclarer un résultat dérivé non trivial, exiger l'une des deux
+conditions suivantes :
+
+```text
+EITHER
+    une classe triviale T_derived propre à la classe dérivée, avec
+    la séparation T5A6 correspondante ;
+
+OR
+    une preuve explicite que l'application dérivante préserve la
+    non-trivialité relativement aux classes triviales déclarées.
+```
+
+```text
+PRIMARY_CLASS_NONTRIVIALITY => DERIVED_CLASS_NONTRIVIALITY
+```
+
+sans l'une de ces deux preuves est interdit.
 
 ```text
 CLASS_PROMOTION_WITHOUT_REQUALIFICATION = FORBIDDEN
@@ -385,9 +433,20 @@ SMALL_SUCCESSIVE_DIFFERENCE != CONVERGENCE
 LAST_TWO_LEVELS_AGREE != LIMIT
 ```
 
-Le numérique peut réfuter ou corroborer A/B/B', ou vérifier des
-constantes/hypothèses utilisées par une borne dérivée, mais ne peut
-seul établir la queue infinie.
+Rôle du numérique dans le dossier de qualification (voir aussi
+`T5A8`, `P_NUM`) :
+
+```text
+NUMERICAL_ROLE = NONE | CORROBORATIVE | SUPPORTING_SUBCLAIM
+```
+
+Quel que soit `NUMERICAL_ROLE`, la preuve de l'existence de la limite
+reste obligatoirement de classe `EVIDENCE_CLASS = A | B | B'` : le
+numérique ne peut seul établir la queue infinie. Il peut réfuter ou
+corroborer A/B/B', ou vérifier des constantes/hypothèses utilisées par
+une borne dérivée, qu'il soit purement corroboratif ou porteur d'un
+sous-claim nécessaire à A/B/B'. Une preuve purement analytique sans
+donnée numérique porte `NUMERICAL_ROLE = NONE`.
 
 ---
 
@@ -458,6 +517,20 @@ a structurally forced null must land in T, the live family must not.
 NT4 :
 finite-size plateau / numerical-floor exclusion is activated only
 when numerics is used.
+```
+
+Lorsque `LIMIT_SPACE_ROUTE = EQUIVALENCE_OR_QUOTIENT` (`T5A4`) :
+
+```text
+TRIVIAL_CLASS_SATURATION_REQUIRED_UNDER_DECLARED_EQUIVALENCE = TRUE
+
+NONTRIVIALITY_SEPARATION_SPACE = DECLARED_QUOTIENT_SPACE
+```
+
+Interdit :
+
+```text
+REPRESENTATIVE_DEPENDENT_T5A6_VERDICT = TRUE
 ```
 
 Retiré du noyau universel :
@@ -538,19 +611,39 @@ SOURCE = T5C1, T5C3, T5C4, T5C6, T5C7, T5C8
 11. domain/fail-closed rules.
 ```
 
-`P_NUM` — activé uniquement si le numérique est porteur (`load-bearing`) :
+`P_NUM` — préenregistrement numérique conditionnel (voir aussi
+`T5A5`, `NUMERICAL_ROLE`) :
+
+```text
+P_NUM s'active dès que des résultats numériques font partie du
+dossier de qualification, qu'ils soient :
+
+* NUMERICAL_ROLE = CORROBORATIVE ;
+* ou NUMERICAL_ROLE = SUPPORTING_SUBCLAIM (porteurs d'un sous-claim
+  nécessaire à EVIDENCE_CLASS A/B/B').
+```
+
+Seuls les champs applicables doivent être exigés :
 
 ```text
 * computed finite level set ;
 * precision/uncertainty protocol ;
-* signal floor where applicable ;
-* d_min ;
+* FIT_WINDOW  = REQUIRED_IF_FIT_USED ;
+* SIGNAL_FLOOR = REQUIRED_IF_SIGNAL_FLOOR_APPLICABLE ;
+* D_MIN        = REQUIRED_IF_FINITE_NUMERICAL_INFERENCE_USED ;
 * asymptotic law/parameter count/window if fitted ;
 * level rejection rules ;
 * numerical tolerances/thresholds.
 ```
 
-Fail-closed en cas d'ambiguïté sur le caractère porteur du numérique.
+```text
+NUMERICAL_ROLE = NONE => aucun P_NUM artificiel.
+```
+
+Une preuve purement analytique sans donnée numérique porte
+`NUMERICAL_ROLE = NONE` et ne doit avoir aucun `P_NUM` artificiel.
+
+Fail-closed en cas d'ambiguïté sur le rôle du numérique.
 
 Une preuve analytique NE DOIT PAS échouer parce qu'un paramètre
 numérique non applicable est absent.
@@ -729,10 +822,39 @@ N8 INVARIANT_ONLY_CONVERGENCE
 
 N9 COMPARISON_COLLAPSE
     -> discrimine un effondrement de l'architecture de comparaison
-       (loi de comparaison définie à partir des valeurs observées,
-       retuning caché) confondu avec une architecture de comparaison
-       admissible.
+       confondu avec une architecture de comparaison admissible. Ce
+       cas recouvre trois situations à distinguer :
+
+       1. comparaison construite à partir des valeurs observées ;
+       2. retuning caché ;
+       3. architecture qui force le PRIMARY_CLAIM_OBJECT vers une
+          valeur indépendante de l'état/relation pertinente, puis
+          présente cette convergence forcée comme non triviale.
+
+       Le cas 3 est rejeté conjointement par T5A2 (architecture de
+       comparaison) et T5A6 (non-trivialité et séparation des nulls) :
+       une valeur forcée indépendamment de l'état appartient à la
+       classe triviale déclarée.
 ```
+
+Clarification sur la dégénérescence de l'application de comparaison :
+
+```text
+GLOBAL_COMPARISON_MAP_INJECTIVITY        != REQUIRED
+INFORMATION_PRESERVING_FULL_STRUCTURE_MAP != REQUIRED
+
+DECLARED_REDUCTIVE_PROJECTION = ALLOWED
+
+STRUCTURALLY_FORCED_STATE_INDEPENDENT_LIMIT => CLAIMED_AS_NONTRIVIAL = FAIL
+
+L5_DIAGNOSTIC_ROUTE = ADMISSIBLE
+```
+
+Une projection volontairement réductrice reste admissible si la
+revendication est explicitement bornée à sa `PRIMARY_CLAIM_CLASS`
+déclarée (`T5A4`). Cette clarification ne crée aucune nouvelle porte
+`T5A` : elle précise la discrimination opérée par `N9` et son
+articulation avec `T5A2`/`T5A6`.
 
 ---
 
