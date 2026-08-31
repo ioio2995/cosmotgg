@@ -14,7 +14,10 @@ MODEL_ID = model1c
 
 MODEL1C_CLASS = T5A_CONTROLLED_CROSS_SCALE_LIMIT_CANDIDATE
 
-MODEL1C_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL1C_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_FINAL_REVIEW
+
+CHATGPT_MODEL1C_INITIAL_DESIGN_REVIEW = REVISION_REQUIRED
+MODEL1C_TARGETED_CORRECTIONS          = C1_C2_C3_C4_C5_INTEGRATED
 
 T5_FLOW_QUALIFICATION = PASS
 T5A_PASS              = NOT_ESTABLISHED
@@ -221,7 +224,21 @@ R_{\mathrm{cell}}(\rho) = \sum_{g \in G_{\mathrm{BELL}}} p_g\, (g\rho g^\dagger)
 \qquad p_{II}=\tfrac58,\ p_{XX}=p_{ZZ}=p_{YY}=\tfrac18.
 $$
 
-`R_cell` est CPTP au niveau de la réduction de la première cellule : les opérateurs de Kraus \(K_g = \sqrt{p_g}\, g \otimes |g\rangle\) satisfont \(\sum_g K_g^\dagger K_g = \sum_g p_g\, g^\dagger g \otimes 1 = \big(\sum_g p_g\big) I = I\) puisque chaque `g` est unitaire (\(g^\dagger g = I\)) et \(\sum_g p_g = 1\).
+`R_cell` est CPTP. Chaque opérateur de Kraus \(K_g = \sqrt{p_g}\,(g\otimes|g\rangle) : H_c \to H_c\otimes H_c\) (dimension \(4\to16\)) vérifie, avec \(\langle g|g\rangle=1\) (normalisation de la base) :
+
+$$
+K_g^\dagger K_g = p_g\, g^\dagger\,\langle g|g\rangle\,g = p_g\, g^\dagger g = p_g\, I_{H_c}
+$$
+
+(opérateur sur \(H_c\) uniquement, aucun facteur tensoriel résiduel), puisque `g` est unitaire (\(g^\dagger g = I_{H_c}\)). Donc :
+
+$$
+\sum_{g} K_g^\dagger K_g = \Big(\sum_g p_g\Big) I_{H_c} = I_{H_c},
+$$
+
+puisque \(\sum_g p_g = 1\). Ceci établit que `R_cell` est CPTP.
+
+Équivalent, sans expliciter les Kraus : \(\rho \mapsto \rho\otimes\alpha\) est CPTP (`alpha` fixe, état valide), et la conjugaison par l'unitaire `U` est CPTP ; `R_cell` est la composée de ces deux applications CPTP, donc CPTP.
 
 `R_cell` produit un état joint sur **deux** cellules filles (dimension \(4\times4=16\)) : la cellule « système » (premier facteur, dite cellule `0`) et la cellule « nouvelle »/ancilla (second facteur, dite cellule `1`).
 
@@ -507,19 +524,49 @@ NUMERICAL_ROLE  = NONE
 
 Aucun fit, plateau ou extrapolation numérique n'intervient dans cette preuve. Les tests numériques futurs (implémentation, §22) seront uniquement `CORROBORATIVE_IMPLEMENTATION_CHECKS`, ne faisant pas partie de la preuve `T5a`.
 
+```text
+IMPLEMENTATION_CORROBORATIVE_TESTS = OUTSIDE_T5A_QUALIFICATION_RECORD
+```
+
+tant qu'aucun protocole numérique de qualification n'est ouvert. Si un futur `docs/toy-models/toy1c/validation-plan.md` décide d'inclure des résultats numériques dans le dossier de qualification `T5a`, il devra alors faire basculer explicitement ce protocole vers :
+
+```text
+NUMERICAL_ROLE = CORROBORATIVE
+```
+
+et activer `P_NUM` (`docs/model/t5a-controlled-cross-scale-limit-criteria.md` §9, `T5A8`) avant cette exécution. Aucun `P_NUM` artificiel n'est introduit par le présent design analytique.
+
 ---
 
 ## 13. Non-trivialité et séparation des nulls (`T5A6`)
 
-Classe triviale `T` (appropriée à `L2`), contenant au minimum :
+Classe triviale candidate-specific, exacte (appropriée à `L2`, à `X_* = \mathcal D(H_c)`) : les états produits à travers la bipartition **interne** \(c_L\mid c_R\) de la cellule (\(H_c = \mathbb C^2_{c_L}\otimes\mathbb C^2_{c_R}\), §5), pas à travers une partition entre cellules.
+
+$$
+T_{\mathrm{model1c}} = \{\, \rho_L \otimes \rho_R \ :\ \rho_L, \rho_R \in \mathcal D(\mathbb C^2) \,\} \subset \mathcal D(H_c).
+$$
 
 ```text
-* les états produits A tensor B ;
-* I/4 (état maximalement mixte de H_c) ;
-* la famille nulle déclarée sigma_0^null et sa limite I/4 ;
-* toute limite structurellement forcée indépendamment de l'état
-  (valeur imposée par la construction quelle que soit la donnée d'entrée).
+T_MODEL1C = PRODUCT_STATES_ACROSS_INTERNAL_BIPARTITION_cL_cR
+          = { rho_L tensor rho_R }
 ```
+
+`T_MODEL1C` est l'image continue du compact \(\mathcal D(\mathbb C^2)\times\mathcal D(\mathbb C^2)\) par l'application produit tensoriel (continue) : c'est un sous-ensemble compact, donc fermé, de \(\mathcal D(H_c)\) en dimension finie, \(\overline{T_{\mathrm{model1c}}}=T_{\mathrm{model1c}}\).
+
+`T_MODEL1C` contient notamment :
+
+```text
+* I/4 = (I/2) tensor (I/2) ;
+* la limite du seed nul, sigma_infinity^null = I/4 (§12).
+```
+
+Aucune clause abstraite non caractérisée (« toute valeur forcée indépendamment de l'état ») n'est incluse dans `T_MODEL1C`. L'absence d'une telle limite forcée par la construction est établie séparément, pas par appartenance à `T_MODEL1C` :
+
+```text
+STATE_INDEPENDENT_FORCED_LIVE_LIMIT = ABSENT
+```
+
+Justification : \(P_{\mathrm{BELL}}(\sigma_0(\kappa)) = \tfrac14[I+\kappa\,XX]\) (§12) est non constant en `kappa` — la limite dépend explicitement du contenu Bell du seed d'entrée pour tout `kappa` admissible ; aucune valeur n'est imposée par la construction indépendamment de l'état. La preuve anti-collapse indépendante correspondante (`N9`) reste établie séparément en §15 et n'est pas remplacée par cette clause.
 
 Séparateur analytique :
 
@@ -528,17 +575,49 @@ C_{XX}(\sigma) = \langle XX\rangle_\sigma - \langle XI\rangle_\sigma \langle IX\
 \qquad \langle O\rangle_\sigma := \mathrm{Tr}[O\,\sigma].
 $$
 
-Pour le seed live à la limite : \(\sigma_\infty = \tfrac14[I+\tfrac14 XX]\), donc \(\langle XI\rangle_\infty = 0\), \(\langle IX\rangle_\infty = 0\), \(\langle XX\rangle_\infty = 1/4\) (coefficient direct dans la décomposition de Pauli normalisée \(\mathrm{Tr}[XX\cdot XX]/4=1\)). Donc :
+**Annulation exacte sur `T_MODEL1C`.** Pour tout \(\tau=\rho_L\otimes\rho_R \in T_{\mathrm{model1c}}\) : \(\langle XX\rangle_\tau=\langle X\rangle_{\rho_L}\langle X\rangle_{\rho_R}\), \(\langle XI\rangle_\tau=\langle X\rangle_{\rho_L}\), \(\langle IX\rangle_\tau=\langle X\rangle_{\rho_R}\), donc \(C_{XX}(\tau)\equiv0\) exactement, pour tout \(\tau\in T_{\mathrm{model1c}}\).
+
+**Valeur à la limite live.** \(\sigma_\infty=\tfrac14[I+\tfrac14XX]\) (§12) : \(\langle XI\rangle_\infty=\langle IX\rangle_\infty=0\), \(\langle XX\rangle_\infty=1/4\), donc \(C_{XX}(\sigma_\infty)=1/4\).
+
+**Borne de Lipschitz.** Pour tout couple d'états \(\rho,\sigma\in\mathcal D(H_c)\) et tout opérateur de Pauli \(O\) de norme opérateur \(\lVert O\rVert_{\mathrm{op}}=1\) (\(XX\), \(XI\) ou \(IX\)) :
 
 $$
-C_{XX}(\sigma_\infty) = \tfrac14 \neq 0.
+|\langle O\rangle_\rho - \langle O\rangle_\sigma| = |\mathrm{Tr}[O(\rho-\sigma)]| \le \lVert O\rVert_{\mathrm{op}}\,\lVert\rho-\sigma\rVert_1 = \lVert\rho-\sigma\rVert_1,
 $$
 
-Pour tout état produit \(A\otimes B\) : \(\langle XX\rangle = \langle X\rangle_A\langle X\rangle_B = \langle XI\rangle\langle IX\rangle\), donc \(C_{XX}\equiv 0\) — la classe produit appartient bien à `T` sous ce séparateur.
+et \(|\langle O\rangle_\rho|\le1\) pour tout état (même argument avec \(\lVert\rho\rVert_1=1\)). En posant \(a=\langle XI\rangle_\rho\), \(b=\langle IX\rangle_\rho\), \(a'=\langle XI\rangle_\sigma\), \(b'=\langle IX\rangle_\sigma\) (\(|a|,|b|,|a'|,|b'|\le1\)) :
 
 $$
-\sigma_\infty \notin \overline{T}, \qquad \mathrm{dist}(C_{XX}(\sigma_\infty), C_{XX}(T)) = 1/4 > 0.
+|ab-a'b'| = |b(a-a')+a'(b-b')| \le |a-a'|+|b-b'| \le 2\,\lVert\rho-\sigma\rVert_1.
 $$
+
+Donc :
+
+$$
+|C_{XX}(\rho)-C_{XX}(\sigma)| \le |\langle XX\rangle_\rho-\langle XX\rangle_\sigma| + |ab-a'b'| \le \lVert\rho-\sigma\rVert_1 + 2\lVert\rho-\sigma\rVert_1 = 3\,\lVert\rho-\sigma\rVert_1.
+$$
+
+**Séparation quantitative.** Pour tout \(\tau\in T_{\mathrm{model1c}}\), \(C_{XX}(\tau)=0\), donc :
+
+$$
+\tfrac14 = |C_{XX}(\sigma_\infty)-C_{XX}(\tau)| \le 3\,\lVert\sigma_\infty-\tau\rVert_1
+\quad\Longrightarrow\quad
+\lVert\sigma_\infty-\tau\rVert_1 \ge \tfrac1{12},
+$$
+
+pour tout \(\tau\in T_{\mathrm{model1c}}\), donc :
+
+$$
+\mathrm{dist}_1\big(\sigma_\infty,\,T_{\mathrm{model1c}}\big) \ge \tfrac1{12} > 0,
+$$
+
+où \(\mathrm{dist}_1\) est la distance induite par la norme trace sur \(X_*=\mathcal D(H_c)\) (§9). Puisque \(T_{\mathrm{model1c}}\) est fermé :
+
+$$
+\sigma_\infty \notin \overline{T_{\mathrm{model1c}}} = T_{\mathrm{model1c}}.
+$$
+
+Cette conclusion porte directement sur la distance dans \(X_*\) (norme trace) ; elle n'est pas substituée par une distance entre valeurs scalaires \(C_{XX}\) seules.
 
 Important :
 
@@ -548,7 +627,7 @@ RELATIONAL_CORRELATION != ENTANGLEMENT
 
 `toy1c` n'exige ni ne revendique que \(\sigma_\infty\) soit intriqué : \(C_{XX}\) est un séparateur de corrélation connectée (fonction de covariance de Pauli), pas un critère d'intrication.
 
-Un microscopique \(2^{-n}\,\tfrac14\,XI \to 0\) n'implique donc PAS \(\sigma_\infty \in T\) (§12–§13, conformément à `T5A6`, `MICROSCOPIC_PARAMETER -> 0` n'implique pas `D_infinity IN T`) : la disparition du terme \(XI\) laisse subsister le terme \(XX\) structurellement conservé.
+Un microscopique \(2^{-n}\,\tfrac14\,XI \to 0\) n'implique donc PAS \(\sigma_\infty \in T_{\mathrm{model1c}}\) (§12–§13, conformément à `T5A6`, `MICROSCOPIC_PARAMETER -> 0` n'implique pas `D_infinity IN T`) : la disparition du terme \(XI\) laisse subsister le terme \(XX\) structurellement conservé, à distance \(\ge1/12\) de `T_MODEL1C`.
 
 ---
 
@@ -652,7 +731,7 @@ T5A2   -> COMMON_TARGET_ROUTE, I_n dérivée de la structure déclarée, §9
 T5A3   -> famille générative unique G_n, E1-E6, §8
 T5A4   -> PRIMARY_CLAIM_CLASS = L2, X_* = D(H_c), topologie norme trace, §9
 T5A5   -> EVIDENCE_CLASS = A, NUMERICAL_ROLE = NONE, §12
-T5A6   -> classe triviale T, séparateur C_XX, §13
+T5A6   -> classe triviale T_MODEL1C, séparateur C_XX, borne de Lipschitz, §13
 T5A7   -> invariance de relabellisation, §17
 T5A8   -> préenregistrement P_CORE complet, §19
 T5A-C3 -> lemme de fermeture I_{n+1} o G_n = Phi o I_n, §10 (ACTIVÉ)
@@ -667,7 +746,7 @@ Pour chaque critère, mécanisme/statut avant exécution/condition d'échec :
 | T5A3 | `G_n` unique, `R_cell` fixe, §8 | `NOT_EXECUTED` | paramètre libre par niveau ; retuning ; loi ajustée a posteriori |
 | T5A4 | `L2`, `X_*=D(H_c)`, norme trace, §9 | `NOT_EXECUTED` | promotion de classe sans requalification ; convergence scalaire présentée comme convergence de structure complète |
 | T5A5 | preuve analytique fermée, §10, §12 | `NOT_EXECUTED` | preuve remplacée par un fit/plateau numérique |
-| T5A6 | `T`, `C_XX`, §13 | `NOT_EXECUTED` | `sigma_infinity` non séparé de `T` ; paramètre microscopique confondu avec appartenance à `T` |
+| T5A6 | `T_MODEL1C`, séparateur `C_XX`, borne de Lipschitz \(3\lVert\cdot\rVert_1\), §13 | `NOT_EXECUTED` | `sigma_infinity` non séparé de `T_MODEL1C` en norme trace ; paramètre microscopique confondu avec appartenance à `T_MODEL1C` ; distance substituée entre valeurs `C_XX` sans traduction vers `dist_1` dans `X_*` |
 | T5A7 | invariance de relabellisation, §17 | `NOT_EXECUTED` | verdict dépendant du nom de l'indice ; changement de cardinalité présenté comme relabellisation |
 | T5A8 | préenregistrement `P_CORE`, §19 | `NOT_EXECUTED` | qualification exécutée sans préenregistrement complet |
 | T5A-C3 | lemme de fermeture, §10 | `NOT_EXECUTED` (preuve analytique déjà établie dans ce document, hors exécution) | fermeture supposée sans preuve indépendante ; preuve remplacée par un test numérique |
@@ -688,8 +767,9 @@ Pour chaque critère, mécanisme/statut avant exécution/condition d'échec :
 6.  X_* / topologie / Hausdorff     = D(H_c), norme trace, Hausdorff, §9
 7.  convergence notion              = convergence exacte en norme trace, §9, §12
 8.  EVIDENCE_CLASS / NUMERICAL_ROLE = A_ANALYTIC_LIMIT_PROOF / NONE, §12
-9.  trivial/null class + seeds      = T (§13), sigma_0 (live), sigma_0^null
-                                      (null), sigma_0(kappa) (famille), §11, §13
+9.  trivial/null class + seeds      = T_MODEL1C (§13), sigma_0 (live),
+                                      sigma_0^null (null), sigma_0(kappa)
+                                      (famille), §11, §13
 10. routes conditionnelles          = T5A-C3 ACTIVÉ (§10) ;
                                       T5A-C1, T5A-C2, T5A-C4, T5A-C5, T5A-C6
                                       = NOT_ACTIVATED (§20)
@@ -729,7 +809,7 @@ Aucune contradiction scientifique découverte pendant la conception ne justifie 
 
 ```text
 N1  null seed -> I/4 -> classe triviale, §12-§13
-    (sigma_0^null -> I/4, appartenance à T)
+    (sigma_0^null -> I/4, appartenance à T_MODEL1C)
 
 N3  index relabeling ne change pas le verdict, §17
 
@@ -853,7 +933,10 @@ Référence de style/portée uniquement : `docs/toy-models/toy1b/specification.m
 ## 26. Statut et prochaine étape
 
 ```text
-MODEL1C_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL1C_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_FINAL_REVIEW
+
+CHATGPT_MODEL1C_INITIAL_DESIGN_REVIEW = REVISION_REQUIRED
+MODEL1C_TARGETED_CORRECTIONS          = C1_C2_C3_C4_C5_INTEGRATED
 
 T5A_PASS = NOT_ESTABLISHED
 T5_PASS  = NOT_ESTABLISHED
@@ -863,6 +946,8 @@ VALIDATION_PLAN  = NOT_AUTHORIZED
 NEXT_MODEL       = NOT_AUTHORIZED
 ```
 
+Corrections apportées par le lot `MODEL1C-DESIGN-CORRECTION-1` sur la revue initiale ChatGPT (`REVISION_REQUIRED`) : classe triviale `T5A6` remplacée par une classe candidate-specific exacte `T_MODEL1C` (produits à travers la bipartition interne \(c_L\mid c_R\) de la cellule, fermée, sans clause abstraite non caractérisée ; absence de limite vive forcée établie séparément, `STATE_INDEPENDENT_FORCED_LIVE_LIMIT = ABSENT`), preuve de séparation quantitative via une borne de Lipschitz \(|C_{XX}(\rho)-C_{XX}(\sigma)|\le3\lVert\rho-\sigma\rVert_1\) traduite en distance trace-norme dans `X_*` (\(\mathrm{dist}_1(\sigma_\infty,T_{\mathrm{model1c}})\ge1/12\), §13) ; typage correct des opérateurs de Kraus de `R_cell` (\(K_g^\dagger K_g = p_g\,I_{H_c}\), sans facteur tensoriel résiduel dimensionnellement incorrect, §6) ; clarification du rôle numérique (`IMPLEMENTATION_CORROBORATIVE_TESTS = OUTSIDE_T5A_QUALIFICATION_RECORD` tant qu'aucun protocole numérique n'est ouvert, activation explicite de `P_NUM` requise avant tout basculement vers `NUMERICAL_ROLE = CORROBORATIVE`, §12). Aucun changement à `Lambda=N`, `N_n=2^n`, `H_c`, `p=1/2`, `alpha`, `G_BELL`, `U`, `R_cell`, `Phi` (dérivée, forme fermée), `COMMON_TARGET_ROUTE`, `c_n=0^n`, `I_n`, au lemme de fermeture, aux seeds live/nul/famille `kappa`, à la limite analytique, à `EVIDENCE_CLASS=A`, à `PRIMARY_CLAIM_CLASS=L2`, au ciblage `T5A1`–`T5A8`, à l'activation de `T5A-C3`, ni à la non-activation de `T5A-C1`/`C2`/`C4`/`C5`/`C6`.
+
 Aucun gel automatique. Aucune implémentation automatique.
 
-La prochaine étape autorisée est la revue à distance de ce design par ChatGPT.
+La prochaine étape autorisée est la revue finale à distance de ce design corrigé par ChatGPT.

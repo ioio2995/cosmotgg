@@ -2424,6 +2424,71 @@ NEXT_TOY   = NOT_AUTHORIZED
 
 Aucun lot suivant n'est autorisé par ce lot.
 
+Le lot `MODEL1C-DESIGN-CORRECTION-1` (rôle `docs`) a intégré les corrections ciblées C1–C5 issues de la revue ChatGPT du design `model1c` (`CHATGPT_MODEL1C_INITIAL_DESIGN_REVIEW = REVISION_REQUIRED`), sans nouvelle analyse scientifique, sans nouveau mécanisme, sans implémentation :
+
+```text
+C1 (T5A6, classe triviale)  : classe candidate-specific exacte T_MODEL1C =
+    PRODUCT_STATES_ACROSS_INTERNAL_BIPARTITION_cL_cR = {rho_L tensor rho_R}
+    (fermée dans D(H_c)), remplaçant la clause abstraite non caractérisée ;
+    STATE_INDEPENDENT_FORCED_LIVE_LIMIT = ABSENT établi séparément
+    (P_BELL(sigma_0(kappa))=1/4[I+kappa XX] non constant en kappa) ; N9
+    préservée comme preuve anti-collapse indépendante.
+
+C2 (T5A6, séparation quantitative) : borne de Lipschitz démontrée
+    |C_XX(rho)-C_XX(sigma)| <= 3||rho-sigma||_1, traduite en
+    dist_1(sigma_infinity, T_MODEL1C) >= 1/12 > 0 dans X_* (norme
+    trace), remplaçant la distance substituée entre valeurs C_XX seules.
+
+C3 (typage Kraus)          : démonstration CPTP de R_cell corrigée,
+    K_g^dagger K_g = p_g I_Hc (opérateur sur H_c uniquement, sans
+    facteur tensoriel résiduel dimensionnellement incorrect), plus
+    remarque équivalente rho->rho tensor alpha CPTP + conjugaison par U
+    CPTP. Aucun changement à R_cell, alpha, U ou Phi.
+
+C4 (global_refinement)     : implementation-design.md §6.2 clarifié
+    pour agir sur l'état global rho_n (rho_extended = rho_n tensor
+    alpha^(tensor N_n) puis conjugaison par U_all, U_b sur facteurs
+    disjoints), GLOBAL_REFINEMENT_PRESERVES_INPUT_INTERCELL_
+    CORRELATIONS = REQUIRED, LOCAL_MARGINAL_REFINEMENT_AND_RETENSORING
+    = FORBIDDEN explicitement exclu (détruirait les corrélations,
+    ne calculerait pas G_n). La branche canonique optimisée (itération
+    de Phi sur une seule cellule, licite par le lemme de fermeture)
+    reste inchangée.
+
+C5 (rôle numérique)        : clarification explicite
+    IMPLEMENTATION_CORROBORATIVE_TESTS = OUTSIDE_T5A_QUALIFICATION_
+    RECORD tant qu'aucun protocole numérique de qualification n'est
+    ouvert ; tout futur validation-plan incluant des résultats
+    numériques dans le dossier de qualification devra faire basculer
+    explicitement NUMERICAL_ROLE = CORROBORATIVE et activer P_NUM avant
+    exécution. Aucun P_NUM artificiel dans le design analytique actuel.
+```
+
+Préservés sans changement : `Lambda=N`, `N_n=2^n`, `H_c`, `p=1/2`, `alpha`, `G_BELL`, l'unitaire contrôlé `U`, `R_cell`, `Phi` dérivée (`Phi=1/2 Id+1/2 P_BELL`), `COMMON_TARGET_ROUTE`, `c_n=0^n`, `I_n`, le lemme de fermeture (`T5A-C3`), les seeds live/nul/famille `kappa`, la limite analytique, `EVIDENCE_CLASS=A`, `PRIMARY_CLAIM_CLASS=L2`, le ciblage `T5A1`–`T5A8`, `T5A-C3` activé, `T5A-C1/C2/C4/C5/C6` non activés, tous les pare-feux scientifiques. Sans modifier `docs/model/t5a-controlled-cross-scale-limit-criteria.md` (gelé), `docs/toy-models/toy1a/**`, `docs/toy-models/toy1b/**`, `experiments/`, `src/`, `tests/` ni `docs/governance/agents/**`.
+
+```text
+MODEL1C_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_FINAL_REVIEW
+
+CHATGPT_MODEL1C_INITIAL_DESIGN_REVIEW = REVISION_REQUIRED
+MODEL1C_TARGETED_CORRECTIONS          = C1_C2_C3_C4_C5_INTEGRATED
+
+T5A_PASS = NOT_ESTABLISHED
+T5_PASS  = NOT_ESTABLISHED
+
+IMPLEMENTATION   = NOT_AUTHORIZED
+VALIDATION_PLAN  = NOT_AUTHORIZED
+NEXT_MODEL       = NOT_AUTHORIZED
+
+CURRENT_LOT                = NONE
+PHASE                      = MODEL1C_DESIGN_CORRECTED_PENDING_CHATGPT_FINAL_REVIEW
+PROCHAINE_ACTION_AUTORISEE = CHATGPT_FINAL_REVIEW_OF_MODEL1C_CORRECTED_DESIGN
+
+NEXT_MODEL = NOT_AUTHORIZED
+NEXT_TOY   = NOT_AUTHORIZED
+```
+
+Aucun lot suivant n'est autorisé par ce lot.
+
 ---
 
 ## Mémoire de session

@@ -7,7 +7,10 @@ Ce document décrit l'architecture logicielle cible minimale de `model1c`, sur l
 Il ne contient aucun code, aucun notebook, aucun plan de validation, aucune fixture numérique de qualification au-delà des seeds déjà fermées par la spécification, aucune tolérance numérique, aucune norme ni seuil scalaire, et aucun verdict `T5a`/`T5`.
 
 ```text
-MODEL1C_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL1C_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_FINAL_REVIEW
+
+CHATGPT_MODEL1C_INITIAL_DESIGN_REVIEW = REVISION_REQUIRED
+MODEL1C_TARGETED_CORRECTIONS          = C1_C2_C3_C4_C5_INTEGRATED
 
 T5A_PASS = NOT_ESTABLISHED
 T5_PASS  = NOT_ESTABLISHED
@@ -146,7 +149,20 @@ NO_GLOBAL_H_N_CONSTRUCTION_FOR_THIS_PATH = TRUE
 
 ### 6.2 Construction multi-cellules explicite (corroborative, `n` borné)
 
-- `global_refinement(rho_n, n)` : construit explicitement \(G_n(\rho_n)\) (spécification §8) en appliquant `local_cell.local_refinement_cell` **indépendamment à chaque cellule** du niveau `n`, avec une ancilla fraîche par cellule, puis en réordonnant les facteurs tensoriels vers l'ordre canonique du niveau `n+1` (`embed_operator`/permutation explicite, jamais de tri implicite). Cette fonction est réservée aux contrôles corroboratifs de fermeture structurelle (§9 ci-dessous) et n'est jamais utilisée pour calculer la branche canonique à grand `n`.
+- `global_refinement(rho_n, n)` : construit explicitement \(G_n(\rho_n)\) (spécification §8) en agissant sur l'état **global** `rho_n` (dimension \(4^{2^n}\)), corrélé ou non entre cellules, jamais sur des marginales locales recomposées. Construction requise, en une seule opération sur l'état global :
+
+  1. état étendu : \(\rho_{\mathrm{extended}} = \rho_n \otimes \alpha^{\otimes N_n}\) (une ancilla fraîche `alpha` par cellule, tensorée globalement, `N_n = 2^n` copies) ;
+  2. \(\rho_{n+1} = U_{\mathrm{all}}\,\rho_{\mathrm{extended}}\,U_{\mathrm{all}}^\dagger\), avec \(U_{\mathrm{all}}\) la conjonction/incorporation tensorielle des \(U_b\) (§8 de la spécification), chaque \(U_b\) agissant comme `U` (§6 de la spécification) sur la paire (cellule `b`, ancilla `b`) et comme l'identité sur toutes les autres paires — les \(U_b\) agissant sur des facteurs deux-à-deux disjoints (`embed_operator` pour chaque \(U_b\), puis composition), leur ordre d'application est sans importance ;
+  3. réordonnancement explicite des facteurs tensoriels vers l'ordre canonique du niveau `n+1` (permutation explicite, jamais de tri implicite).
+
+```text
+GLOBAL_REFINEMENT_PRESERVES_INPUT_INTERCELL_CORRELATIONS = REQUIRED
+LOCAL_MARGINAL_REFINEMENT_AND_RETENSORING                = FORBIDDEN
+```
+
+Interdit explicitement : calculer la marginale locale de chaque cellule (\(\mathrm{Tr}_{\mathrm{autres}}[\rho_n]\) cellule par cellule), lui appliquer `local_cell.local_refinement_cell` séparément, puis reconstruire `rho_{n+1}` par produit tensoriel des marginales raffinées. Ce chemin détruirait les corrélations inter-cellules présentes dans `rho_n` et ne calcule pas `G_n` — ce n'est pas une implémentation admissible de `global_refinement`.
+
+Cette fonction est réservée aux contrôles corroboratifs de fermeture structurelle (§9 ci-dessous) et n'est jamais utilisée pour calculer la branche canonique à grand `n` : celle-ci continue d'utiliser exclusivement l'itération de `local_cell.phi` sur une unique cellule (§6.1), licite par le lemme de fermeture démontré analytiquement (spécification §10), sans jamais construire `rho_extended`/`rho_{n+1}` ci-dessus à grand `n`.
 
 ```text
 GLOBAL_REFINEMENT_SCOPE = STRUCTURAL_CLOSURE_CORROBORATION_ONLY
@@ -276,7 +292,10 @@ T5A_QUALIFICATION                    = NOT_EXECUTED
 ## 13. Statut et prochaine étape
 
 ```text
-MODEL1C_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_REVIEW
+MODEL1C_IMPLEMENTATION_DESIGN_STATUS = PROPOSED_PENDING_CHATGPT_FINAL_REVIEW
+
+CHATGPT_MODEL1C_INITIAL_DESIGN_REVIEW = REVISION_REQUIRED
+MODEL1C_TARGETED_CORRECTIONS          = C1_C2_C3_C4_C5_INTEGRATED
 
 T5A_PASS = NOT_ESTABLISHED
 T5_PASS  = NOT_ESTABLISHED
@@ -286,6 +305,8 @@ VALIDATION_PLAN  = NOT_AUTHORIZED
 NEXT_MODEL       = NOT_AUTHORIZED
 ```
 
+Correction apportée par le lot `MODEL1C-DESIGN-CORRECTION-1` sur la revue initiale ChatGPT (`REVISION_REQUIRED`) : `global_refinement` (§6.2) doit désormais agir sur l'état global `rho_n` (étape explicite `rho_extended = rho_n tensor alpha^(tensor N_n)` puis conjugaison par `U_all`), préservant par construction les corrélations inter-cellules déjà présentes dans `rho_n` ; le chemin interdit « marginale locale par cellule → raffinement local → retensorisation » est explicitement exclu (`LOCAL_MARGINAL_REFINEMENT_AND_RETENSORING = FORBIDDEN`), car il détruirait ces corrélations et ne calculerait pas `G_n`. La branche canonique optimisée (§6.1, itération de `phi` sur une seule cellule) reste inchangée, licite par le lemme de fermeture démontré dans `specification.md` §10. Aucun changement à l'arborescence cible, aux responsabilités des autres modules, ni à l'architecture de test.
+
 Aucun gel automatique. Aucune implémentation automatique.
 
-La prochaine étape autorisée est la revue à distance de ce design par ChatGPT.
+La prochaine étape autorisée est la revue finale à distance de ce design corrigé par ChatGPT.
