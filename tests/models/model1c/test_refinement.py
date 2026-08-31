@@ -105,8 +105,9 @@ def test_r6_closure_corroboration_n1_to_2_on_correlated_global_state():
     """Closure lemma corroboration on an EXPLICITLY inter-cell-correlated
     global state (mandate item 6: 'closure on explicitly correlated global
     state'). `rho_level1 = R_cell(SIGMA_0)` is a genuinely correlated
-    two-cell state (U entangles system and ancilla): it is verified below
-    to NOT be a product state before being used as `global_refinement`'s
+    two-cell state (R_cell produces a correlated/non-product two-cell
+    state, spec §6): it is verified below to NOT be a product state
+    before being used as `global_refinement`'s
     input, ruling out the forbidden 'local marginal -> independent
     refinement -> retensoring' shortcut trivially satisfying the identity."""
     rho_level1 = local_refinement_cell(
@@ -198,4 +199,25 @@ def test_r13_global_refinement_rejects_invalid_density_matrix():
     with pytest.raises(ValueError):
         global_refinement(
             bad, 0, hermiticity_tolerance=TOL, trace_tolerance=TOL, positivity_tolerance=TOL
+        )
+
+
+def test_r14_global_refinement_rejects_n_2_before_exponential_allocation():
+    """global_refinement is bounded to n in {0, 1}
+    (GLOBAL_REFINEMENT_SCOPE = STRUCTURAL_CLOSURE_CORROBORATION_ONLY): n=2
+    would already allocate 65536 x 65536 dense matrices (alpha_all,
+    rho_extended, U_all). The bound guard must fire with ValueError BEFORE
+    any such allocation is attempted; a cheap, genuinely valid level-2-sized
+    (256 x 256) maximally-mixed density matrix is used here as input so
+    this test cannot pass merely because of a missing/invalid input
+    (only the level bound itself is being exercised)."""
+    level2_dim = 4 ** (2**2)
+    valid_level2_state = np.eye(level2_dim, dtype=complex) / level2_dim
+    with pytest.raises(ValueError):
+        global_refinement(
+            valid_level2_state,
+            2,
+            hermiticity_tolerance=TOL,
+            trace_tolerance=TOL,
+            positivity_tolerance=TOL,
         )

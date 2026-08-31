@@ -26,6 +26,18 @@ Two distinct production paths, never conflated (spec §6.1/§6.2 of
   (`LOCAL_MARGINAL_REFINEMENT_AND_RETENSORING = FORBIDDEN`): it would
   destroy inter-cell correlations already present in `rho_n` and would
   not compute `G_n`.
+
+  `global_refinement` only accepts `n in {0, 1}`
+  (`_MAX_EXPLICIT_GLOBAL_REFINEMENT_LEVEL = 1`, i.e. `level 0 -> 1` and
+  `level 1 -> 2`): this is an explicit, bounded corroborative
+  construction (spec `implementation-design.md` §6.2,
+  `GLOBAL_REFINEMENT_BOUNDED_LEVELS = n = 0 -> 1 ... n = 1 -> 2`), not a
+  general-purpose multi-cell simulator. `n >= 2` fails closed with
+  `ValueError` BEFORE any allocation of `alpha_all`, `rho_extended`, or
+  `U_all` (already `n = 2` would allocate `65536 x 65536` dense
+  matrices): the canonical branch at any `n`, including large `n`, is
+  always computed instead by `canonical_branch_sequence`, which never
+  constructs a global `H_n` space.
 """
 
 from __future__ import annotations
@@ -36,6 +48,14 @@ import numpy as np
 
 from cosmotgg.core.states import embed_operator, validate_density_matrix
 from cosmotgg.models.model1c.local_cell import ALPHA, controlled_bell_unitary, phi
+
+# GLOBAL_REFINEMENT_SCOPE = STRUCTURAL_CLOSURE_CORROBORATION_ONLY
+# (implementation-design.md §6.2): global_refinement is an explicit,
+# bounded corroborative construction, restricted to n = 0 -> 1 and
+# n = 1 -> 2. n = 2 would already allocate 4 ** 8 = 65536-dimensional
+# dense matrices (alpha_all, rho_extended, U_all); this is outside the
+# declared bounded scope, not a performance optimization.
+_MAX_EXPLICIT_GLOBAL_REFINEMENT_LEVEL = 1
 
 
 def _validate_level(n) -> int:
@@ -110,8 +130,22 @@ def global_refinement(
     reserved for bounded structural-closure corroboration at a few small
     `n` only (spec §10 corroboration); the canonical branch at large `n`
     is always computed by `canonical_branch_sequence` instead.
+
+    Only `n in {0, 1}` is accepted
+    (`_MAX_EXPLICIT_GLOBAL_REFINEMENT_LEVEL`): `n >= 2` fails closed with
+    `ValueError` BEFORE any allocation of `alpha_all`, `rho_extended`, or
+    `U_all` (already `n = 2` would allocate `65536 x 65536` dense
+    matrices, outside the declared bounded corroborative scope).
     """
     n_v = _validate_level(n)
+    if n_v > _MAX_EXPLICIT_GLOBAL_REFINEMENT_LEVEL:
+        raise ValueError(
+            "global_refinement is bounded to n in "
+            f"{{0, ..., {_MAX_EXPLICIT_GLOBAL_REFINEMENT_LEVEL}}} "
+            "(GLOBAL_REFINEMENT_SCOPE = STRUCTURAL_CLOSURE_CORROBORATION_ONLY, "
+            "implementation-design.md §6.2), got n="
+            f"{n_v}; use canonical_branch_sequence for large n instead"
+        )
     num_cells = 2**n_v
     expected_dim = 4**num_cells
 
