@@ -2489,6 +2489,59 @@ NEXT_TOY   = NOT_AUTHORIZED
 
 Aucun lot suivant n'est autorisé par ce lot.
 
+Le lot `MODEL1C-T5A-QUALIFICATION-RECORD-1` (rôle `docs`) a transcrit le verdict scientifique ChatGPT sur la qualification `T5a` de `model1c` dans `docs/toy-models/toy1c/qualification.md`, sans rejuger `T5a`, sans exécuter de code, sans modifier le verdict :
+
+```text
+CHATGPT_T5A_SCIENTIFIC_REVIEW = PASS
+
+T5A1 = PASS
+T5A2 = PASS
+T5A3 = PASS
+T5A4 = PASS
+T5A5 = PASS
+T5A6 = PASS
+T5A7 = PASS
+T5A8 = PASS
+
+T5A-C3 = PASS
+
+T5A_QUALIFICATION = PASS
+T5A_PASS = ESTABLISHED
+
+T5_PASS  = NOT_ESTABLISHED
+T5B_PASS = NOT_ESTABLISHED
+
+SCIENTIFIC_BLOCKING = NONE
+```
+
+```text
+MODEL1C_DESIGN_HEAD         = c2d8afdd9bdfb6db211d21c63a576d709c2cc8e4
+MODEL1C_IMPLEMENTATION_HEAD = 456d3c46f8e64bb2f01271394d99d66591b4b66a
+
+MODEL1C_STATUS = CLOSED_AT_T5A_QUALIFICATION_LEVEL
+
+T5A_QUALIFICATION = PASS
+T5A_PASS           = ESTABLISHED
+T5_PASS            = NOT_ESTABLISHED
+T5B_PASS           = NOT_ESTABLISHED
+
+CONTINUUM        = NOT_ESTABLISHED
+LOCALITY         = NOT_ESTABLISHED
+GEOMETRY         = NOT_ESTABLISHED
+CURVATURE        = NOT_ESTABLISHED
+GRAVITY          = NOT_ESTABLISHED
+NONCLASSICALITY  = NOT_ESTABLISHED
+
+CURRENT_LOT                = NONE
+PHASE                      = MODEL1C_CLOSED_AT_T5A_QUALIFICATION_LEVEL
+PROCHAINE_ACTION_AUTORISEE = NONE — aucun lot suivant n'est autorisé par ce lot
+
+NEXT_MODEL = NOT_AUTHORIZED
+NEXT_TOY   = NOT_AUTHORIZED
+```
+
+Aucun lot suivant n'est autorisé par ce lot. Les pare-feux de faux positif `T5a`/`T5b` sont préservés sans changement.
+
 ---
 
 ## Mémoire de session
